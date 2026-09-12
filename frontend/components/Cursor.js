@@ -16,9 +16,8 @@ export default function Cursor() {
   const touch = useIsTouch();
 
   useEffect(() => {
-    if (reduce || touch) return;
+    if (!isMounted || reduce || touch) return;
 
-    document.body.classList.add("has-cursor");
     const dot = dotRef.current;
     const ring = ringRef.current;
     if (!dot || !ring) return;
@@ -81,7 +80,6 @@ export default function Cursor() {
 
     return () => {
       cancelAnimationFrame(raf);
-      document.body.classList.remove("has-cursor");
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseover", onOver);
       window.removeEventListener("mousedown", onDown);
@@ -89,7 +87,7 @@ export default function Cursor() {
       document.documentElement.removeEventListener("mouseleave", onLeaveDoc);
       document.removeEventListener("mouseleave", onLeaveDoc);
     };
-  }, [reduce, touch]);
+  }, [isMounted, reduce, touch]);
 
   if (!isMounted || reduce || touch) return null;
 
