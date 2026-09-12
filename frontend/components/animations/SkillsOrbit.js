@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { motion } from "framer-motion";
 import { usePrefersReducedMotion, useIsTouch } from "@/lib/hooks";
 import styles from "./SkillsOrbit.module.css";
 
