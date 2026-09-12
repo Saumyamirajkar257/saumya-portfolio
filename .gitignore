@@ -28,6 +28,7 @@ Thumbs.db
 *.docx
 *.doc
 *.pdf
+!frontend/public/resume/*
 
 # Scratch files
 *.txt.txt

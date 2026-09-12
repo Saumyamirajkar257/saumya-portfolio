@@ -10,14 +10,16 @@
  */
 
 export const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  process.env.NEXT_PUBLIC_API_URL ||
+  (process.env.NODE_ENV === "production" ? "" : "http://localhost:8000");
 
 /** Fetch with a timeout so a dead backend never wedges the page. */
 async function fetchJSON(path, options = {}, timeoutMs = 4000) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const url = API_BASE ? `${API_BASE}${path}` : path;
   try {
-    const res = await fetch(`${API_BASE}${path}`, {
+    const res = await fetch(url, {
       ...options,
       signal: controller.signal,
       headers: { "Content-Type": "application/json", ...(options.headers || {}) },
@@ -39,6 +41,11 @@ export async function submitContact(payload) {
 
 /** Resolve the whole content bundle: backend-first, fallback second. */
 export async function getContent() {
+  if (typeof window === "undefined" && !API_BASE) {
+    // In server-side production with no external backend configured,
+    // load bundled resume data instantly without waiting for network timeouts.
+    return { ...fallbackContent, _source: "bundled" };
+  }
   const res = await fetchJSON("/api/content");
   if (res.ok && res.data && res.data.profile) return res.data;
   return { ...fallbackContent, _source: "fallback" };
