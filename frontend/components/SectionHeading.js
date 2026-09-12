@@ -4,14 +4,11 @@ import Reveal from "@/components/animations/Reveal";
  * SectionHeading — the consistent eyebrow + big title block used across
  * every section. Optional lead paragraph slots beneath the title.
  */
-export default function SectionHeading({ eyebrow, title, index = "", lead = null, align = "left" }) {
+export default function SectionHeading({ eyebrow, title, lead = null, align = "left" }) {
   return (
     <div className={`section-heading ${align === "center" ? "section-heading--center" : ""}`}>
       <Reveal delay={0.05}>
-        <span className="eyebrow">
-          {index ? <span className="text-faint">{index}</span> : null}
-          {eyebrow}
-        </span>
+        <span className="eyebrow">{eyebrow}</span>
       </Reveal>
 
       <Reveal delay={0.12}>

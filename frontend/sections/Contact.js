@@ -93,7 +93,6 @@ export default function Contact({ profile }) {
     <section id="contact" className={`block ${styles.contact}`}>
       <div className="wrap">
         <SectionHeading
-          index="09"
           eyebrow="let's talk"
           title={<>Let's build <span className="gradient-text">something</span></>}
           lead={<p className="prose">Have an internship, a project, or just a question? My inbox is open.</p>}
@@ -112,9 +111,7 @@ export default function Contact({ profile }) {
                     className={styles.infoRow}
                   >
                     <span className="text-mono infoRow__label">{line.label}</span>
-                    <span className={styles.infoRow__value}>
-                      {line.value} <span className={styles.infoRow__arrow} aria-hidden="true">↗</span>
-                    </span>
+                    <span className={styles.infoRow__value}>{line.value}</span>
                   </a>
                 ) : (
                   <div className={styles.infoRow}>
@@ -198,7 +195,7 @@ export default function Contact({ profile }) {
                       <span className={styles.spinner} aria-hidden="true" /> Sending…
                     </>
                   ) : (
-                    <>Send message <span className="btn-arrow">→</span></>
+                    <>Send message</>
                   )}
                 </button>
                 <span className="text-mono contact__footHint">usually replies within 24h</span>
@@ -229,7 +226,7 @@ export default function Contact({ profile }) {
                     exit={{ opacity: 0 }}
                     className={`${styles.form__notice} ${styles.form__noticeError}`} role="alert"
                   >
-                    <span className={styles.form__check} style={{ background: "#ff5e62" }} aria-hidden="true">!</span>
+                    <span className={styles.form__check} style={{ background: "var(--accent)" }} aria-hidden="true">!</span>
                     <div>
                       <strong>Something went wrong.</strong>
                       <p>{serverError}</p>

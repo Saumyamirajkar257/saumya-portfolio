@@ -10,10 +10,10 @@
   cursor: pointer;
 }
 .skills__filter.isActive {
-  border-color: rgba(255, 176, 84, 0.65);
+  border-color: rgba(0, 229, 160, 0.65);
   color: var(--accent);
-  background: rgba(255, 176, 84, 0.08);
-  box-shadow: 0 0 22px -8px rgba(255, 122, 69, 0.6);
+  background: rgba(0, 229, 160, 0.08);
+  box-shadow: 0 0 22px -8px rgba(0, 201, 139, 0.6);
 }
 .skills__count {
   display: inline-grid;
@@ -23,7 +23,7 @@
   padding-inline: 5px;
   border-radius: 999px;
   background: var(--grad-primary);
-  color: #16090a;
+  color: #04120b;
   font-size: 10.5px;
   font-weight: 700;
 }
@@ -61,7 +61,7 @@
   border-radius: var(--radius-m);
   border: 1px solid var(--line);
   background:
-    radial-gradient(140% 100% at 20% 0%, rgba(255, 176, 84, 0.06), transparent 55%),
+    radial-gradient(140% 100% at 20% 0%, rgba(0, 229, 160, 0.06), transparent 55%),
     var(--surface);
   overflow: hidden;
   transition: border-color 0.35s, transform 0.35s var(--ease), box-shadow 0.35s;
@@ -70,14 +70,14 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(120% 90% at 70% 110%, rgba(255, 94, 98, 0.12), transparent 55%);
+  background: radial-gradient(120% 90% at 70% 110%, rgba(0, 184, 127, 0.12), transparent 55%);
   opacity: 0;
   transition: opacity 0.35s;
 }
 .skillCard:hover {
-  border-color: rgba(255, 176, 84, 0.5);
+  border-color: rgba(0, 229, 160, 0.5);
   transform: translateY(-5px);
-  box-shadow: 0 22px 50px -24px rgba(255, 122, 69, 0.45);
+  box-shadow: 0 22px 50px -24px rgba(0, 201, 139, 0.45);
 }
 .skillCard:hover::after { opacity: 1; }
 
@@ -93,14 +93,14 @@
   font-weight: 700;
   line-height: 1;
   color: var(--accent);
-  text-shadow: 0 0 26px rgba(255, 176, 84, 0.45);
+  text-shadow: 0 0 26px rgba(0, 229, 160, 0.45);
   width: 52px;
   height: 52px;
   display: grid;
   place-items: center;
   border-radius: 14px;
-  border: 1px solid rgba(255, 176, 84, 0.25);
-  background: rgba(255, 176, 84, 0.07);
+  border: 1px solid rgba(0, 229, 160, 0.25);
+  background: rgba(0, 229, 160, 0.07);
 }
 .skillCard__meta { display: grid; gap: 4px; }
 .skillCard__name { font-size: 18px; letter-spacing: -0.01em; }

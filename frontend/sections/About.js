@@ -5,17 +5,27 @@ import SectionHeading from "@/components/SectionHeading";
 import TiltCard from "@/components/animations/TiltCard";
 import styles from "./About.module.css";
 
+/**
+ * Fail-safe stats: these numbers are from the resume and change rarely, so they
+ * are hardcoded client-side. They never depend on the backend call and can
+ * never render 0 if the API is slow, cold-starting, or offline.
+ */
+const STATS = [
+  { value: 4, label: "Semesters Completed" },
+  { value: 3, label: "Programming Languages" },
+  { value: 10, label: "Certifications Earned" },
+  { value: 2, label: "Academic Projects Built" },
+];
+
 export default function About({ profile }) {
   const name = profile?.name || "Saumya Mirajkar";
   const initials = name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
-  const highlights = profile?.highlights || [];
   const interests = profile?.interests || [];
 
   return (
     <section id="about" className="block">
       <div className="wrap">
         <SectionHeading
-          index="01"
           eyebrow="who I am"
           title={<>About <span className="gradient-text">me</span></>}
         />
@@ -83,19 +93,17 @@ export default function About({ profile }) {
           </div>
         </div>
 
-        {/* stats band */}
-        {highlights.length > 0 && (
-          <div className={styles.about__stats}>
-            {highlights.map((h, i) => (
-              <Reveal key={h.label} delay={i * 0.07} className={styles.about__statCell}>
-                <div className={styles.about__statValue}>
-                  <Counter end={h.value} />
-                </div>
-                <div className={styles.about__statLabel}>{h.label}</div>
-              </Reveal>
-            ))}
-          </div>
-        )}
+        {/* stats band — hardcoded client-side, never 0 on a slow backend */}
+        <div className={styles.about__stats}>
+          {STATS.map((h, i) => (
+            <Reveal key={h.label} delay={i * 0.07} className={styles.about__statCell}>
+              <div className={styles.about__statValue}>
+                <Counter end={h.value} />
+              </div>
+              <div className={styles.about__statLabel}>{h.label}</div>
+            </Reveal>
+          ))}
+        </div>
       </div>
     </section>
   );

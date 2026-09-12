@@ -58,11 +58,11 @@ export const fallbackContent = {
   profile: {
     name: "Saumya Mirajkar",
     role: "Computer Engineering & IoT Student",
-    tagline: "Building digital experiences with code.",
+    tagline: "I build sensor-driven hardware and the software that runs it.",
     location: "Pune, Maharashtra",
     email: "Saumyamirajkar25@icloud.com",
     phone: "+91 98928 14242",
-    resume_url: "/resume/Saumya_Mirajkar_Resume.docx",
+    resume_url: "/resume/Saumya_Mirajkar_Resume.pdf",
     avatar: "",
     summary:
       "Computer Engineering and IoT diploma student with hands-on experience in web development, Python, C/C++, JavaScript, Arduino, and embedded systems. Completed a web development internship involving web/mobile application development, project planning and execution, technical research, and collaboration with development and design teams. Built academic projects involving sensor integration, automated control systems, and Python-based CRUD operations.",
@@ -120,6 +120,12 @@ export const fallbackContent = {
         "Arduino-based wiper system that detects rainfall and activates the wiper automatically.",
       description:
         "Designed and built an Arduino-based automatic wiper system using rain and moisture sensors to detect real-time weather conditions. Engineered the control logic so the wiper activates the moment rainfall is detected, removing the need for manual operation and making driving safer in changing conditions.",
+      problem:
+        "Manual wipers demand constant attention the moment rain starts.",
+      approach:
+        "Detected rain with moisture and rain sensors wired to an Arduino, then automated the wiper activation logic.",
+      result:
+        "The wiper engages on its own the instant rain is sensed, so the driver never scrambles for the stalk.",
       features: [
         "Automatic wiper activation on rainfall detection",
         "Rain & moisture sensor signal processing",
@@ -143,6 +149,12 @@ export const fallbackContent = {
         "Python-based system for managing book records, members, and issue/return tracking.",
       description:
         "Built a Python-based Library Management System to manage book records, member registration, and issue/return tracking. Implemented full CRUD operations with structured data handling so records stay reliable and easy to maintain.",
+      problem:
+        "Paper-based records made books, members, and issue/return tracking unreliable.",
+      approach:
+        "Designed a clean data model and a Python CRUD flow for books, members, and transactions.",
+      result:
+        "Records stay accurate and searchable, with a clear audit trail for every issue and return.",
       features: [
         "Book record management",
         "Member registration & accounts",

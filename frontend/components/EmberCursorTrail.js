@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { usePrefersReducedMotion, useIsTouch } from "@/lib/hooks";
+import { usePrefersReducedMotion, useIsTouch, useMounted } from "@/lib/hooks";
 import styles from "./EmberCursorTrail.module.css";
 
 /**
@@ -9,6 +9,7 @@ import styles from "./EmberCursorTrail.module.css";
  * Desktop only, respects reduced motion.
  */
 export default function EmberCursorTrail() {
+  const isMounted = useMounted();
   const reduce = usePrefersReducedMotion();
   const touch = useIsTouch();
   const canvasRef = useRef(null);
@@ -114,7 +115,7 @@ export default function EmberCursorTrail() {
     };
   }, [reduce, touch]);
 
-  if (reduce || touch) return null;
+  if (!isMounted || reduce || touch) return null;
 
   return (
     <canvas

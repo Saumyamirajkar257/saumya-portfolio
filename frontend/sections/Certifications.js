@@ -8,10 +8,10 @@ import styles from "./Certifications.module.css";
 function badgeColor(name = "") {
   const hash = [...name].reduce((a, c) => a + c.charCodeAt(0), 0);
   const palettes = [
-    { bg: "rgba(110,231,216,0.12)", fg: "#6ee7d8", bd: "rgba(110,231,216,0.35)" },
-    { bg: "rgba(255,176,84,0.12)", fg: "#ffb054", bd: "rgba(255,176,84,0.35)" },
-    { bg: "rgba(139,108,255,0.12)", fg: "#8b6cff", bd: "rgba(139,108,255,0.35)" },
-    { bg: "rgba(255,94,98,0.12)", fg: "#ff5e62", bd: "rgba(255,94,98,0.35)" },
+    { bg: "rgba(79,220,180,0.12)", fg: "#4fdcb4", bd: "rgba(79,220,180,0.35)" },
+    { bg: "rgba(0,229,160,0.12)", fg: "#00e5a0", bd: "rgba(0,229,160,0.35)" },
+    { bg: "rgba(22,201,160,0.12)", fg: "#16c9a0", bd: "rgba(22,201,160,0.35)" },
+    { bg: "rgba(0,184,127,0.12)", fg: "#00b87f", bd: "rgba(0,184,127,0.35)" },
   ];
   return palettes[hash % palettes.length];
 }
@@ -27,7 +27,6 @@ export default function Certifications({ certifications = [] }) {
     <section id="certifications" className="block">
       <div className="wrap">
         <SectionHeading
-          index="08"
           eyebrow="recognized learning"
           title={<>Certifications &amp; <span className="gradient-text">credentials</span></>}
           lead={<p className="prose">Ten verified credentials — from Google, IBM and Cisco.</p>}
@@ -56,12 +55,12 @@ export default function Certifications({ certifications = [] }) {
                 <h3 className={styles.certCard__name}>{cert.name}</h3>
                 <p className={styles.certCard__issuer}>
                   <span className={styles.certCard__org}>{cert.organization}</span>
-                  {cert.issuer ? <span className={styles.certCard__sep}> · {cert.issuer}</span> : null}
+                  {cert.issuer ? <span className={styles.certCard__sep}>, {cert.issuer}</span> : null}
                 </p>
 
                 {cert.credential_url ? (
                   <a href={cert.credential_url} target="_blank" rel="noreferrer noopener" className={styles.certCard__link}>
-                    Verify →
+                    Verify credential
                   </a>
                 ) : (
                   <span className={styles.certCard__verifiedTag}>✓ Earned</span>

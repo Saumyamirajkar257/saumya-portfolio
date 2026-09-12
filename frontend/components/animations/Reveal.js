@@ -29,25 +29,28 @@ export default function Reveal({
   );
 }
 
-/** Counter — animates a number when scrolled into view. */
+/** Counter — animates a number when scrolled into view. Fail-safe: renders
+ *  the final value immediately and only animates up from 0 once it is
+ *  actually in view, so a stalled observer never leaves a 0 on screen. */
 export function Counter({ end, suffix = "", duration = 1.6, className = "" }) {
   const reduce = useReducedMotion();
   const ref = useRef(null);
-  const [value, setValue] = useState(0);
+  const target = Number(end) || 0;
+  const [value, setValue] = useState(target);
   const started = useRef(false);
 
   useEffect(() => {
-    const node = ref.current;
-    if (!node || reduce) {
-      setValue(Number(end) || 0);
+    if (reduce) {
+      setValue(target);
       return;
     }
+    const node = ref.current;
+    if (!node) return;
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
         if (entry.isIntersecting && !started.current) {
           started.current = true;
-          const target = Number(end) || 0;
           const startTime = performance.now();
           const tick = (now) => {
             const t = Math.min((now - startTime) / (duration * 1000), 1);
@@ -62,7 +65,7 @@ export function Counter({ end, suffix = "", duration = 1.6, className = "" }) {
     );
     observer.observe(node);
     return () => observer.disconnect();
-  }, [end, duration, reduce]);
+  }, [end, duration, reduce, target]);
 
   return (
     <span ref={ref} className={className}>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import SectionHeading from "@/components/SectionHeading";
 import Reveal from "@/components/animations/Reveal";
@@ -12,10 +13,10 @@ const FILTERS = ["All", "IoT & Embedded", "Software"];
 /** Deterministic cover art from the project id/title (no fake images). */
 function coverStyle(id = 1) {
   const palettes = [
-    ["#ff7a45", "#ff5e62", "rgba(255,122,69,0.15)"],
-    ["#6ee7d8", "#8b6cff", "rgba(110,231,216,0.14)"],
-    ["#ffb054", "#ff5e62", "rgba(255,176,84,0.15)"],
-    ["#8b6cff", "#5e5bd0", "rgba(139,108,255,0.15)"],
+    ["#00c98b", "#00b87f", "rgba(0,201,139,0.15)"],
+    ["#4fdcb4", "#16c9a0", "rgba(79,220,180,0.14)"],
+    ["#00e5a0", "#00b87f", "rgba(0,229,160,0.15)"],
+    ["#16c9a0", "#5e5bd0", "rgba(22,201,160,0.15)"],
   ];
   const [a, b, glow] = palettes[id % palettes.length];
   return { "--ca": a, "--cb": b, "--glow": glow };
@@ -42,18 +43,32 @@ function ProjectCard({ project, index, onOpen, reduce }) {
       aria-label={`Open ${project.title} details`}
     >
       {/* cover */}
-      <div className={styles.project__cover} style={style}>
-        {/* decorative grid + shapes */}
-        <span className={styles.project__initial}>{initial}</span>
-        <span className={styles.project__orbit} aria-hidden="true" />
-        <span className={styles.project__glow} aria-hidden="true" />
+      <div className={`${styles.project__cover} ${project.image ? styles.project__coverShot : ""}`} style={style}>
+        {/* real screenshot / demo still when available, decorative cover otherwise */}
+        {project.image ? (
+          <Image
+            src={project.image}
+            alt={`Screenshot of ${project.title}`}
+            fill
+            sizes="(min-width: 1100px) 50vw, (min-width: 760px) 50vw, 100vw"
+            priority={project.featured}
+            loading={project.featured ? "eager" : "lazy"}
+            className={styles.project__shot}
+          />
+        ) : (
+          <>
+            <span className={styles.project__initial}>{initial}</span>
+            <span className={styles.project__orbit} aria-hidden="true" />
+            <span className={styles.project__glow} aria-hidden="true" />
+          </>
+        )}
         <span className={styles.project__tagline}>{project.featured ? "★ FEATURED" : "CASE STUDY"}</span>
         <div className={styles.project__coverChips}>
           {(project.technologies || []).slice(0, 4).map((t) => (
             <span key={t} className={styles.project__coverChip}>{t}</span>
           ))}
         </div>
-        <span className={styles.project__openHint}>view details →</span>
+        <span className={styles.project__openHint}>View details</span>
       </div>
 
       {/* body */}
@@ -92,7 +107,6 @@ export default function Projects({ projects = [] }) {
     <section id="projects" className="block">
       <div className="wrap">
         <SectionHeading
-          index="03"
           eyebrow="selected work"
           title={<>Projects &amp; <span className="gradient-text">builds</span></>}
           lead={
@@ -161,7 +175,18 @@ export default function Projects({ projects = [] }) {
               </button>
 
               <div className={styles.modal__cover} style={coverStyle(activeProject.id ?? 0)}>
-                <span className={styles.modal__initial}>{(activeProject.title || "P")[0]}</span>
+                {activeProject.image ? (
+                  <Image
+                    src={activeProject.image}
+                    alt={`Screenshot of ${activeProject.title}`}
+                    fill
+                    sizes="(min-width: 720px) 720px, 100vw"
+                    loading="lazy"
+                    className={styles.modal__shot}
+                  />
+                ) : (
+                  <span className={styles.modal__initial}>{(activeProject.title || "P")[0]}</span>
+                )}
                 <span className={styles.modal__tag}>{activeProject.featured ? "★ FEATURED BUILD" : "CASE STUDY"}</span>
               </div>
 
@@ -169,6 +194,23 @@ export default function Projects({ projects = [] }) {
                 <span className="text-mono modal__cat">{activeProject.category}</span>
                 <h3 className={`display-3 ${styles.modal__title}`}>{activeProject.title}</h3>
                 <p className={styles.modal__desc}>{activeProject.description}</p>
+
+                {(activeProject.problem || activeProject.approach || activeProject.result) && (
+                  <div className={styles.modal__section}>
+                    <h4 className={styles.modal__h4}>Problem → Approach → Result</h4>
+                    <ul className={styles.modal__nar}>
+                      {activeProject.problem ? (
+                        <li><b>Problem</b><span>{activeProject.problem}</span></li>
+                      ) : null}
+                      {activeProject.approach ? (
+                        <li><b>Approach</b><span>{activeProject.approach}</span></li>
+                      ) : null}
+                      {activeProject.result ? (
+                        <li><b>Result</b><span>{activeProject.result}</span></li>
+                      ) : null}
+                    </ul>
+                  </div>
+                )}
 
                 <div className={styles.modal__section}>
                   <h4 className={styles.modal__h4}>Features</h4>
@@ -198,16 +240,16 @@ export default function Projects({ projects = [] }) {
                 <div className={styles.modal__links}>
                   {activeProject.github_url ? (
                     <a href={activeProject.github_url} target="_blank" rel="noreferrer noopener" className="btn btn--ghost btn--sm">
-                      GitHub <span className="btn-arrow">↗</span>
+                      View on GitHub
                     </a>
                   ) : null}
                   {activeProject.live_url ? (
                     <a href={activeProject.live_url} target="_blank" rel="noreferrer noopener" className="btn btn--primary btn--sm">
-                      Live Demo <span className="btn-arrow">↗</span>
+                      Visit live demo
                     </a>
                   ) : null}
                   {!activeProject.github_url && !activeProject.live_url ? (
-                    <span className="text-mono modal__src">source available on request ↗</span>
+                    <span className="text-mono modal__src">Source available on request.</span>
                   ) : null}
                 </div>
               </div>

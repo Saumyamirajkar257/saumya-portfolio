@@ -42,10 +42,10 @@ export default function ProjectPreview({ projects = [] }) {
 
   const coverStyle = (id = 0) => {
     const palettes = [
-      ["#ff7a45", "#ff5e62"],
-      ["#6ee7d8", "#8b6cff"],
-      ["#ffb054", "#ff5e62"],
-      ["#8b6cff", "#5e5bd0"],
+      ["#00c98b", "#00b87f"],
+      ["#4fdcb4", "#16c9a0"],
+      ["#00e5a0", "#00b87f"],
+      ["#16c9a0", "#5e5bd0"],
     ];
     const [a, b] = palettes[id % palettes.length];
     return { "--ca": a, "--cb": b };
@@ -68,7 +68,6 @@ export default function ProjectPreview({ projects = [] }) {
         <span className={styles.previewInitial}>{initial}</span>
         <span className={styles.previewTitle}>{project.title}</span>
         <span className={styles.previewCat}>{project.category}</span>
-        <span className={styles.previewArrow}>→</span>
       </div>
     </div>
   );

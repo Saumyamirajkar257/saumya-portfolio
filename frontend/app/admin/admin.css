@@ -33,7 +33,7 @@
   place-items: center;
   border-radius: 12px;
   background: var(--grad-primary);
-  color: #16090a;
+  color: #04120b;
   font-family: var(--font-display);
   font-weight: 800;
 }
@@ -51,8 +51,8 @@
 }
 .admin__navBtn:hover { background: var(--surface-2); color: var(--text); }
 .admin__navBtn.is-active {
-  background: rgba(255, 176, 84, 0.1);
-  border-color: rgba(255, 176, 84, 0.35);
+  background: rgba(0, 229, 160, 0.1);
+  border-color: rgba(0, 229, 160, 0.35);
   color: var(--accent);
 }
 
@@ -86,20 +86,20 @@
   font-size: 13.5px;
   transition: all 0.25s;
 }
-.admin-btn:hover { border-color: rgba(255, 176, 84, 0.5); color: var(--accent); }
+.admin-btn:hover { border-color: rgba(0, 229, 160, 0.5); color: var(--accent); }
 .admin-btn--primary {
   background: var(--grad-primary);
   border-color: transparent;
-  color: #16090a;
+  color: #04120b;
   font-weight: 600;
 }
-.admin-btn--primary:hover { color: #16090a; filter: brightness(1.1); }
-.admin-btn--danger { border-color: rgba(255, 94, 98, 0.4); color: #ff8086; }
-.admin-btn--danger:hover { background: rgba(255, 94, 98, 0.1); color: #ff8086; }
+.admin-btn--primary:hover { color: #04120b; filter: brightness(1.1); }
+.admin-btn--danger { border-color: rgba(0, 184, 127, 0.4); color: #ff8086; }
+.admin-btn--danger:hover { background: rgba(0, 184, 127, 0.1); color: #ff8086; }
 .admin-btn--sm { padding: 7px 12px; font-size: 12.5px; }
 
 .admin-notice { color: var(--cyan); font-size: 13px; }
-.admin-error { color: #ff8086; font-size: 13.5px; background: rgba(255, 94, 98, 0.08); border: 1px solid rgba(255, 94, 98, 0.3); padding: 10px 14px; border-radius: 10px; margin-bottom: 16px; }
+.admin-error { color: #ff8086; font-size: 13.5px; background: rgba(0, 184, 127, 0.08); border: 1px solid rgba(0, 184, 127, 0.3); padding: 10px 14px; border-radius: 10px; margin-bottom: 16px; }
 .admin-muted { color: var(--text-mute); font-size: 13.5px; }
 .admin-tip { margin-top: 18px; }
 
@@ -144,7 +144,7 @@
   font-size: 14px;
   resize: vertical;
 }
-.admin-field input:focus, .admin-field textarea:focus { outline: none; border-color: rgba(255, 176, 84, 0.7); }
+.admin-field input:focus, .admin-field textarea:focus { outline: none; border-color: rgba(0, 229, 160, 0.7); }
 .admin-field--wide { grid-column: 1 / -1; }
 .admin-field input[type="checkbox"] { width: 20px; height: 20px; }
 .admin-edit__foot { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
@@ -186,7 +186,7 @@
   place-items: center;
   padding: 24px;
   background:
-    radial-gradient(60% 40% at 20% 10%, rgba(255, 122, 69, 0.12), transparent 60%),
+    radial-gradient(60% 40% at 20% 10%, rgba(0, 201, 139, 0.12), transparent 60%),
     var(--bg);
 }
 .admin-login__card {
@@ -209,7 +209,7 @@
   place-items: center;
   border-radius: 16px;
   background: var(--grad-primary);
-  color: #16090a;
+  color: #04120b;
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 20px;

@@ -68,7 +68,7 @@ export default function Preloader() {
           <span className={styles.loader__mark}>SM</span>
         </motion.div>
 
-        <motion.p
+        <motion.div
           className={styles.counter}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4 }}
@@ -83,7 +83,7 @@ export default function Preloader() {
               style={{ transformOrigin: "left center" }}
             />
           </span>
-        </motion.p>
+        </motion.div>
 
         <motion.p
           className={styles.hint}

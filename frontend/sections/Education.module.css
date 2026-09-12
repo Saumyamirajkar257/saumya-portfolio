@@ -13,8 +13,8 @@
   transition: border-color 0.35s, box-shadow 0.35s;
 }
 .edu__card:hover {
-  border-color: rgba(255, 176, 84, 0.45);
-  box-shadow: 0 28px 70px -32px rgba(255, 122, 69, 0.4);
+  border-color: rgba(0, 229, 160, 0.45);
+  box-shadow: 0 28px 70px -32px rgba(0, 201, 139, 0.4);
 }
 
 .edu__cardHead {

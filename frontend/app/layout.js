@@ -1,4 +1,5 @@
 import { Syne, Inter, JetBrains_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import Cursor from "@/components/Cursor";
 import Navbar from "@/components/Navbar";
@@ -38,11 +39,11 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 export const metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Saumya Mirajkar — Computer Engineering & IoT Student",
-    template: "%s · Saumya Mirajkar",
+    default: "Saumya Mirajkar | Computer Engineering & IoT Student",
+    template: "%s | Saumya Mirajkar",
   },
   description:
-    "Computer Engineering & IoT diploma student skilled in Python, C/C++, JavaScript, Arduino and embedded systems. Open to software development, web development, Python and IoT internships.",
+    "Sensor-driven hardware and the software that runs it. Computer Engineering & IoT diploma student skilled in Python, C/C++, JavaScript, Arduino and embedded systems. Open to software development, web development, Python and IoT internships.",
   applicationName: "Saumya Mirajkar Portfolio",
   authors: [{ name: "Saumya Mirajkar" }],
   keywords: [
@@ -54,40 +55,53 @@ export const metadata = {
     locale: "en_IN",
     url: SITE_URL,
     siteName: "Saumya Mirajkar",
-    title: "Saumya Mirajkar — Computer Engineering & IoT Student",
+    title: "Saumya Mirajkar | Computer Engineering & IoT Student",
     description:
-      "Building digital experiences with code. Open to software, web, Python and IoT internships.",
+      "Sensor-driven hardware and the software that runs it. Open to software, web, Python and IoT internships.",
+    images: [{ url: `${SITE_URL}/opengraph-image`, width: 1200, height: 630, alt: "Saumya Mirajkar — Computer Engineering & IoT Student" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Saumya Mirajkar — Computer Engineering & IoT Student",
+    title: "Saumya Mirajkar | Computer Engineering & IoT Student",
     description:
-      "Building digital experiences with code. Open to software, web, Python and IoT internships.",
+      "Sensor-driven hardware and the software that runs it. Open to software, web, Python and IoT internships.",
+    images: [`${SITE_URL}/opengraph-image`],
   },
   icons: { icon: "/favicon.svg", apple: "/favicon.svg" },
   robots: { index: true, follow: true },
 };
 
 export const viewport = {
-  themeColor: "#070708",
+  themeColor: "#0b0e12",
   colorScheme: "dark",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${syne.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${syne.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
       <body>
         {/* Prevent flash of wrong theme */}
-        <script dangerouslySetInnerHTML={{
-          __html: `try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t)}}catch(e){}`
-        }} />
+        <Script
+          id="theme-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t)}}catch(e){}`
+          }}
+        />
 
         {/* Plausible analytics */}
-        <script defer data-domain="saumyamirajkar.dev" src="https://plausible.io/js/script.js" />
+        <Script
+          id="plausible-analytics"
+          strategy="afterInteractive"
+          data-domain="saumyamirajkar.dev"
+          src="https://plausible.io/js/script.js"
+        />
 
         {/* JSON-LD structured data */}
-        <script
+        <Script
+          id="json-ld"
           type="application/ld+json"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",

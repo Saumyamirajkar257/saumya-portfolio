@@ -12,7 +12,7 @@ function categoryToRing(category) {
   return order.indexOf(category);
 }
 
-function ringRadius(ring, totalRings, minR = 90, maxR = 300) {
+function ringRadius(ring, totalRings, minR = 110, maxR = 360) {
   // exponential spread: inner rings tighter
   const t = ring / Math.max(1, totalRings - 1);
   return minR + (maxR - minR) * (t ** 1.3);
@@ -61,11 +61,11 @@ export default function SkillsOrbit({ skills = [], onSkillHover }) {
     };
 
     const COLORS = [
-      { r: 255, g: 176, b: 84, bg: "rgba(255,176,84," },
-      { r: 110, g: 231, b: 216, bg: "rgba(110,231,216," },
-      { r: 139, g: 108, b: 255, bg: "rgba(139,108,255," },
-      { r: 255, g: 94, b: 98, bg: "rgba(255,94,98," },
-      { r: 200, g: 200, b: 210, bg: "rgba(200,200,210," },
+      { r: 0, g: 229, b: 160, bg: "rgba(0,229,160," },
+      { r: 79, g: 220, b: 180, bg: "rgba(79,220,180," },
+      { r: 22, g: 201, b: 160, bg: "rgba(22,201,160," },
+      { r: 0, g: 179, b: 122, bg: "rgba(0,179,122," },
+      { r: 168, g: 224, b: 190, bg: "rgba(168,224,190," },
     ];
 
     const draw = () => {
@@ -153,11 +153,11 @@ export default function SkillsOrbit({ skills = [], onSkillHover }) {
         {rings.current.map((ringSkills, r) => {
           const radius = ringRadius(r, RING_COUNT);
           const color = [
-            { r: 255, g: 176, b: 84 },
-            { r: 110, g: 231, b: 216 },
-            { r: 139, g: 108, b: 255 },
-            { r: 255, g: 94, b: 98 },
-            { r: 200, g: 200, b: 210 },
+            { r: 0, g: 229, b: 160 },
+            { r: 79, g: 220, b: 180 },
+            { r: 22, g: 201, b: 160 },
+            { r: 0, g: 179, b: 122 },
+            { r: 168, g: 224, b: 190 },
           ][r];
 
           return ringSkills.map((skill, i) => {

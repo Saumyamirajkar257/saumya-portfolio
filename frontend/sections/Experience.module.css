@@ -23,7 +23,7 @@
   background: linear-gradient(180deg, var(--accent), var(--accent-3));
   transform-origin: top;
   transform: translateX(-50%);
-  box-shadow: 0 0 18px rgba(255, 122, 69, 0.5);
+  box-shadow: 0 0 18px rgba(0, 201, 139, 0.5);
 }
 
 .timeline__item {
@@ -54,7 +54,7 @@
   position: absolute;
   inset: -9px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 176, 84, 0.35);
+  border: 1px solid rgba(0, 229, 160, 0.35);
   animation: dot-ripple 3s ease-out infinite;
 }
 .timeline__dotCore {
@@ -76,14 +76,14 @@
   border-radius: var(--radius-m);
   border: 1px solid var(--line);
   background:
-    radial-gradient(120% 90% at 10% 0%, rgba(255, 176, 84, 0.05), transparent 55%),
+    radial-gradient(120% 90% at 10% 0%, rgba(0, 229, 160, 0.05), transparent 55%),
     var(--surface);
   transition: border-color 0.35s, transform 0.35s var(--ease), box-shadow 0.35s;
 }
 .job:hover {
-  border-color: rgba(255, 176, 84, 0.45);
+  border-color: rgba(0, 229, 160, 0.45);
   transform: translateY(-4px);
-  box-shadow: 0 24px 60px -28px rgba(255, 122, 69, 0.4);
+  box-shadow: 0 24px 60px -28px rgba(0, 201, 139, 0.4);
 }
 
 .job__top { display: grid; gap: 4px; margin-bottom: 12px; }
@@ -102,7 +102,7 @@
 .job__now {
   font-size: 10px;
   color: var(--cyan);
-  border: 1px solid rgba(110, 231, 216, 0.4);
+  border: 1px solid rgba(79, 220, 180, 0.4);
   border-radius: 999px;
   padding: 2px 8px;
   letter-spacing: 0.08em;

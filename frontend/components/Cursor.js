@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { usePrefersReducedMotion, useIsTouch } from "@/lib/hooks";
+import { usePrefersReducedMotion, useIsTouch, useMounted } from "@/lib/hooks";
 
 /**
  * Custom cursor — a glowing dot with a trailing ring that morphs over
@@ -9,6 +9,7 @@ import { usePrefersReducedMotion, useIsTouch } from "@/lib/hooks";
  * motion. Native cursor is hidden via the `has-cursor` body class.
  */
 export default function Cursor() {
+  const isMounted = useMounted();
   const dotRef = useRef(null);
   const ringRef = useRef(null);
   const reduce = usePrefersReducedMotion();
@@ -90,7 +91,7 @@ export default function Cursor() {
     };
   }, [reduce, touch]);
 
-  if (reduce || touch) return null;
+  if (!isMounted || reduce || touch) return null;
 
   return (
     <div aria-hidden="true">

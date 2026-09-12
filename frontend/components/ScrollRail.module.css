@@ -37,8 +37,8 @@
 
 .item:hover {
   color: var(--text);
-  border-color: rgba(255, 176, 84, 0.35);
-  background: rgba(255, 176, 84, 0.06);
+  border-color: rgba(0, 229, 160, 0.35);
+  background: rgba(0, 229, 160, 0.06);
 }
 
 .itemLabel {
@@ -76,7 +76,7 @@
   height: 28px;
   border-radius: 3px;
   background: var(--grad-primary);
-  box-shadow: 0 0 12px rgba(255, 122, 69, 0.6);
+  box-shadow: 0 0 12px rgba(0, 201, 139, 0.6);
 }
 
 .progress {
@@ -85,7 +85,7 @@
   top: 0;
   bottom: 0;
   width: 2px;
-  background: rgba(255, 176, 84, 0.15);
+  background: rgba(0, 229, 160, 0.15);
   border-radius: 2px;
   overflow: hidden;
 }

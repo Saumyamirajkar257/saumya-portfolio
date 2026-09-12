@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { usePrefersReducedMotion, useIsTouch } from "@/lib/hooks";
+import { usePrefersReducedMotion, useIsTouch, useMounted } from "@/lib/hooks";
 import styles from "./CursorSpotlight.module.css";
 
 /**
@@ -10,6 +10,7 @@ import styles from "./CursorSpotlight.module.css";
  * with a CSS gradient for GPU-friendly performance.
  */
 export default function CursorSpotlight() {
+  const isMounted = useMounted();
   const reduce = usePrefersReducedMotion();
   const touch = useIsTouch();
   const elRef = useRef(null);
@@ -56,7 +57,7 @@ export default function CursorSpotlight() {
     };
   }, [reduce, touch, visible]);
 
-  if (reduce || touch) return null;
+  if (!isMounted || reduce || touch) return null;
 
   return (
     <div

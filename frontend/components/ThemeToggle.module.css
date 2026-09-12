@@ -20,7 +20,7 @@
 .toggle:hover {
   border-color: var(--accent);
   transform: scale(1.08);
-  box-shadow: 0 0 20px rgba(255, 176, 84, 0.3);
+  box-shadow: 0 0 20px rgba(0, 229, 160, 0.3);
 }
 
 .icon {

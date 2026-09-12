@@ -30,7 +30,6 @@ export default function Testimonials({ testimonials = [] }) {
     <section id="testimonials" className="block">
       <div className="wrap">
         <SectionHeading
-          index="05"
           eyebrow="what people say"
           title={<>Recommendations & <span className="gradient-text">praise</span></>}
         />
@@ -66,7 +65,10 @@ export default function Testimonials({ testimonials = [] }) {
 
             {testimonials.length > 1 && (
               <div className={styles.controls}>
-                <button className={styles.navBtn} onClick={prev} aria-label="Previous testimonial">&larr;</button>
+                <button className={styles.navBtn} onClick={prev} aria-label="Previous testimonial">
+                  <span aria-hidden="true">&larr;</span>
+                  <span className="sr-only">Previous</span>
+                </button>
                 <div className={styles.dots}>
                   {testimonials.map((_, i) => (
                     <button
@@ -77,7 +79,10 @@ export default function Testimonials({ testimonials = [] }) {
                     />
                   ))}
                 </div>
-                <button className={styles.navBtn} onClick={next} aria-label="Next testimonial">&rarr;</button>
+                <button className={styles.navBtn} onClick={next} aria-label="Next testimonial">
+                  <span aria-hidden="true">&rarr;</span>
+                  <span className="sr-only">Next</span>
+                </button>
               </div>
             )}
           </div>

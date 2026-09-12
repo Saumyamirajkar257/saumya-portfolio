@@ -1,22 +1,19 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { motion, useReducedMotion, useMotionValue, useSpring } from "framer-motion";
+import { motion, useMotionValue, useSpring } from "framer-motion";
 import Magnetic from "@/components/animations/Magnetic";
 import TiltCard from "@/components/animations/TiltCard";
-import TextReveal from "@/components/animations/TextReveal";
 import ScrambleText from "@/components/animations/ScrambleText";
 import Particles from "@/components/Particles";
 import { usePrefersReducedMotion } from "@/lib/hooks";
 import styles from "./Hero.module.css";
 
-const ROLES = ["development", "embedded systems", "IoT", "Python"];
-
 const TERMINAL_LINES = [
-  { prompt: "$", cmd: "whoami", out: "saumya.mirajkar — student · developer · iot-builder" },
-  { prompt: "$", cmd: "cat languages.txt", out: "C · C++ · Python · JavaScript" },
+  { prompt: "$", cmd: "whoami", out: "saumya.mirajkar: computer engineering & iot student" },
+  { prompt: "$", cmd: "cat languages.txt", out: "C, C++, Python, JavaScript" },
   { prompt: "$", cmd: "cat stack.json", out: "{ web, embedded, automation }" },
-  { prompt: "$", cmd: "./apply --type internship", out: "status: OPEN TO OPPORTUNITIES ✦" },
+  { prompt: "$", cmd: "./apply --type internship", out: "status: OPEN TO OPPORTUNITIES" },
 ];
 
 function Terminal({ reduce }) {
@@ -60,7 +57,7 @@ function Terminal({ reduce }) {
         <span className={styles.terminal__dot} style={{ background: "#ff5e62" }} />
         <span className={styles.terminal__dot} style={{ background: "#ffb054" }} />
         <span className={styles.terminal__dot} style={{ background: "#6ee7d8" }} />
-        <span className={styles.terminal__title}>saumya@portfolio — zsh</span>
+        <span className={styles.terminal__title}>saumya@portfolio: ~</span>
       </div>
       <div className={styles.terminal__body}>
         {TERMINAL_LINES.slice(0, done).map((l, i) => (
@@ -113,7 +110,8 @@ export default function Hero({ profile }) {
   };
 
   const resumeHref = profile?.resume_url || "/resume/Saumya_Mirajkar_Resume.docx";
-  const contactEmail = profile?.email;
+  const tagline =
+    profile?.tagline || "I build sensor-driven hardware and the software that runs it.";
   const socials = profile?.socials || {};
 
   return (
@@ -130,7 +128,7 @@ export default function Hero({ profile }) {
             className={styles.hero__eyebrow}
           >
             <span className={styles.hero__eyebrowDot} aria-hidden="true" />
-            <span className="text-mono">hello — welcome to my portfolio</span>
+            <span className="text-mono">open to software & IoT internships</span>
           </motion.p>
 
           <h1 className={styles.hero__name}>
@@ -143,39 +141,26 @@ export default function Hero({ profile }) {
             <span className="sr-only">{profile?.name || "Saumya Mirajkar"}</span>
           </h1>
 
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            className={styles.hero__subline}
-          >
-            <RunRoles roles={ROLES} reduce={reduce} />
-          </motion.div>
-
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1.05, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.8, delay: 0.9, ease: [0.22, 1, 0.36, 1] }}
             className={styles.hero__tagline}
           >
-            {profile?.tagline || "Building digital experiences with code."}
+            {tagline}
           </motion.p>
 
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1.2, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.8, delay: 1.05, ease: [0.22, 1, 0.36, 1] }}
             className={styles.hero__cta}
           >
             <Magnetic>
               <a href="#projects" className="btn btn--primary btn--lg"
-                 onClick={(e) => { e.preventDefault(); document.querySelector("#projects")?.scrollIntoView({ behavior: reduce ? "auto" : "smooth" }); }}>
-                View My Work <span className="btn-arrow">→</span>
-              </a>
-            </Magnetic>
-            <Magnetic>
-              <a href={resumeHref} download className="btn btn--ghost btn--lg">
-                Download Resume <span className="btn-arrow">↓</span>
+                 onClick={(e) => { e.preventDefault(); document.querySelector("#projects")?.scrollIntoView({ behavior: reduce ? "auto" : "smooth" }); }}
+                 aria-label="View my projects">
+                See my work
               </a>
             </Magnetic>
           </motion.div>
@@ -183,11 +168,15 @@ export default function Hero({ profile }) {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 1.45 }}
+            transition={{ duration: 0.8, delay: 1.3 }}
             className={styles.hero__meta}
           >
-            <span className="text-mono">// based in {profile?.location || "Pune, Maharashtra"}</span>
-            <span className={styles.hero__metaDot}>·</span>
+            <span className="text-mono">based in {profile?.location || "Pune, Maharashtra"}</span>
+            <span className={styles.hero__metaDot} aria-hidden="true">·</span>
+            <a href={resumeHref} download className={`${styles.hero__resume} text-mono`}>
+              download résumé ↓
+            </a>
+            <span className={styles.hero__metaDot} aria-hidden="true">·</span>
             <span className="text-mono">
               open to internships <span className={styles.hero__pulse}>●</span>
             </span>
@@ -202,6 +191,14 @@ export default function Hero({ profile }) {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
+          {/* faint constellation rings echoing the skills orbit */}
+          <div className={styles.hero__constel} aria-hidden="true">
+            <span className={styles.constel__ring} />
+            <span className={styles.constel__ring} />
+            <span className={styles.constel__ring} />
+            <span className={styles.constel__core} />
+          </div>
+
           <TiltCard max={5} className={styles.hero__tilt}>
             <Terminal reduce={reduce} />
           </TiltCard>
@@ -240,27 +237,5 @@ export default function Hero({ profile }) {
         <span className="text-mono">{socials.github ? "github.com/saumyamirajkar" : ""}</span>
       </div>
     </section>
-  );
-}
-
-/** RunRoles — cycles a word in a role line: "I build for {word}." */
-function RunRoles({ roles, reduce }) {
-  const [i, setI] = useState(0);
-  useEffect(() => {
-    if (reduce) return;
-    const id = window.setInterval(() => setI((v) => (v + 1) % roles.length), 2400);
-    return () => window.clearInterval(id);
-  }, [roles.length, reduce]);
-
-  return (
-    <p className={styles.hero__role}>
-      <span className="text-mono" aria-hidden="true">&gt;</span>
-      <span className={styles.hero__roleBody}>
-        Computer Engineering &amp; IoT student, building for{" "}
-        <span className={styles.roleRotate}>
-          <span key={i} className={styles.roleWord}>{roles[i]}</span>
-        </span>
-      </span>
-    </p>
   );
 }

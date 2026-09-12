@@ -6,10 +6,10 @@
 }
 .projects__filter { padding: 9px 18px; font-size: 13px; cursor: pointer; }
 .projects__filter.isActive {
-  border-color: rgba(255, 176, 84, 0.65);
+  border-color: rgba(0, 229, 160, 0.65);
   color: var(--accent);
-  background: rgba(255, 176, 84, 0.08);
-  box-shadow: 0 0 22px -8px rgba(255, 122, 69, 0.6);
+  background: rgba(0, 229, 160, 0.08);
+  box-shadow: 0 0 22px -8px rgba(0, 201, 139, 0.6);
 }
 
 .projects__grid {
@@ -31,14 +31,14 @@
   transition: border-color 0.35s, transform 0.35s var(--ease), box-shadow 0.5s;
 }
 .project:hover {
-  border-color: rgba(255, 176, 84, 0.5);
+  border-color: rgba(0, 229, 160, 0.5);
   transform: translateY(-6px) scale(1.01);
-  box-shadow: 0 30px 70px -30px rgba(255, 122, 69, 0.4), 0 0 0 1px rgba(255, 176, 84, 0.15);
+  box-shadow: 0 30px 70px -30px rgba(0, 201, 139, 0.4), 0 0 0 1px rgba(0, 229, 160, 0.15);
 }
 
 .projectFeatured { grid-column: span 1; }
-.projectIoT { --ptint: rgba(110, 231, 216, 0.5); }
-.projectSoft { --ptint: rgba(255, 176, 84, 0.5); }
+.projectIoT { --ptint: rgba(79, 220, 180, 0.5); }
+.projectSoft { --ptint: rgba(0, 229, 160, 0.5); }
 
 /* ------ cover ------ */
 .project__cover {
@@ -78,6 +78,29 @@
   position: absolute;
   inset: 0;
   background: radial-gradient(60% 60% at 50% 120%, rgba(255, 255, 255, 0.14), transparent 70%);
+}
+
+/* real screenshot / demo GIF fills the cover when present */
+.project__coverShot { background: var(--bg-2); }
+.project__shot { object-fit: cover; }
+.modal__shot { object-fit: cover; }
+
+/* Problem → Approach → Result */
+.modal__nar { display: grid; gap: 12px; }
+.modal__nar li {
+  display: grid;
+  gap: 3px;
+  color: var(--text-dim);
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+.modal__nar b {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
 }
 
 .project__tagline {

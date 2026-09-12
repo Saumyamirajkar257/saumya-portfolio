@@ -148,7 +148,6 @@ export default function Navbar({ name }) {
                   transition={{ delay: 0.12 + i * 0.06, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                   className={`nav-overlay__link ${active === l.href ? "is-active" : ""}`}
                 >
-                  <span className="nav-overlay__num">0{i + 1}</span>
                   {l.label}
                 </motion.a>
               ))}

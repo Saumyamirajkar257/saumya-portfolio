@@ -19,7 +19,6 @@ export default function Experience({ experience = [] }) {
     <section id="experience" className="block">
       <div className="wrap">
         <SectionHeading
-          index="06"
           eyebrow="where I've worked"
           title={<>Experience <span className="gradient-text">timeline</span></>}
           lead={<p className="prose">Professional and hands-on background, in order.</p>}

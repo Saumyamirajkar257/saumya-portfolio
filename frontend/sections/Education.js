@@ -7,9 +7,9 @@ import styles from "./Education.module.css";
 
 /** Deterministic accent per education record. */
 const ACCENTS = [
-  ["#ffb054", "#ff5e62"],
-  ["#6ee7d8", "#8b6cff"],
-  ["#8b6cff", "#ffb054"],
+  ["#00e5a0", "#00b87f"],
+  ["#4fdcb4", "#16c9a0"],
+  ["#16c9a0", "#00e5a0"],
 ];
 
 export default function Education({ education = [] }) {
@@ -17,7 +17,6 @@ export default function Education({ education = [] }) {
     <section id="education" className="block">
       <div className="wrap">
         <SectionHeading
-          index="07"
           eyebrow="where I studied"
           title={<>Education <span className="gradient-text">&amp; academics</span></>}
           lead={<p className="prose">Institutes and courses that shaped my foundation.</p>}

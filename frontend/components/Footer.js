@@ -32,7 +32,7 @@ export default function Footer() {
       <div className="wrap footer__inner">
         <div className="footer__top">
           <div className="footer__brand">
-            <span className="text-mono">© {year} —</span>
+            <span className="text-mono">© {year}</span>
             <span className="footer__name">{profile?.name || "Saumya Mirajkar"}</span>
             <span className="text-mono">{profile?.location || "Pune, Maharashtra"}</span>
           </div>
@@ -47,7 +47,7 @@ export default function Footer() {
                     rel={s.href.startsWith("http") ? "noreferrer noopener" : undefined}
                     className="footer__social"
                   >
-                    {s.label} <span aria-hidden="true">↗</span>
+                    {s.label}
                   </a>
                 ))
               : null}
@@ -66,10 +66,9 @@ export default function Footer() {
         </div>
 
         <div className="footer__bottom text-mono">
-          <span>Built with React · Next.js · FastAPI</span>
-          <span className="footer__dot">◆</span>
-          <span>Content served dynamically from API</span>
-          {source === "fallback" ? <span className="footer__fallback">· demo data mode (backend offline)</span> : null}
+          <span>Built with Next.js and a FastAPI backend.</span>
+          <span>Content is fetched from the live API.</span>
+          {source === "fallback" ? <span className="footer__fallback">demo data mode (backend offline)</span> : null}
         </div>
       </div>
     </footer>

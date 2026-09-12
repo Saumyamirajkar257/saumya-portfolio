@@ -12,7 +12,7 @@ export default async function Image() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          background: "linear-gradient(135deg, #070708 0%, #0b0b0f 40%, #101016 100%)",
+          background: "linear-gradient(135deg, #0b0e12 0%, #0d1117 40%, #12171e 100%)",
           padding: "80px",
           position: "relative",
           overflow: "hidden",
@@ -26,7 +26,7 @@ export default async function Image() {
             width: "500px",
             height: "500px",
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(255,122,69,0.3), transparent 70%)",
+            background: "radial-gradient(circle, rgba(0,201,139,0.3), transparent 70%)",
           }}
         />
         <div
@@ -37,13 +37,13 @@ export default async function Image() {
             width: "400px",
             height: "400px",
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(139,108,255,0.25), transparent 70%)",
+            background: "radial-gradient(circle, rgba(22,201,160,0.25), transparent 70%)",
           }}
         />
         <span
           style={{
             fontSize: "18px",
-            color: "rgba(255,176,84,0.8)",
+            color: "rgba(79,220,180,0.8)",
             fontFamily: "monospace",
             letterSpacing: "0.14em",
             textTransform: "uppercase",
@@ -51,7 +51,7 @@ export default async function Image() {
             zIndex: 1,
           }}
         >
-          Portfolio
+          IoT + Embedded Systems
         </span>
         <span
           style={{
@@ -69,7 +69,7 @@ export default async function Image() {
           style={{
             fontSize: "72px",
             fontWeight: 800,
-            background: "linear-gradient(115deg, #ffcb8a, #ff9a4f, #ff5e62)",
+            background: "linear-gradient(115deg, #8fffd2, #00e5a0, #00b87f)",
             backgroundClip: "text",
             color: "transparent",
             lineHeight: 1.0,
@@ -88,7 +88,7 @@ export default async function Image() {
             zIndex: 1,
           }}
         >
-          Computer Engineering & IoT Student · Open to Internships
+          Computer Engineering & IoT Student, open to internships
         </span>
       </div>
     ),

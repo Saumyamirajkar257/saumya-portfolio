@@ -13,7 +13,7 @@
   padding: 34px 30px;
   border-radius: var(--radius-l);
   background:
-    radial-gradient(120% 80% at 85% 0%, rgba(255, 122, 69, 0.12), transparent 55%),
+    radial-gradient(120% 80% at 85% 0%, rgba(0, 201, 139, 0.12), transparent 55%),
     linear-gradient(165deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
   border: 1px solid var(--line);
   box-shadow: var(--shadow-1);
@@ -26,11 +26,11 @@
   place-items: center;
   border-radius: 20px;
   background: var(--grad-primary);
-  color: #16090a;
+  color: #04120b;
   font-family: var(--font-display);
   font-size: 30px;
   font-weight: 800;
-  box-shadow: 0 14px 40px -12px rgba(255, 122, 69, 0.5);
+  box-shadow: 0 14px 40px -12px rgba(0, 201, 139, 0.5);
   margin-bottom: 22px;
 }
 .about__rolename { color: var(--text-dim); margin-top: 6px; font-size: 15px; }
@@ -85,8 +85,8 @@
   transition: border-color 0.3s, transform 0.3s var(--ease), background 0.3s;
 }
 .about__goal:hover {
-  border-color: rgba(255, 176, 84, 0.45);
-  background: rgba(255, 176, 84, 0.05);
+  border-color: rgba(0, 229, 160, 0.45);
+  background: rgba(0, 229, 160, 0.05);
   transform: translateX(6px);
 }
 .about__goalArrow { color: var(--accent); }
@@ -107,12 +107,12 @@
   border-radius: var(--radius-m);
   border: 1px solid var(--line);
   background:
-    radial-gradient(120% 90% at 50% 0%, rgba(255, 176, 84, 0.07), transparent 60%),
+    radial-gradient(120% 90% at 50% 0%, rgba(0, 229, 160, 0.07), transparent 60%),
     var(--surface);
   transition: border-color 0.3s, transform 0.3s var(--ease);
 }
 .about__statCell:hover {
-  border-color: rgba(255, 176, 84, 0.45);
+  border-color: rgba(0, 229, 160, 0.45);
   transform: translateY(-4px);
 }
 .about__statValue {

@@ -14,7 +14,7 @@ export default function NotFound() {
           This page drifted out of orbit. Let's get you back on track.
         </p>
         <Link href="/" className="btn btn--primary">
-          Back home <span className="btn-arrow">→</span>
+          Take me back to the homepage
         </Link>
       </div>
     </div>
