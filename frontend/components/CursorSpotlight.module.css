@@ -1,0 +1,15 @@
+.spotlight {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    radial-gradient(
+      400px 400px at var(--cx, 50%) var(--cy, 50%),
+      rgba(255, 176, 84, 0.035) 0%,
+      rgba(139, 108, 255, 0.025) 35%,
+      transparent 65%
+    );
+  transition: opacity 0.4s ease-out;
+  will-change: opacity;
+}

@@ -1,0 +1,73 @@
+.edu__grid {
+  margin-top: clamp(36px, 5vw, 60px);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22px;
+}
+
+.edu__card {
+  border-radius: var(--radius-l);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  overflow: hidden;
+  transition: border-color 0.35s, box-shadow 0.35s;
+}
+.edu__card:hover {
+  border-color: rgba(255, 176, 84, 0.45);
+  box-shadow: 0 28px 70px -32px rgba(255, 122, 69, 0.4);
+}
+
+.edu__cardHead {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 26px 26px 20px;
+  background:
+    radial-gradient(120% 100% at 90% 0%, color-mix(in srgb, var(--ea) 16%, transparent), transparent 60%),
+    linear-gradient(150deg, color-mix(in srgb, var(--ea) 12%, transparent), color-mix(in srgb, var(--eb) 8%, transparent));
+  border-bottom: 1px solid var(--line);
+}
+.edu__monogram {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(150deg, var(--ea), var(--eb));
+  box-shadow: 0 12px 30px -12px color-mix(in srgb, var(--ea) 60%, transparent);
+}
+.edu__years { font-size: 12px; color: var(--text-dim); letter-spacing: 0.06em; }
+
+.edu__body { padding: 24px 26px 28px; }
+.edu__degree { font-size: clamp(19px, 2.3vw, 24px); margin-bottom: 6px; }
+.edu__institution { color: var(--accent); font-size: 15px; font-weight: 500; }
+.edu__location { font-size: 12px; color: var(--text-mute); margin-top: 6px; }
+.edu__detail { color: var(--text-dim); font-size: 14.5px; line-height: 1.6; margin-top: 14px; }
+
+.edu__grades {
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.edu__grade {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.02);
+  font-size: 12.5px;
+}
+.edu__gradeKey { color: var(--text-mute); font-family: var(--font-mono); font-size: 11px; }
+.edu__gradeVal { color: var(--text); font-weight: 600; }
+
+@media (max-width: 820px) {
+  .edu__grid { grid-template-columns: 1fr; }
+}

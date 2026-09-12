@@ -1,0 +1,63 @@
+.preview {
+  position: fixed;
+  z-index: 9998;
+  pointer-events: none;
+  width: 280px;
+  height: 160px;
+  border-radius: var(--radius-m);
+  background:
+    radial-gradient(ellipse at 80% 0%, var(--ca), transparent 55%),
+    linear-gradient(150deg, var(--ca), var(--cb));
+  box-shadow:
+    0 30px 80px -30px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transform: translate(-2px, -2px);
+  will-change: transform, left, top;
+  transition: left 0.08s ease-out, top 0.08s ease-out;
+  overflow: hidden;
+}
+
+.previewInner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+  padding: 16px;
+  text-align: center;
+}
+
+.previewInitial {
+  font-family: var(--font-display);
+  font-size: 64px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.14);
+  line-height: 1;
+}
+
+.previewTitle {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+}
+
+.previewCat {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+  background: rgba(0, 0, 0, 0.2);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.previewArrow {
+  color: #fff;
+  font-size: 18px;
+  opacity: 0.9;
+}

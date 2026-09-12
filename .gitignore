@@ -1,0 +1,35 @@
+# Dependencies & environment
+node_modules/
+venv/
+__pycache__/
+*.pyc
+.env
+.env.local
+.env*.local
+
+# Build output
+.next/
+out/
+dist/
+build/
+
+# Runtime / data
+*.log
+*.db
+*.db-journal
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Personal files
+*.docx
+*.doc
+*.pdf
+
+# Scratch files
+*.txt.txt
+changes_prompt*
+portfolio_prompt*

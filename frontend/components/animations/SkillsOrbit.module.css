@@ -1,0 +1,138 @@
+.orbit {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  min-height: 480px;
+  max-height: 620px;
+  border-radius: var(--radius-l);
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(ellipse at center, rgba(255, 176, 84, 0.03), transparent 65%),
+    var(--surface);
+  overflow: hidden;
+}
+
+.canvas { display: block; }
+
+.labels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.orbitalSkill {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: center;
+  will-change: transform, opacity;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.orbitalSkill .skillName {
+  position: absolute;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(10, 10, 14, 0.85);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  transform: translateX(8px) translateY(-50%);
+  transition: opacity 0.25s, transform 0.25s var(--ease);
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  .orbitalSkill:hover .skillName {
+    opacity: 1;
+    transform: translateX(18px) translateY(-50%);
+  }
+}
+
+.center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.centerName {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 3.5vw, 32px);
+  font-weight: 700;
+  background: var(--grad-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-top: 4px;
+}
+
+.toggle {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s var(--ease);
+  z-index: 20;
+}
+.toggle:hover {
+  border-color: rgba(255, 176, 84, 0.55);
+  color: var(--accent);
+  background: rgba(255, 176, 84, 0.06);
+}
+.toggleIcon { font-size: 14px; line-height: 1; }
+
+/* Grid view */
+.grid {
+  padding: 20px;
+  display: grid;
+  gap: 20px;
+}
+.gridCategory { display: grid; gap: 10px; }
+.gridSkills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.gridChip {
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.3s var(--ease);
+}
+.gridChip:hover {
+  border-color: rgba(255, 176, 84, 0.5);
+  color: var(--accent);
+  transform: translateY(-2px);
+  background: rgba(255, 176, 84, 0.06);
+}
+
+@media (max-width: 560px) {
+  .orbit { min-height: 380px; }
+  .centerName { font-size: 18px; }
+  .orbitalSkill .skillName { font-size: 11px; padding: 5px 10px; }
+}
