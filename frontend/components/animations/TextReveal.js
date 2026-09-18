@@ -15,14 +15,8 @@ export default function TextReveal({
   split = "word", // "word" | "char"
   once = true,
 }) {
-  const reduce = useReducedMotion();
   const Component = motion[as];
   const unit = split === "char" ? text.split("") : text.split(" ");
-
-  if (reduce) {
-    const R = as;
-    return <R className={className}>{text}</R>;
-  }
 
   return (
     <Component

@@ -1,11 +1,11 @@
 .orbit {
   position: relative;
   width: 100%;
-  max-width: 760px;
+  max-width: 920px;
   margin-inline: auto;
   aspect-ratio: 1 / 1;
-  min-height: 560px;
-  max-height: 760px;
+  min-height: 680px;
+  max-height: 920px;
   border-radius: var(--radius-l);
   border: 1px solid var(--line);
   background:
@@ -134,7 +134,7 @@
 }
 
 @media (max-width: 560px) {
-  .orbit { min-height: 460px; }
+  .orbit { min-height: 560px; }
   .centerName { font-size: 18px; }
   .orbitalSkill .skillName { font-size: 11px; padding: 5px 10px; }
 }

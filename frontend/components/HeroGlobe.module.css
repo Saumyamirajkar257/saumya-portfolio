@@ -1,0 +1,141 @@
+.globeWrapper {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  aspect-ratio: 1;
+  margin-inline: auto;
+  display: grid;
+  place-items: center;
+}
+
+.globeBackglow {
+  position: absolute;
+  width: 80%;
+  height: 80%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, rgba(56, 189, 248, 0.04) 50%, transparent 70%);
+  filter: blur(40px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.orbitSvg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  animation: orbit-rotate 60s linear infinite;
+  opacity: 0.6;
+}
+
+@keyframes orbit-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.globeCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.labelsContainer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.floatingCard {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: rgba(18, 18, 21, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 14px 34px -10px rgba(0, 0, 0, 0.8);
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  pointer-events: auto;
+}
+
+.floatingCard:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 18px 45px -10px rgba(0, 0, 0, 0.9);
+  transform: translateY(-3px) scale(1.04);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cardDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #38BDF8;
+  box-shadow: 0 0 8px #38BDF8;
+}
+
+.cardTag {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--text-heading);
+}
+
+.cardDesc {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-dim);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+/* Card positions around the globe */
+.labelTopLeft {
+  top: 8%;
+  left: 0%;
+}
+
+.labelTopRight {
+  top: 14%;
+  right: 0%;
+}
+
+.labelBottomLeft {
+  bottom: 12%;
+  left: 2%;
+}
+
+.labelBottomRight {
+  bottom: 6%;
+  right: 2%;
+}
+
+@media (max-width: 640px) {
+  .globeWrapper {
+    max-width: 360px;
+    margin-top: 20px;
+  }
+  .floatingCard {
+    padding: 6px 10px;
+  }
+  .cardTag { font-size: 9.5px; }
+  .cardDesc { font-size: 11px; }
+  .labelTopLeft { top: 2%; left: -4%; }
+  .labelTopRight { top: 6%; right: -4%; }
+  .labelBottomLeft { bottom: 4%; left: -2%; }
+  .labelBottomRight { bottom: 0%; right: -2%; }
+}

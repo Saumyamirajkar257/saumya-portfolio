@@ -41,9 +41,9 @@ export default function Testimonials({ testimonials = [] }) {
               <AnimatePresence mode="wait">
                 <motion.blockquote
                   key={active}
-                  initial={reduce ? { opacity: 0 } : { opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={reduce ? { opacity: 0 } : { opacity: 0, y: -20 }}
+                  exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                   className={styles.slide}
                 >

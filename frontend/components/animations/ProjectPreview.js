@@ -42,10 +42,10 @@ export default function ProjectPreview({ projects = [] }) {
 
   const coverStyle = (id = 0) => {
     const palettes = [
-      ["#00c98b", "#00b87f"],
-      ["#4fdcb4", "#16c9a0"],
-      ["#00e5a0", "#00b87f"],
-      ["#16c9a0", "#5e5bd0"],
+      ["#0070F3", "#00d4ff"],
+      ["#38bdf8", "#2563eb"],
+      ["#00d4ff", "#6366f1"],
+      ["#0ea5e9", "#0070F3"],
     ];
     const [a, b] = palettes[id % palettes.length];
     return { "--ca": a, "--cb": b };

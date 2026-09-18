@@ -1,0 +1,34 @@
+You're helping me fix and de-templatize my personal portfolio site (Next.js/React frontend, FastAPI backend, dark theme, deployed on Vercel). Work through these in order and tell me what changed after each step.
+
+1. FIX THE BROKEN SOCIAL PREVIEW (highest priority)
+   - og:image, og:url, and twitter:image currently hardcode http://localhost:3000. Replace every instance with the real production URL, ideally read from an environment variable (e.g. NEXT_PUBLIC_SITE_URL) so it can't break again on the next deploy.
+   - Verify the /opengraph-image route renders correctly at the production URL using a live OG debugger before calling this done.
+
+2. MAKE THE "DYNAMIC FROM API" STATS FAIL-SAFE
+   - The stat counters (semesters completed, programming languages, certifications earned, projects built) must never render 0 if the FastAPI call fails, is slow, or cold-starts. Add hardcoded fallback values, or — since these numbers rarely change — just hardcode them client-side and drop the API dependency for this one widget.
+
+3. REMOVE GENERIC-TEMPLATE PATTERNS
+   - Search the codebase for arrow characters (? ? ?) appended to link/button text and remove them except where they add real directional meaning; vary the CTA copy instead.
+   - Remove the numbered eyebrow label (01, 02, 03...) above each section heading — audit the current numbering first (it's currently non-sequential and skips 04). If a label stays, make it meaningful, not decorative.
+   - Replace the middle-dot-joined footer credit ("React · Next.js · FastAPI") and any other "A · B · C"-style strings with plain, natural phrasing.
+   - Reconsider the "Name — Role" em-dash construction used in both the page title and the terminal widget label.
+   - Swap the default near-black (#070708) + accent pairing for a deliberately chosen palette — pick one accent color that isn't the standard dark-theme default, and set it as a token (theme/tailwind config) so it's used consistently.
+
+4. SIMPLIFY THE HERO
+   - Collapse it to one headline, one distinctive line of supporting copy, and a single primary CTA. Let either the terminal mockup or the scrolling marquee support the message — not both competing above the fold.
+   - Rewrite "Building digital experiences with code" into a line that signals the hardware+software (IoT/embedded) combination that actually differentiates this portfolio from a typical web-only one.
+
+5. MAKE THE SKILLS CONSTELLATION THE CENTERPIECE
+   - This is the most distinctive thing already on the site. Give it more visual weight — larger, possibly echoed in the hero — instead of treating it as a secondary toggle next to a plain grid.
+
+6. RESUME & DOMAIN
+   - Add a PDF version of the resume alongside the .docx.
+   - Rename the Vercel project (or attach a custom domain) so the live URL isn't the auto-generated frontend-kappa-cyan-44.vercel.app.
+
+7. STRENGTHEN THE PROJECT CASE STUDIES
+   - For each existing project, add a real screenshot or short demo GIF, a one-line problem ? approach ? result summary, and a link to the GitHub repo if public.
+
+8. QUICK QUALITY PASS
+   - Check WCAG AA contrast for body and muted text in dark mode.
+   - Add aria-labels to icon-only controls (theme toggle, back-to-top, carousel arrows).
+   - Confirm images use next/image with correct sizing and that below-the-fold sections lazy-load.

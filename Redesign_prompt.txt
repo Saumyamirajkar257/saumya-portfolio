@@ -1,0 +1,694 @@
+I want you to redesign my existing portfolio website UI/UX.
+
+IMPORTANT:
+- Do NOT create a completely different website.
+- Keep my existing functionality, content, projects, links, routing, and working features unless a change is necessary for the redesign.
+- The attached/reference screenshot is the PRIMARY visual reference for the new design.
+- First inspect my entire existing codebase and understand how the current website works.
+- Then inspect the reference image carefully and recreate its visual language in my actual website.
+- Do not simply make a screenshot/mockup. IMPLEMENT the design in the code.
+
+REFERENCE DESIGN:
+The design should closely follow the attached screenshot:
+- Very dark / almost black background
+- White typography as the primary text color
+- Electric blue used as an accent, not as the main background
+- Premium futuristic developer/IoT aesthetic
+- Minimal and spacious
+- Clean visual hierarchy
+- Thin subtle borders
+- Soft blue glows
+- Rounded but not overly rounded cards
+- Large amounts of negative space
+- No visual clutter
+- Professional rather than "gaming website"
+- Desktop-first but fully responsive
+
+COLOR DIRECTION:
+Background:
+- Near black: #030609 / #05080C
+- Secondary surfaces slightly lighter than background
+
+Text:
+- Primary: white / #F5F7FA
+- Secondary: muted gray / #9AA4B2
+
+Accent:
+- Electric blue / #1683FF
+- Bright blue highlights can be used sparingly
+
+IMPORTANT:
+Do NOT fill the entire website with blue.
+The website should feel approximately:
+80-90% black/dark
+10-20% white + blue accents.
+
+==================================================
+1. NAVBAR
+==================================================
+
+Create a minimal floating/sticky navbar.
+
+Left:
+[SM] logo
+Saumya Mirajkar
+
+Center:
+Home
+About
+Projects
+Experience
+Skills
+Certifications
+Contact
+
+Right:
+theme toggle
+Let's Connect ? button
+
+Design:
+- Transparent/very dark background initially
+- subtle glass effect while scrolling
+- thin border
+- clean typography
+- lots of spacing
+- active navigation item gets a subtle blue underline
+- navbar should NOT feel crowded
+
+Animation:
+- navbar fades/slides in on initial load
+- active underline smoothly moves between navigation items
+- when scrolling, navbar transitions into a slightly darker glass panel
+- transition should be smooth around 300-500ms
+
+==================================================
+2. HERO SECTION
+==================================================
+
+This is the most important section.
+
+Use a large two-column composition.
+
+LEFT:
+Small eyebrow:
+COMPUTER ENGINEERING STUDENT • IOT ENTHUSIAST
+
+Large heading:
+
+Hi, I'm
+Saumya Mirajkar
+
+Make "Mirajkar" blue.
+
+Below:
+
+Building intelligent solutions for a connected world.
+
+Then short description:
+
+Passionate about software development, embedded systems
+and the Internet of Things. I love turning ideas into real-world
+solutions that create impact.
+
+Buttons:
+
+View My Projects ?
+Download Resume ?
+
+Then a small "Scroll to explore" indicator.
+
+RIGHT:
+Use a sophisticated IoT / technology visual.
+
+A glowing digital Earth / connected globe with:
+- subtle orbital lines
+- small IoT nodes
+- sensor/device/ideas labels
+- subtle blue glow
+- tiny particles
+
+It should NOT dominate the entire screen.
+
+The right side should feel elegant and cinematic.
+
+IMPORTANT:
+The hero must remain spacious.
+Do NOT put too many floating elements around the globe.
+
+Hero background:
+- mostly black
+- subtle blurred technology/workspace image or gradient
+- very subtle blue light
+- no excessive patterns
+
+==================================================
+3. HERO ANIMATIONS
+==================================================
+
+Implement polished animations.
+
+Initial load sequence:
+
+0ms:
+background appears
+
+150ms:
+navbar fades in
+
+300ms:
+eyebrow fades upward
+
+450ms:
+"Hi, I'm" reveals
+
+600ms:
+"Saumya Mirajkar" reveals
+
+800ms:
+subtitle fades in
+
+950ms:
+description appears
+
+1100ms:
+buttons appear
+
+1250ms:
+stats appear
+
+1400ms:
+IoT globe begins subtle animation
+
+Do NOT make animations slow or annoying.
+
+Use smooth easing such as:
+cubic-bezier / easeOutCubic / easeOutExpo.
+
+Respect:
+prefers-reduced-motion.
+
+==================================================
+4. STATS
+==================================================
+
+Under the hero content create a spacious horizontal stats bar.
+
+Example:
+
+3+
+Projects Completed
+
+5+
+Technologies
+
+?
+Learning Everyday
+
+100%
+Passion
+
+Design:
+- dark transparent panel
+- subtle border
+- lots of horizontal spacing
+- thin separators
+- blue icons
+- white numbers
+- gray labels
+
+Numbers can use a subtle counter animation when entering viewport.
+
+==================================================
+5. PROJECTS
+==================================================
+
+Create a "Featured Projects" section.
+
+Heading:
+
+Featured Projects
+
+Subtitle:
+A mix of hardware and software projects that solve real problems.
+
+Right:
+View All Projects ?
+
+Create THREE clean project cards.
+
+Projects:
+
+1. Automatic Car Wiper System
+Category: Hardware + IoT
+Technologies:
+Arduino
+C/C++
+Rain Sensor
+Embedded
+
+2. Library Management System
+Category: Python
+Technologies:
+Python
+File Handling
+OOP
+
+3. Personal Portfolio Website
+Category: Web Development
+Technologies:
+HTML
+CSS
+JavaScript
+
+Each card should have:
+- large image
+- category pill
+- title
+- short description
+- technology tags
+- View Details ?
+- GitHub icon
+
+IMPORTANT:
+Cards must have plenty of breathing room.
+
+Do NOT cram information into cards.
+
+Card hover:
+- image zoom approximately 1.03-1.05
+- card moves upward approximately 4-6px
+- subtle blue border glow
+- subtle shadow
+- arrow moves slightly right
+
+Use approximately 300-400ms transitions.
+
+Optional:
+subtle cursor-following radial light inside cards.
+
+Keep it VERY subtle.
+
+==================================================
+6. SKILLS
+==================================================
+
+Create a clean Skills & Technologies section beside/near the projects section.
+
+Show technology cards:
+
+Python
+JavaScript
+C/C++
+Arduino
+React
+Git & GitHub
+Linux
+Figma
+
+Potentially:
+Node.js
+MySQL
+HTML
+CSS
+
+Each technology should be represented as a clean icon card.
+
+Do NOT use giant progress bars.
+
+Cards should be:
+- dark
+- thin border
+- centered icon
+- technology name
+- subtle hover glow
+
+Hover:
+icon slightly scales up
+card border becomes blue
+very subtle glow
+
+==================================================
+7. ABOUT
+==================================================
+
+Create a spacious About Me section.
+
+Heading:
+
+More Than Just Code
+
+Description explaining that I am a computer engineering student interested in technology, problem solving, IoT, software and real-world solutions.
+
+Use a cinematic image on one side.
+
+Do NOT make the image huge.
+
+Add:
+
+3+
+Projects
+
+100+
+Hours of Learning
+
+?
+Curiosity
+
+Button:
+More About Me ?
+
+Design should feel editorial and premium.
+
+==================================================
+8. EXPERIENCE
+==================================================
+
+Create a clean vertical timeline.
+
+Heading:
+Experience
+
+Timeline:
+
+2026 – Present
+B.E. in Computer Engineering
+Pune, Maharashtra
+
+2023
+Personal Projects
+IoT, Python, Web Development
+
+Ongoing
+Learning & Growth
+
+Timeline animation:
+- vertical line draws as the user scrolls
+- timeline dots appear one by one
+- text fades/slides in
+
+Do NOT use huge cards.
+Keep this section clean.
+
+==================================================
+9. CERTIFICATIONS
+==================================================
+
+Create a clean Certifications section.
+
+Examples:
+
+Python Programming
+IoT Fundamentals
+Web Development
+Arduino Basics
+
+Use compact cards.
+
+Each card:
+icon
+title
+short description
+certificate/provider
+
+Hover:
+subtle elevation
+blue border
+small arrow movement
+
+==================================================
+10. CONTACT
+==================================================
+
+Create a spacious "Let's Build Something Together" section.
+
+Heading:
+Let's Build Something Together
+
+Text:
+I'm always open to discussing new projects, opportunities
+or interesting technology ideas.
+
+Provide clean buttons/cards:
+
+Send an Email ?
+Connect on LinkedIn ?
+View GitHub ?
+
+Use a subtle blue gradient/glow behind this section.
+
+Do NOT make the entire section bright blue.
+
+==================================================
+11. FOOTER
+==================================================
+
+Minimal footer.
+
+Left:
+SM
+Saumya Mirajkar
+
+Center:
+Home
+About
+Projects
+Experience
+Skills
+Certifications
+Contact
+
+Right:
+© 2026 Saumya Mirajkar. All rights reserved.
+
+Keep it very clean.
+
+==================================================
+12. GLOBAL UI STYLE
+==================================================
+
+The most important requirement:
+
+THE WEBSITE MUST NOT LOOK CONGESTED.
+
+Use:
+- generous padding
+- large spacing between sections
+- consistent max-width
+- strong typography hierarchy
+- limited number of UI elements
+- consistent card heights
+- consistent border radius
+- consistent spacing scale
+
+Avoid:
+- excessive glowing elements
+- excessive gradients
+- excessive animations
+- giant text everywhere
+- too many floating badges
+- too many cards
+- unnecessary decorative elements
+- excessive blue
+- excessive glassmorphism
+
+The website should feel like a premium engineering portfolio.
+
+Think:
+Apple + Linear + Vercel + futuristic IoT laboratory.
+
+NOT:
+gaming dashboard / cyberpunk gaming website.
+
+==================================================
+13. TYPOGRAPHY
+==================================================
+
+Use a modern clean sans-serif.
+
+Prefer:
+Inter
+Manrope
+or Geist
+
+Headings:
+bold
+large
+tight line-height
+
+Body:
+muted gray
+comfortable line-height
+
+Use uppercase small labels with letter spacing for section eyebrows.
+
+==================================================
+14. SCROLL ANIMATIONS
+==================================================
+
+Every major section should have subtle scroll reveal.
+
+Use:
+
+fade-up
+stagger
+scale-in
+text-reveal
+parallax where appropriate
+
+Recommended:
+
+Section heading:
+fade-up 500ms
+
+Description:
+fade-up with 100ms delay
+
+Cards:
+stagger 100ms
+
+Images:
+scale from 0.97 ? 1
+
+Timeline:
+draw line progressively
+
+Do not animate everything at once.
+
+==================================================
+15. MICRO INTERACTIONS
+==================================================
+
+Buttons:
+- slight lift
+- subtle blue glow
+- arrow translates 3-5px right
+
+Cards:
+- slight lift
+- image zoom
+- border glow
+
+Links:
+- underline/blue transition
+
+Icons:
+- subtle scale
+
+Cursor:
+If implementing custom cursor effects, keep them extremely subtle.
+Do NOT replace the normal cursor with a huge circle.
+
+==================================================
+16. RESPONSIVENESS
+==================================================
+
+Desktop:
+Full visual composition.
+
+Tablet:
+Reduce spacing and rearrange grids.
+
+Mobile:
+- navbar becomes hamburger
+- hero becomes single column
+- globe moves below text
+- stats become 2x2
+- projects become one column
+- skills become 2-column grid
+- timeline remains readable
+- contact cards stack vertically
+
+IMPORTANT:
+Mobile must NOT feel like the desktop layout squeezed into a phone.
+
+==================================================
+17. TECHNICAL REQUIREMENTS
+==================================================
+
+Before changing anything:
+
+1. Inspect the entire project.
+2. Identify framework and dependencies.
+3. Identify all routes/components.
+4. Identify current styling system.
+5. Identify reusable components.
+6. Preserve working functionality.
+7. Reuse existing project data where possible.
+
+If React/Next.js is already being used, continue using it.
+
+Do not unnecessarily rewrite the entire application.
+
+Use reusable components for:
+- Navbar
+- Button
+- SectionHeader
+- ProjectCard
+- SkillCard
+- Timeline
+- CertificationCard
+- ContactCard
+- Footer
+
+Use performant CSS/animation techniques.
+
+Avoid unnecessary JavaScript animation loops.
+
+Prefer:
+CSS transitions
+CSS transforms
+IntersectionObserver
+Framer Motion if already installed or if it makes sense for the existing stack.
+
+==================================================
+18. MOST IMPORTANT VISUAL RULE
+==================================================
+
+Compare the final implementation against the reference image.
+
+Ask yourself:
+
+"Does this look clean, spacious, premium and futuristic?"
+
+If the answer is no:
+REMOVE elements rather than adding more.
+
+Whitespace is intentional.
+
+The final website should look approximately:
+
+BLACK ????????????????????
+WHITE ?????
+BLUE  ??
+
+Blue is an accent.
+
+White is the primary content.
+
+Black is the dominant visual identity.
+
+==================================================
+19. EXECUTION
+==================================================
+
+Do not just tell me what you would change.
+
+Actually modify the existing codebase.
+
+After implementation:
+
+1. Run the project.
+2. Check for build errors.
+3. Check console errors.
+4. Check desktop layout.
+5. Check mobile layout.
+6. Fix spacing/alignment issues.
+7. Make sure all existing buttons/links still work.
+8. Make sure animations do not cause layout shifts.
+9. Make a final visual polish pass.
+
+Do NOT stop after making only the hero.
+
+Redesign the COMPLETE website.
+
+The reference image is the visual direction, not something to literally copy pixel-for-pixel.

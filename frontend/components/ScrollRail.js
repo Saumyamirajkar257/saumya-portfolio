@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { motion, useScroll, useReducedMotion } from "framer-motion";
 import { usePrefersReducedMotion, useMounted } from "@/lib/hooks";
 import styles from "./ScrollRail.module.css";
@@ -17,10 +18,15 @@ const SECTIONS = [
 ];
 
 export default function ScrollRail() {
+  const pathname = usePathname();
   const reduce = usePrefersReducedMotion();
   const isMounted = useMounted();
   const [activeId, setActiveId] = useState("home");
   const [visible, setVisible] = useState(false);
+
+  if (pathname?.startsWith("/ielts") || pathname?.startsWith("/secret") || pathname?.startsWith("/vault")) {
+    return null;
+  }
 
   // Scroll-driven active section detection
   const refs = useRef({});

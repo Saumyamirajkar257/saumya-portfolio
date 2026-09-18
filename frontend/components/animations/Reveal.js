@@ -15,12 +15,11 @@ export default function Reveal({
   className = "",
   duration = 0.7,
 }) {
-  const reduce = useReducedMotion();
   return (
     <motion.div
       className={className}
-      initial={reduce ? { opacity: 0 } : { opacity: 0, y }}
-      whileInView={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once, margin: "0px 0px -12% 0px" }}
       transition={{ duration, delay, ease: [0.22, 1, 0.36, 1] }}
     >

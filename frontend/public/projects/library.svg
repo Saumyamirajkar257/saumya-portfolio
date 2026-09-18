@@ -1,0 +1,114 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Library Management System — data and flow diagram</title>
+  <desc id="desc">Diagram of a Python-based library system: a catalog of books and members with an issue/return (CRUD) flow.</desc>
+
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="0%" r="90%">
+      <stop offset="0%" stop-color="#0070F3" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#080D13" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#ffffff" stroke-opacity="0.035"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="675" fill="#080D13"/>
+  <rect width="1200" height="675" fill="url(#grid)"/>
+  <rect width="1200" height="675" fill="url(#glow)"/>
+
+  <!-- shelf panel -->
+  <g transform="translate(90, 120)">
+    <rect width="520" height="420" rx="16" fill="#0b1118" stroke="#0070F3" stroke-opacity="0.6" stroke-width="2"/>
+    <!-- shelf boards -->
+    <rect x="24" y="130" width="472" height="8" rx="4" fill="#0070F3" fill-opacity="0.35"/>
+    <rect x="24" y="262" width="472" height="8" rx="4" fill="#0070F3" fill-opacity="0.35"/>
+    <!-- books on top shelf -->
+    <g>
+      <rect x="48" y="58"  width="26" height="72" rx="3" fill="#0070F3" fill-opacity="0.7"/>
+      <rect x="78" y="48"  width="24" height="82" rx="3" fill="#38bdf8" fill-opacity="0.6"/>
+      <rect x="106" y="66" width="28" height="64" rx="3" fill="#00d4ff" fill-opacity="0.5"/>
+      <rect x="138" y="50" width="24" height="80" rx="3" fill="#2563eb" fill-opacity="0.6"/>
+      <rect x="460" y="62" width="22" height="68" rx="3" fill="#38bdf8" fill-opacity="0.6"/>
+      <rect x="486" y="72" width="26" height="58" rx="3" fill="#0070F3" fill-opacity="0.7"/>
+    </g>
+    <!-- books on middle shelf -->
+    <g>
+      <rect x="56"  y="176" width="24" height="86" rx="3" fill="#38bdf8" fill-opacity="0.55"/>
+      <rect x="84"  y="186" width="28" height="76" rx="3" fill="#0070F3" fill-opacity="0.65"/>
+      <rect x="116" y="170" width="22" height="92" rx="3" fill="#00d4ff" fill-opacity="0.5"/>
+      <rect x="430" y="182" width="26" height="80" rx="3" fill="#2563eb" fill-opacity="0.6"/>
+      <rect x="460" y="172" width="22" height="90" rx="3" fill="#38bdf8" fill-opacity="0.55"/>
+    </g>
+    <!-- lower shelf: rows of records -->
+    <g>
+      <rect x="48" y="300" width="448" height="10" rx="3" fill="#0070F3" fill-opacity="0.2"/>
+      <rect x="48" y="318" width="448" height="10" rx="3" fill="#38bdf8" fill-opacity="0.25"/>
+      <rect x="48" y="336" width="448" height="10" rx="3" fill="#0070F3" fill-opacity="0.2"/>
+      <rect x="48" y="354" width="448" height="10" rx="3" fill="#38bdf8" fill-opacity="0.25"/>
+    </g>
+    <text x="236" y="120" text-anchor="middle" font-family="monospace" font-size="12" letter-spacing="2" fill="#38bdf8">CATALOG</text>
+  </g>
+
+  <!-- record card (CRUD table) -->
+  <g transform="translate(660, 150)">
+    <rect width="450" height="230" rx="14" fill="#0b1118" stroke="#38bdf8" stroke-opacity="0.5" stroke-width="2"/>
+    <!-- header -->
+    <rect x="0" y="0" width="450" height="40" rx="14" fill="#0070F3" fill-opacity="0.2"/>
+    <g font-family="monospace" font-size="12" letter-spacing="1">
+      <text x="22" y="25" fill="#38bdf8">BOOK ID</text>
+      <text x="150" y="25" fill="#38bdf8">TITLE</text>
+      <text x="316" y="25" fill="#38bdf8">STATUS</text>
+    </g>
+    <!-- rows -->
+    <g font-family="monospace" font-size="12.5" fill="#f4f3f0">
+      <text x="22" y="66">B-014</text>
+      <text x="150" y="66">Sensor Networks</text>
+      <text x="316" y="70" fill="#00d4ff">✓ issued</text>
+      <line x1="22" y1="82" x2="428" y2="82" stroke="#ffffff" stroke-opacity="0.07"/>
+      <text x="22" y="106">B-023</text>
+      <text x="150" y="106">Digital Logic Design</text>
+      <text x="316" y="110" fill="#38bdf8">↺ returned</text>
+      <line x1="22" y1="122" x2="428" y2="122" stroke="#ffffff" stroke-opacity="0.07"/>
+      <text x="22" y="146">B-031</text>
+      <text x="150" y="146">Python in Practice</text>
+      <text x="316" y="150" fill="#60a5fa">→ on hold</text>
+      <line x1="22" y1="162" x2="428" y2="162" stroke="#ffffff" stroke-opacity="0.07"/>
+      <text x="22" y="186">M-101</text>
+      <text x="150" y="186">member record</text>
+      <text x="316" y="190" fill="#00d4ff">✓ active</text>
+    </g>
+  </g>
+
+  <!-- issue / return flow -->
+  <g transform="translate(885, 430)">
+    <circle cx="0" cy="0" r="74" fill="none" stroke="#0070F3" stroke-opacity="0.4" stroke-width="2"/>
+    <path d="M 20 -74 A 74 74 0 0 0 -20 -74" fill="none" stroke="#00d4ff" stroke-width="4" stroke-linecap="round"/>
+    <path d="M 6 -86 l 14 -6 l -2 15" fill="none" stroke="#00d4ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M -20 74 A 74 74 0 0 0 20 74" fill="none" stroke="#38bdf8" stroke-width="4" stroke-linecap="round"/>
+    <path d="M -6 86 l -14 6 l 2 -15" fill="none" stroke="#38bdf8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="0" y="-12" text-anchor="middle" font-family="monospace" font-size="13" letter-spacing="1.5" fill="#00d4ff">ISSUE</text>
+    <text x="0" y="16" text-anchor="middle" font-family="monospace" font-size="11" letter-spacing="2" fill="#38bdf8">RETURN</text>
+  </g>
+  <text x="885" y="540" text-anchor="middle" font-family="monospace" font-size="12" letter-spacing="2" fill="#38bdf8">CRUD FLOW</text>
+
+  <!-- members chip -->
+  <g transform="translate(660, 430)">
+    <rect width="150" height="52" rx="10" fill="#0b1118" stroke="#0070F3" stroke-opacity="0.6" stroke-width="2"/>
+    <g transform="translate(16, 26)">
+      <circle cx="0" cy="0" r="9" fill="#38bdf8" fill-opacity="0.4"/>
+      <path d="M -5 16 q 5 -8 10 0 z" fill="#38bdf8" fill-opacity="0.6"/>
+      <circle cx="28" cy="0" r="9" fill="#38bdf8" fill-opacity="0.4"/>
+      <path d="M 23 16 q 5 -8 10 0 z" fill="#38bdf8" fill-opacity="0.6"/>
+      <circle cx="56" cy="0" r="9" fill="#38bdf8" fill-opacity="0.4"/>
+      <path d="M 51 16 q 5 -8 10 0 z" fill="#38bdf8" fill-opacity="0.6"/>
+    </g>
+    <text x="106" y="29" text-anchor="middle" font-family="monospace" font-size="12" letter-spacing="1" fill="#f4f3f0">MEMBERS</text>
+  </g>
+
+  <!-- title block -->
+  <g font-family="monospace">
+    <rect x="48" y="42" width="392" height="76" rx="10" fill="#080D13" stroke="#0070F3" stroke-opacity="0.6"/>
+    <text x="68" y="72" font-size="17" letter-spacing="2" font-weight="bold" fill="#f4f3f0">LIBRARY MANAGER</text>
+    <text x="68" y="94" font-size="12" letter-spacing="1" fill="#38bdf8">Python CRUD · books, members, issue/return</text>
+  </g>
+</svg>

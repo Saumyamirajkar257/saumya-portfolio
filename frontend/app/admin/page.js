@@ -2,38 +2,14 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { API_BASE } from "@/lib/content";
+import { auth, db } from "@/lib/firebase";
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
+import { collection, getDocs, doc, setDoc, deleteDoc, updateDoc } from "firebase/firestore";
 import "./admin.css";
 
 /* ------------------------------------------------------------------ */
 /* Small helpers                                                       */
 /* ------------------------------------------------------------------ */
-const tokenKey = "portfolio_admin_token";
-const userKey = "portfolio_admin_user";
-
-class Api {
-  constructor(token) {
-    this.token = token;
-  }
-  headers(extra = {}) {
-    return {
-      "Content-Type": "application/json",
-      ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
-      ...extra,
-    };
-  }
-  async request(path, options = {}) {
-    const res = await fetch(`${API_BASE}${path}`, options);
-    const data = await res.json().catch(() => ({}));
-    return { ok: res.ok, status: res.status, data };
-  }
-  get(path) {
-    return this.request(path, { headers: this.headers() });
-  }
-  send(method, path, body) {
-    return this.request(path, { method, headers: this.headers(), body: JSON.stringify(body) });
-  }
-}
 
 const parseLines = (s) => (s || "").split("\n").map((x) => x.trim()).filter(Boolean);
 const joinLines = (arr = []) => (Array.isArray(arr) ? arr.join("\n") : "");
@@ -41,7 +17,7 @@ const joinLines = (arr = []) => (Array.isArray(arr) ? arr.join("\n") : "");
 /* Field config -> auto-generated forms. type: text|textarea|lines|json|checkbox */
 const MODELS = {
   profile: {
-    label: "About / Profile", singular: "Profile", endpoint: "/api/admin/profile", method: "PUT", emptyId: 1,
+    label: "About / Profile", singular: "Profile", collection: "profile", isSingleton: true,
     fields: [
       { key: "name", label: "Full name", type: "text" },
       { key: "role", label: "Role / title", type: "text" },
@@ -58,7 +34,7 @@ const MODELS = {
     ],
   },
   skills: {
-    label: "Skills", singular: "Skill", endpoint: "/api/admin/skills",
+    label: "Skills", singular: "Skill", collection: "skills",
     fields: [
       { key: "name", label: "Skill name", type: "text" },
       { key: "category", label: "Category", type: "text" },
@@ -67,22 +43,27 @@ const MODELS = {
     ],
   },
   projects: {
-    label: "Projects", singular: "Project", endpoint: "/api/admin/projects",
+    label: "Projects", singular: "Project", collection: "projects",
     fields: [
       { key: "title", label: "Title", type: "text" },
       { key: "category", label: "Category", type: "text" },
       { key: "short_description", label: "Short description", type: "textarea" },
       { key: "description", label: "Full description", type: "textarea" },
+      { key: "summary", label: "One-line P→A→R summary", type: "textarea" },
+      { key: "problem", label: "Problem", type: "textarea" },
+      { key: "approach", label: "Approach", type: "textarea" },
+      { key: "result", label: "Result", type: "textarea" },
       { key: "features", label: "Features (one per line)", type: "lines" },
       { key: "contribution", label: "My contribution", type: "textarea" },
       { key: "technologies", label: "Technologies (one per line)", type: "lines" },
       { key: "github_url", label: "GitHub URL", type: "text" },
       { key: "live_url", label: "Live URL", type: "text" },
+      { key: "image", label: "Cover image path (e.g. /projects/car-wiper.svg)", type: "text" },
       { key: "featured", label: "Featured (larger card)", type: "checkbox" },
     ],
   },
   experience: {
-    label: "Experience", singular: "Job", endpoint: "/api/admin/experience",
+    label: "Experience", singular: "Job", collection: "experience",
     fields: [
       { key: "position", label: "Position", type: "text" },
       { key: "company", label: "Company", type: "text" },
@@ -95,7 +76,7 @@ const MODELS = {
     ],
   },
   education: {
-    label: "Education", singular: "School", endpoint: "/api/admin/education",
+    label: "Education", singular: "School", collection: "education",
     fields: [
       { key: "institution", label: "Institution", type: "text" },
       { key: "degree", label: "Degree / course", type: "text" },
@@ -108,30 +89,23 @@ const MODELS = {
     ],
   },
   certifications: {
-    label: "Certifications", singular: "Certification", endpoint: "/api/admin/certifications",
+    label: "Certifications", singular: "Certification", collection: "certifications",
     fields: [
       { key: "name", label: "Certification name", type: "text" },
       { key: "organization", label: "Organization", type: "text" },
       { key: "issuer", label: "Issuer / platform", type: "text" },
       { key: "date", label: "Date (e.g. Jul 2026)", type: "text" },
       { key: "credential_url", label: "Credential URL", type: "text" },
+      { key: "logo", label: "Logo URL / Path (e.g. /logos/ibm.svg)", type: "text" },
     ],
   },
-};
-
-const PUBLIC_ENDPOINTS = {
-  skills: "/api/skills",
-  projects: "/api/projects",
-  experience: "/api/experience",
-  education: "/api/education",
-  certifications: "/api/certifications",
 };
 
 /* ------------------------------------------------------------------ */
 /* UI atoms                                                             */
 /* ------------------------------------------------------------------ */
 function LoginScreen({ onLogin }) {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -140,18 +114,13 @@ function LoginScreen({ onLogin }) {
     e.preventDefault();
     setBusy(true);
     setError("");
-    const api = new Api(null);
-    const res = await api.send("POST", "/api/auth/login", { username, password });
-    setBusy(false);
-    if (res.ok && res.data?.access_token) {
-      try {
-        sessionStorage.setItem(tokenKey, res.data.access_token);
-        sessionStorage.setItem(userKey, JSON.stringify({ username, role: res.data.role }));
-      } catch { /* private mode — fall back to in-memory */ }
-      onLogin(res.data.access_token);
-    } else {
-      setError(res.data?.detail || "Login failed. Is the backend running?");
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      onLogin(userCredential.user);
+    } catch (err) {
+      setError(err.message || "Login failed.");
     }
+    setBusy(false);
   };
 
   return (
@@ -163,8 +132,8 @@ function LoginScreen({ onLogin }) {
         <p className="admin-login__sub">Sign in to edit your portfolio content.</p>
 
         <label className="admin-field">
-          <span>Username</span>
-          <input value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="username" />
+          <span>Email</span>
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
         </label>
         <label className="admin-field">
           <span>Password</span>
@@ -176,7 +145,6 @@ function LoginScreen({ onLogin }) {
         <button className="admin-btn admin-btn--primary" disabled={busy}>
           {busy ? "Signing in…" : "Sign in"}
         </button>
-        <p className="admin-login__hint text-mono">default: admin / change-me-admin-password</p>
       </form>
     </div>
   );
@@ -231,7 +199,7 @@ function valuesFromItem(fields, item) {
 /* ------------------------------------------------------------------ */
 /* Manager per content model                                            */
 /* ------------------------------------------------------------------ */
-function ContentManager({ api, modelKey }) {
+function ContentManager({ modelKey }) {
   const model = MODELS[modelKey];
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -242,10 +210,16 @@ function ContentManager({ api, modelKey }) {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const res = await api.get(PUBLIC_ENDPOINTS[modelKey]);
-    setItems(res.ok ? res.data : []);
+    try {
+      const snap = await getDocs(collection(db, model.collection));
+      const fetched = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      fetched.sort((a, b) => (a.order || 0) - (b.order || 0));
+      setItems(fetched);
+    } catch (err) {
+      setError(err.message);
+    }
     setLoading(false);
-  }, [api, modelKey]);
+  }, [model.collection]);
 
   useEffect(() => { refresh(); }, [refresh]);
 
@@ -264,31 +238,37 @@ function ContentManager({ api, modelKey }) {
     setError("");
     const payload = buildPayload(model, values);
 
-    let res;
-    if (editing === "new") {
-      res = await api.send("POST", model.endpoint, payload);
-    } else if (model.method === "PUT") {
-      res = await api.send("PUT", model.endpoint, payload); // profile
-    } else {
-      res = await api.send("PUT", `${model.endpoint}/${editing.id}`, payload);
-    }
+    try {
+      if (editing === "new") {
+        payload.order = items.length;
+        // generate a random id or rely on firestore
+        const docRef = doc(collection(db, model.collection));
+        await setDoc(docRef, payload);
+      } else if (model.isSingleton) {
+        const targetId = editing.id || "main";
+        await setDoc(doc(db, model.collection, targetId), payload, { merge: true });
+      } else {
+        await updateDoc(doc(db, model.collection, editing.id), payload);
+      }
 
-    if (res.ok) {
       setNotice(`${model.singular} saved ✓`);
       setEditing(null);
       refresh();
       setTimeout(() => setNotice(""), 3000);
-    } else {
-      setError(res.data?.detail?.[0]?.msg || res.data?.detail || "Save failed.");
+    } catch (err) {
+      setError("Save failed: " + err.message);
     }
   };
 
   const remove = async (item) => {
-    if (model.method === "PUT") return;
+    if (model.isSingleton) return;
     if (!window.confirm(`Delete "${item.name || item.title || item.position || item.institution}"?`)) return;
-    const res = await api.send("DELETE", `${model.endpoint}/${item.id}`);
-    if (res.ok) refresh();
-    else setError(res.data?.detail || "Delete failed.");
+    try {
+      await deleteDoc(doc(db, model.collection, item.id));
+      refresh();
+    } catch (err) {
+      setError("Delete failed: " + err.message);
+    }
   };
 
   const headline = (item) =>
@@ -301,7 +281,7 @@ function ContentManager({ api, modelKey }) {
         <div className="admin-panel__actions">
           {notice ? <span className="admin-notice">{notice}</span> : null}
           <button className="admin-btn" onClick={refresh}>↻ Refresh</button>
-          <button className="admin-btn admin-btn--primary" onClick={beginNew}>+ New {model.singular}</button>
+          {!model.isSingleton && <button className="admin-btn admin-btn--primary" onClick={beginNew}>+ New {model.singular}</button>}
         </div>
       </div>
 
@@ -334,7 +314,7 @@ function ContentManager({ api, modelKey }) {
               </div>
               <div className="admin-list__tools">
                 <button className="admin-btn admin-btn--sm" onClick={() => beginEdit(item)}>Edit</button>
-                {model.method !== "PUT" && (
+                {!model.isSingleton && (
                   <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(item)}>Delete</button>
                 )}
               </div>
@@ -350,22 +330,36 @@ function ContentManager({ api, modelKey }) {
 /* ------------------------------------------------------------------ */
 /* Messages + overview                                                  */
 /* ------------------------------------------------------------------ */
-function MessagesManager({ api }) {
+function MessagesManager() {
   const [msgs, setMsgs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const res = await api.get("/api/admin/messages");
-    setMsgs(res.ok ? res.data : []);
+    try {
+      const snap = await getDocs(collection(db, "messages"));
+      const fetched = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      fetched.sort((a, b) => {
+        const ta = a.created_at?.toMillis?.() || 0;
+        const tb = b.created_at?.toMillis?.() || 0;
+        return tb - ta;
+      });
+      setMsgs(fetched);
+    } catch (err) {
+      console.error(err);
+    }
     setLoading(false);
-  }, [api]);
+  }, []);
 
   useEffect(() => { refresh(); }, [refresh]);
 
   const toggleHandled = async (msg) => {
-    const res = await api.send("PATCH", `/api/admin/messages/${msg.id}`, { handled: !msg.handled });
-    if (res.ok) refresh();
+    try {
+      await updateDoc(doc(db, "messages", msg.id), { handled: !msg.handled });
+      refresh();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -381,7 +375,9 @@ function MessagesManager({ api }) {
               <div className="admin-msg__head">
                 <strong>{m.name}</strong>
                 <a href={`mailto:${m.email}`} className="admin-msg__mail">{m.email}</a>
-                <span className="admin-msg__date">{new Date(m.created_at).toLocaleString()}</span>
+                <span className="admin-msg__date">
+                  {m.created_at?.toDate ? m.created_at.toDate().toLocaleString() : ""}
+                </span>
                 <button className="admin-btn admin-btn--sm" onClick={() => toggleHandled(m)}>
                   {m.handled ? "Reopen" : "Mark done"}
                 </button>
@@ -397,21 +393,7 @@ function MessagesManager({ api }) {
   );
 }
 
-function Overview({ api, onLogout }) {
-  const [stats, setStats] = useState(null);
-  useEffect(() => {
-    api.get("/api/admin/stats").then((r) => r.ok && setStats(r.data));
-  }, [api]);
-
-  const cards = stats
-    ? [
-        { label: "Contact messages", value: stats.messages, accent: "var(--cyan)" },
-        { label: "Unhandled", value: stats.unhandled_messages, accent: "var(--accent)" },
-        { label: "Projects", value: stats.projects, accent: "var(--accent-2)" },
-        { label: "Skills", value: stats.skills, accent: "var(--violet)" },
-      ]
-    : [];
-
+function Overview({ onLogout }) {
   return (
     <div className="admin-panel">
       <div className="admin-overview">
@@ -419,16 +401,9 @@ function Overview({ api, onLogout }) {
           <h2>Overview</h2>
           <button className="admin-btn" onClick={onLogout}>Sign out</button>
         </div>
-        <div className="admin-stats">
-          {cards.map((c) => (
-            <div key={c.label} className="admin-stat">
-              <span className="admin-stat__value" style={{ color: c.accent }}>{c.value}</span>
-              <span className="admin-stat__label">{c.label}</span>
-            </div>
-          ))}
-        </div>
         <p className="admin-muted admin-tip">
-          Tip: content changes here are instantly live on the public site — no rebuild needed.
+          Welcome to the new Firebase-powered Serverless Admin Panel!
+          Content changes here are instantly saved to Firestore and live on the public site.
         </p>
       </div>
     </div>
@@ -439,22 +414,27 @@ function Overview({ api, onLogout }) {
 /* Page                                                                 */
 /* ------------------------------------------------------------------ */
 export default function AdminPage() {
-  const [token, setToken] = useState("");
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState("overview");
 
   useEffect(() => {
-    try {
-      const t = sessionStorage.getItem(tokenKey);
-      if (t) setToken(t);
-    } catch { /* ignore */ }
+    const unsubscribe = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      setLoading(false);
+    });
+    return () => unsubscribe();
   }, []);
 
-  const handleLogin = (t) => setToken(t);
+  if (loading) return <div style={{ padding: "40px", color: "white" }}>Loading...</div>;
 
-  if (!token) return <LoginScreen onLogin={handleLogin} />;
+  if (!user) return <LoginScreen onLogin={setUser} />;
 
-  const api = new Api(token);
   const TABS = ["overview", ...Object.keys(MODELS), "messages"];
+
+  const handleLogout = () => {
+    signOut(auth);
+  };
 
   return (
     <div className="admin">
@@ -478,10 +458,10 @@ export default function AdminPage() {
       </aside>
 
       <main className="admin__main">
-        {tab === "overview" && <Overview api={api} onLogout={() => { sessionStorage.clear(); setToken(""); setTab("overview"); }} />}
-        {tab === "messages" && <MessagesManager api={api} />}
+        {tab === "overview" && <Overview onLogout={handleLogout} />}
+        {tab === "messages" && <MessagesManager />}
         {TABS.filter((t) => t !== "overview" && t !== "messages").map((k) =>
-          tab === k ? <ContentManager key={k} api={api} modelKey={k} /> : null
+          tab === k ? <ContentManager key={k} modelKey={k} /> : null
         )}
       </main>
     </div>

@@ -1,4 +1,5 @@
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+import { SITE_URL } from "@/lib/site";
+export const dynamic = "force-static";
 
 export default function sitemap() {
   const routes = ["", "#about", "#skills", "#projects", "#experience", "#education", "#certifications", "#contact"];

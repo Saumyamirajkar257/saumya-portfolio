@@ -1,0 +1,173 @@
+/* ============================================================
+   Macbook3D.module.css — Minimal Cinematic 3D MacBook Pro
+   ============================================================ */
+
+.wrapper {
+  position: relative;
+  width: 100%;
+  height: clamp(400px, 44vw, 500px);
+  min-height: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  border-radius: 20px;
+  overflow: hidden;
+  background: transparent;
+  cursor: default;
+}
+
+/* Subtle, dark ambient backlight matching website blue accent */
+.ambientGlow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70%;
+  height: 70%;
+  background: radial-gradient(circle, rgba(22, 131, 255, 0.09) 0%, rgba(56, 189, 248, 0.04) 45%, transparent 70%);
+  filter: blur(45px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.canvas3d {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  touch-action: none;
+  position: relative;
+  z-index: 1;
+}
+
+/* --------- Top Spec Badge --------- */
+.topSpecBadge {
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(14, 15, 20, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+.appleSvg {
+  width: 13px;
+  height: 13px;
+  color: #E2E8F0;
+  flex-shrink: 0;
+}
+
+.specText {
+  display: flex;
+  flex-direction: column;
+}
+
+.specTitle {
+  font-family: var(--font-display, inherit);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.specChip {
+  font-family: var(--font-mono, monospace);
+  font-size: 9.5px;
+  color: #38BDF8;
+  letter-spacing: 0.02em;
+}
+
+/* --------- Minimal Loader Overlay --------- */
+.loaderOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(9, 9, 11, 0.7);
+  backdrop-filter: blur(6px);
+  gap: 12px;
+}
+
+.loaderSpinner {
+  width: 36px;
+  height: 36px;
+  border: 2.5px solid rgba(56, 189, 248, 0.12);
+  border-top-color: #38BDF8;
+  border-right-color: #1683FF;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.loaderText {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  color: #94A3B8;
+  letter-spacing: 0.03em;
+}
+
+.progressBar {
+  width: 140px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #38BDF8, #1683FF);
+  border-radius: 999px;
+  transition: width 0.2s ease;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.errorOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(9, 9, 11, 0.85);
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  color: #F87171;
+}
+
+/* --------- Responsive Adjustments --------- */
+@media (max-width: 768px) {
+  .wrapper {
+    height: 360px;
+    min-height: 320px;
+  }
+  .topSpecBadge {
+    top: 8px;
+    left: 10px;
+    padding: 5px 10px;
+  }
+  .specTitle {
+    font-size: 11px;
+  }
+  .specChip {
+    font-size: 9px;
+  }
+}

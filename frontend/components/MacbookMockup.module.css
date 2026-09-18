@@ -1,0 +1,762 @@
+/* MacbookMockup.module.css — Realistic Space Gray MacBook Pro with Saumya OS */
+
+.macbookContainer {
+  position: relative;
+  width: 100%;
+  max-width: 620px;
+  margin-inline: auto;
+  perspective: 1200px;
+  user-select: none;
+}
+
+.macbookFrame {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-style: preserve-3d;
+  transition: transform 0.1s ease-out;
+}
+
+/* Ambient Backlight Reflection */
+.ambientScreenGlow {
+  position: absolute;
+  top: 10%;
+  left: 10%;
+  width: 80%;
+  height: 70%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(22, 131, 255, 0.18) 0%, rgba(139, 92, 246, 0.08) 50%, transparent 75%);
+  filter: blur(50px);
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 0.5s ease;
+}
+
+/* Display Lid Assembly */
+.displayLid {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10.4;
+  background: #14171C;
+  border-radius: 18px 18px 4px 4px;
+  padding: 11px 12px 13px;
+  box-shadow: 
+    0 0 0 1px rgba(255, 255, 255, 0.14),
+    0 8px 32px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Inner Bezel */
+.screenBezel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #05070A;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Top Notch Camera */
+.cameraNotch {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 12px;
+  background: #05070A;
+  border-radius: 0 0 6px 6px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-inline: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.cameraLens {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #111;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+}
+
+.cameraLens::after {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 1.5px;
+  height: 1.5px;
+  border-radius: 50%;
+  background: #3EA6FF;
+  opacity: 0.8;
+}
+
+.cameraIndicator {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 4px #10B981;
+}
+
+/* Screen Glass Surface & Desktop */
+.screenGlass {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at 80% 20%, #161D2F 0%, #0B0E17 50%, #06080E 100%);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.glassReflection {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 35%, transparent 50%);
+  pointer-events: none;
+  z-index: 25;
+}
+
+/* ============================================================
+   macOS TOP MENU BAR
+   ============================================================ */
+.macosMenuBar {
+  height: 20px;
+  background: rgba(10, 14, 23, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 8.5px;
+  color: #D1D5DB;
+  flex-shrink: 0;
+  z-index: 20;
+}
+
+.menuLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.appleLogo {
+  font-size: 10px;
+  color: #FFFFFF;
+  margin-right: 2px;
+}
+
+.appName {
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 0.02em;
+}
+
+.menuItem {
+  color: #9CA3AF;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.menuItem:hover {
+  color: #FFFFFF;
+}
+
+.menuRight {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-mono), monospace;
+  font-size: 8px;
+  color: #9CA3AF;
+}
+
+.menuStatusPill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(22, 131, 255, 0.12);
+  border: 1px solid rgba(22, 131, 255, 0.25);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: #38BDF8;
+  font-weight: 600;
+}
+
+/* ============================================================
+   DESKTOP WORKSPACE & ACTIVE WINDOW
+   ============================================================ */
+.desktopArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding: 6px 8px 36px 8px;
+  overflow: hidden;
+}
+
+.osWindow {
+  flex: 1;
+  background: rgba(11, 15, 25, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.windowHeader {
+  height: 24px;
+  background: rgba(18, 24, 38, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: 8px;
+  flex-shrink: 0;
+}
+
+.trafficDots {
+  display: flex;
+  align-items: center;
+  gap: 4.5px;
+}
+
+.dotClose { width: 6.5px; height: 6.5px; border-radius: 50%; background: #EF4444; box-shadow: 0 0 4px rgba(239, 68, 68, 0.4); }
+.dotMin { width: 6.5px; height: 6.5px; border-radius: 50%; background: #F59E0B; box-shadow: 0 0 4px rgba(245, 158, 11, 0.4); }
+.dotMax { width: 6.5px; height: 6.5px; border-radius: 50%; background: #10B981; box-shadow: 0 0 4px rgba(16, 185, 129, 0.4); }
+
+.windowTitle {
+  font-family: var(--font-mono), monospace;
+  font-size: 8.5px;
+  font-weight: 500;
+  color: #E2E8F0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.windowHeaderRight {
+  font-size: 7.5px;
+  color: #64748B;
+  font-family: var(--font-mono), monospace;
+}
+
+/* ============================================================
+   APP 1: INTERACTIVE TERMINAL
+   ============================================================ */
+.terminalBody {
+  flex: 1;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  line-height: 1.45;
+  color: #E2E8F0;
+  overflow-y: auto;
+}
+
+.terminalScroll {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.terminalRow {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.terminalPrompt {
+  color: #38BDF8;
+  font-weight: 600;
+}
+
+.terminalHost {
+  color: #818CF8;
+}
+
+.terminalCmd {
+  color: #F8FAFC;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.terminalOutput {
+  color: #94A3B8;
+  padding-left: 6px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.terminalPillGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 3px;
+  padding-left: 6px;
+}
+
+.terminalPill {
+  font-size: 7.5px;
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #38BDF8;
+  padding: 1px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.terminalPill:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: #38BDF8;
+  color: #FFFFFF;
+}
+
+.terminalInputLine {
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.08);
+}
+
+.terminalInput {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #38BDF8;
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  font-weight: 600;
+  flex: 1;
+  margin-left: 4px;
+}
+
+.terminalInput::placeholder {
+  color: #475569;
+}
+
+/* ============================================================
+   APP 2: CODE EDITOR (VS CODE STYLE)
+   ============================================================ */
+.editorContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.editorTabs {
+  display: flex;
+  background: rgba(15, 20, 32, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-left: 4px;
+  gap: 2px;
+}
+
+.editorTab {
+  font-family: var(--font-mono), monospace;
+  font-size: 8px;
+  color: #94A3B8;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-top: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s;
+}
+
+.editorTabActive {
+  background: rgba(22, 30, 48, 0.85);
+  color: #FFFFFF;
+  border-top: 2px solid #38BDF8;
+}
+
+.editorCodeBody {
+  flex: 1;
+  padding: 8px 10px;
+  font-family: var(--font-mono), monospace;
+  font-size: 8.5px;
+  line-height: 1.45;
+  overflow-y: auto;
+  color: #CBD5E1;
+}
+
+.codeLine {
+  display: flex;
+  gap: 8px;
+  white-space: pre;
+}
+
+.lineNum {
+  color: #475569;
+  width: 14px;
+  text-align: right;
+  user-select: none;
+}
+
+.codeKw { color: #F43F5E; font-weight: 600; }
+.codeVar { color: #38BDF8; }
+.codeFn { color: #818CF8; }
+.codeStr { color: #34D399; }
+.codeCm { color: #64748B; font-style: italic; }
+.codeVal { color: #FBBF24; }
+
+.editorStatusBar {
+  height: 16px;
+  background: #0284C7;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: 8px;
+  font-family: var(--font-mono), monospace;
+  font-size: 7.5px;
+  font-weight: 600;
+}
+
+/* ============================================================
+   APP 3: SPOTIFY / LO-FI MUSIC PLAYER
+   ============================================================ */
+.musicPlayerBody {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+.musicCard {
+  width: 100%;
+  max-width: 320px;
+  background: rgba(18, 24, 38, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.musicTrackRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.musicArt {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 50%, #EC4899 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.35);
+}
+
+.musicInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.musicTitle {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #FFFFFF;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.musicArtist {
+  font-size: 8px;
+  color: #94A3B8;
+  font-family: var(--font-mono), monospace;
+}
+
+.equalizerTrack {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 22px;
+  background: rgba(10, 14, 22, 0.7);
+  padding: 3px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.eqBar {
+  flex: 1;
+  background: linear-gradient(180deg, #38BDF8 0%, #818CF8 100%);
+  border-radius: 1px;
+  transition: height 0.2s ease;
+}
+
+.musicControls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ctrlBtn {
+  background: transparent;
+  border: none;
+  color: #CBD5E1;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+
+.ctrlBtn:hover {
+  color: #38BDF8;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.ctrlPlay {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #38BDF8;
+  color: #030712;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+}
+
+.ctrlPlay:hover {
+  transform: scale(1.05);
+  background: #7DD3FC;
+}
+
+/* ============================================================
+   APP 4: ACTIVITY MONITOR & TELEMETRY
+   ============================================================ */
+.monitorBody {
+  flex: 1;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+}
+
+.monitorGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.monitorCard {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 6px;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.monitorLabel {
+  font-family: var(--font-mono), monospace;
+  font-size: 7.5px;
+  color: #94A3B8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.monitorValue {
+  font-size: 11px;
+  font-weight: 700;
+  color: #F8FAFC;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.monitorSub {
+  font-family: var(--font-mono), monospace;
+  font-size: 7px;
+  color: #38BDF8;
+}
+
+.monitorProgressTrack {
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 2px;
+}
+
+.monitorProgressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #38BDF8, #818CF8);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.gitCommitBar {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 6px;
+  padding: 6px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-mono), monospace;
+  font-size: 7.5px;
+  color: #E2E8F0;
+}
+
+/* ============================================================
+   macOS FLOATING DOCK
+   ============================================================ */
+.macosDock {
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  padding: 3px 6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  z-index: 22;
+}
+
+.dockItem {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  font-size: 12px;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.15s ease;
+}
+
+.dockItem:hover {
+  transform: scale(1.22) translateY(-2px);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.dockItemActive {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: rgba(56, 189, 248, 0.5);
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.35);
+}
+
+.dockDot {
+  position: absolute;
+  bottom: -3px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #38BDF8;
+  box-shadow: 0 0 4px #38BDF8;
+}
+
+/* ============================================================
+   MacBook BASE & HINGE
+   ============================================================ */
+.macbookBase {
+  position: relative;
+  width: 106%;
+  height: 14px;
+  background: linear-gradient(180deg, #1C2026 0%, #101317 70%, #0A0C0E 100%);
+  border-radius: 0 0 16px 16px;
+  box-shadow: 
+    0 1px 0 rgba(255, 255, 255, 0.14) inset,
+    0 6px 16px rgba(0, 0, 0, 0.85);
+  margin-top: -1px;
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+}
+
+.baseHingeNotch {
+  width: 90px;
+  height: 4px;
+  background: #080A0D;
+  border-radius: 0 0 4px 4px;
+  border-inline: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.macbookShadow {
+  width: 95%;
+  height: 24px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.6) 45%, transparent 75%);
+  filter: blur(10px);
+  margin-top: -6px;
+  z-index: 1;
+}
+
+/* ============================================================
+   RESPONSIVE SCALING
+   ============================================================ */
+@media (max-width: 640px) {
+  .macbookContainer {
+    max-width: 94%;
+  }
+  .displayLid {
+    border-radius: 14px 14px 4px 4px;
+    padding: 8px 9px 10px;
+  }
+  .menuItem {
+    display: none;
+  }
+  .dockItem {
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+  }
+}

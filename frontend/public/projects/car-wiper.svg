@@ -1,0 +1,105 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Automatic Car Wiper System — build diagram</title>
+  <desc id="desc">Schematic of an Arduino-based wiper system: a rain sensor feeds an Arduino which drives the wiper motor when rain is detected.</desc>
+
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="0%" r="90%">
+      <stop offset="0%" stop-color="#0070F3" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#080D13" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="car" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#080D13"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#ffffff" stroke-opacity="0.04"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="675" fill="#080D13"/>
+  <rect width="1200" height="675" fill="url(#grid)"/>
+  <rect width="1200" height="675" fill="url(#glow)"/>
+
+  <!-- ground line -->
+  <line x1="40" y1="520" x2="1160" y2="520" stroke="#38bdf8" stroke-opacity="0.2" stroke-width="2"/>
+
+  <!-- car body (side view, front toward the right) -->
+  <path d="M 150 520 L 150 430 Q 150 405 178 400 L 620 400 Q 640 368 700 330 Q 860 228 980 258 L 1050 268 Q 1090 276 1094 312 L 1102 400 L 1102 520 Z"
+        fill="url(#car)" stroke="#0070F3" stroke-opacity="0.7" stroke-width="2.5"/>
+  <!-- windshield -->
+  <path d="M 618 400 L 706 342 Q 820 255 940 272 L 1000 282 L 1000 400 Z" fill="#05080c" stroke="#38bdf8" stroke-opacity="0.75" stroke-width="2"/>
+  <!-- wheels -->
+  <ellipse cx="360" cy="520" rx="62" ry="30" fill="#0d1117" stroke="#38bdf8" stroke-opacity="0.4" stroke-width="2"/>
+  <ellipse cx="360" cy="520" rx="20" ry="10" fill="#00d4ff" fill-opacity="0.45"/>
+  <ellipse cx="960" cy="520" rx="62" ry="30" fill="#0d1117" stroke="#38bdf8" stroke-opacity="0.4" stroke-width="2"/>
+  <ellipse cx="960" cy="520" rx="20" ry="10" fill="#00d4ff" fill-opacity="0.45"/>
+
+  <!-- rain falling toward the windshield -->
+  <g stroke="#00d4ff" stroke-opacity="0.8" stroke-width="2.5" stroke-linecap="round">
+    <line x1="700" y1="120" x2="700" y2="150"/>
+    <line x1="762" y1="80" x2="762" y2="112"/>
+    <line x1="830" y1="120" x2="830" y2="150"/>
+    <line x1="896" y1="82" x2="896" y2="114"/>
+    <line x1="952" y1="120" x2="952" y2="150"/>
+  </g>
+
+  <!-- rain sensor on the windshield (hexagon) -->
+  <g transform="translate(806, 258)">
+    <polygon points="0,-26 22,-13 22,13 0,26 -22,13 -22,-13" fill="#080D13" stroke="#00d4ff" stroke-width="2.5"/>
+    <path d="M -6,-8 Q 0,-2 6,-8 Q 4,-14 0,-14 Q -4,-14 -6,-8 Z" fill="#0070F3" fill-opacity="0.9"/>
+    <circle cx="0" cy="6" r="3.5" fill="#38bdf8" fill-opacity="0.8"/>
+  </g>
+
+  <!-- wiper blade + sweep arc -->
+  <g stroke="#38bdf8" stroke-linecap="round">
+    <path d="M 706 342 Q 780 250 860 285" fill="none" stroke-opacity="0.4" stroke-width="2" stroke-dasharray="6 7"/>
+    <path d="M 706 342 Q 720 320 738 322" fill="none" stroke="#00d4ff" stroke-width="7" stroke-opacity="0.9"/>
+  </g>
+  <!-- sweep arrow -->
+  <g stroke="#0070F3" stroke-opacity="0.9" stroke-width="2" fill="none">
+    <path d="M 806 258 Q 800 300 778 312"/>
+    <path d="M 778 312 l 10 -4 m -2 8 l 8 -1"/>
+  </g>
+
+  <!-- Arduino module -->
+  <g transform="translate(300, 436)">
+    <rect width="168" height="58" rx="8" fill="#0b1118" stroke="#0070F3" stroke-opacity="0.8" stroke-width="2"/>
+    <rect x="12" y="10" width="144" height="12" rx="3" fill="#0070F3" fill-opacity="0.25"/>
+    <rect x="12" y="30" width="34" height="14" rx="3" fill="#00d4ff" fill-opacity="0.3"/>
+    <rect x="54" y="30" width="96" height="14" rx="3" fill="#0070F3" fill-opacity="0.25"/>
+    <text x="84" y="20" text-anchor="middle" font-family="monospace" font-size="14" letter-spacing="1.5" fill="#f4f3f0">ARDUINO</text>
+  </g>
+
+  <!-- wiper motor node -->
+  <g transform="translate(700, 452)">
+    <rect width="120" height="44" rx="8" fill="#0b1118" stroke="#38bdf8" stroke-opacity="0.7" stroke-width="2"/>
+    <circle cx="24" cy="22" r="9" fill="none" stroke="#00d4ff" stroke-width="2"/>
+    <path d="M 18 22 h 12 M 24 16 v 12" stroke="#00d4ff" stroke-width="2"/>
+    <text x="82" y="27" text-anchor="middle" font-family="monospace" font-size="12" letter-spacing="1" fill="#f4f3f0">WIPER</text>
+  </g>
+
+  <!-- signal lines -->
+  <g stroke="#38bdf8" stroke-opacity="0.6" stroke-width="1.8" fill="none">
+    <path d="M 806 284 L 806 330 L 700 330 L 468 436"/>
+    <path d="M 700 452 L 792 432 Q 730 380 724 360"/>
+  </g>
+  <g fill="#00d4ff">
+    <circle cx="410" cy="436" r="3.5"/>
+    <circle cx="540" cy="436" r="3.5"/>
+  </g>
+
+  <!-- labels -->
+  <g font-family="monospace" font-size="13" letter-spacing="1.5">
+    <text x="806" y="196" text-anchor="middle" fill="#38bdf8">RAIN</text>
+    <text x="806" y="213" text-anchor="middle" fill="#38bdf8">SENSOR</text>
+    <text x="384" y="410" text-anchor="middle" fill="#00d4ff">MCU</text>
+    <text x="760" y="524" text-anchor="middle" fill="#38bdf8">WIPER MOTOR</text>
+  </g>
+
+  <!-- title block -->
+  <g font-family="monospace">
+    <rect x="48" y="42" width="352" height="76" rx="10" fill="#080D13" stroke="#0070F3" stroke-opacity="0.6"/>
+    <text x="68" y="72" font-size="17" letter-spacing="2" font-weight="bold" fill="#f4f3f0">CAR WIPER SYSTEM</text>
+    <text x="68" y="94" font-size="12" letter-spacing="1" fill="#38bdf8">rain detected  →  wiper sweeps</text>
+  </g>
+</svg>

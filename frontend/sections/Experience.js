@@ -1,80 +1,83 @@
 "use client";
 
-import { motion, useReducedMotion, useScroll, useSpring } from "framer-motion";
 import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import SectionHeading from "@/components/SectionHeading";
 import Reveal from "@/components/animations/Reveal";
 import styles from "./Experience.module.css";
 
 export default function Experience({ experience = [] }) {
-  const reduce = useReducedMotion();
-  const lineRef = useRef(null);
+  const containerRef = useRef(null);
+  
   const { scrollYProgress } = useScroll({
-    target: lineRef,
-    offset: ["start 75%", "end 60%"],
+    target: containerRef,
+    offset: ["start center", "end center"],
   });
-  const scaleY = useSpring(scrollYProgress, { stiffness: 90, damping: 22, restDelta: 0.001 });
+
+  const lineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
   return (
     <section id="experience" className="block">
       <div className="wrap">
         <SectionHeading
-          eyebrow="where I've worked"
-          title={<>Experience <span className="gradient-text">timeline</span></>}
-          lead={<p className="prose">Professional and hands-on background, in order.</p>}
+          eyebrow="MY JOURNEY"
+          title={<>My <span className="gradient-text">Experience</span></>}
+          lead={<p className="prose">Education, internships, and technical development path.</p>}
         />
 
-        <div className={styles.timeline} ref={lineRef}>
-          {!reduce && (
-            <motion.span
-              className={styles.timeline__line}
-              style={{ scaleY }}
-              aria-hidden="true"
-            />
-          )}
-          <span className={styles.timeline__base} aria-hidden="true" />
+        <div className={styles.timeline} ref={containerRef}>
+          <motion.div className={styles.timelineLine} style={{ height: lineHeight }} aria-hidden="true" />
 
-          {experience.map((exp, i) => (
-            <div
-              key={exp.id ?? i}
-              className={`${styles.timeline__item} ${i % 2 === 0 ? styles.timeline__itemLeft : styles.timeline__itemRight}`}
+          {experience.map((item, i) => (
+            <motion.div
+              key={item.id ?? i}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "0px 0px -8% 0px" }}
+              transition={{ duration: 0.5, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+              className={styles.timelineItem}
             >
-              <span className={styles.timeline__dot} aria-hidden="true">
-                <span className={styles.timeline__dotCore} />
-              </span>
+              {/* Blue Circular Node */}
+              <div className={styles.nodeWrapper}>
+                <span className={styles.timelineNode}>
+                  <span className={styles.timelineDot} />
+                </span>
+              </div>
 
-              <Reveal
-                delay={0.08}
-                y={30}
-                className={`${styles.timeline__card} ${i % 2 === 0 ? styles.cardLeft : styles.cardRight}`}
-              >
-                <div className={styles.job}>
-                  <div className={styles.job__top}>
-                    <h3 className={styles.job__position}>{exp.position}</h3>
-                    <span className={styles.job__company}>{exp.company}</span>
-                  </div>
-                  <div className={`${styles.job__dates} text-mono`}>
-                    <span className={styles.job__date}>{exp.start_date}</span>
-                    <span className={styles.job__arrow}>—</span>
-                    <span className={styles.job__date}>{exp.end_date}</span>
-                    {exp.current && <span className={styles.job__now}>now</span>}
-                  </div>
-                  <ul className={styles.job__list}>
-                    {(exp.responsibilities || []).map((r) => (
-                      <li key={r} className={styles.job__li}>
-                        <span className={styles.job__liArrow} aria-hidden="true">▸</span>
-                        {r}
+              {/* Content Card */}
+              <div className={styles.timelineContent}>
+                <div className={styles.itemHeader}>
+                  <span className={styles.itemDates}>
+                    {item.start_date} — {item.end_date || "Present"}
+                  </span>
+                  {item.current && <span className={styles.currentBadge}>CURRENT</span>}
+                </div>
+
+                <h3 className={styles.itemPosition}>{item.position}</h3>
+                <span className={styles.itemCompany}>
+                  {item.company} {item.location ? `• ${item.location}` : ""}
+                </span>
+
+                {item.responsibilities?.length > 0 && (
+                  <ul className={styles.responsibilitiesList}>
+                    {item.responsibilities.map((r, idx) => (
+                      <li key={idx} className={styles.resItem}>
+                        <span className={styles.resBullet}>›</span>
+                        <span>{r}</span>
                       </li>
                     ))}
                   </ul>
-                  <div className={styles.job__tech}>
-                    {(exp.technologies || []).map((t) => (
-                      <span key={t} className="chip">{t}</span>
+                )}
+
+                {item.technologies?.length > 0 && (
+                  <div className={styles.itemChips}>
+                    {item.technologies.map((t) => (
+                      <span key={t} className={styles.techChip}>{t}</span>
                     ))}
                   </div>
-                </div>
-              </Reveal>
-            </div>
+                )}
+              </div>
+            </motion.div>
           ))}
         </div>
       </div>

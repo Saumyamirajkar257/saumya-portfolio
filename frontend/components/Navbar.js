@@ -1,17 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useIsTouch } from "@/lib/hooks";
 
 const LINKS = [
   { label: "Home", href: "#home" },
   { label: "About", href: "#about" },
-  { label: "Skills", href: "#skills" },
   { label: "Projects", href: "#projects" },
   { label: "Experience", href: "#experience" },
+  { label: "Skills", href: "#skills" },
   { label: "Education", href: "#education" },
-  { label: "Certifications", href: "#certifications" },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -20,11 +20,16 @@ const LINKS = [
  * full-screen overlay menu with staggered, oversized links.
  */
 export default function Navbar({ name }) {
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const [active, setActive] = useState("");
+  const [active, setActive] = useState("#home");
   const reduce = useReducedMotion();
   const touch = useIsTouch();
+
+  if (pathname?.startsWith("/ielts") || pathname?.startsWith("/secret") || pathname?.startsWith("/vault")) {
+    return null;
+  }
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -61,18 +66,11 @@ export default function Navbar({ name }) {
 
   const scrollTo = (href) => {
     setOpen(false);
-    // Let the menu close before scrolling so layout isn't mid-anim.
+    setActive(href);
     setTimeout(() => {
       document.querySelector(href)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
     }, open ? 80 : 0);
   };
-
-  const initials = (name || "SM")
-    .split(" ")
-    .map((w) => w[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
 
   return (
     <>
@@ -89,7 +87,8 @@ export default function Navbar({ name }) {
             onClick={(e) => { e.preventDefault(); scrollTo("#home"); }}
             aria-label="Back to top"
           >
-            <span className="nav__monogram">{initials}</span>
+            <span className="nav__monogram">SM</span>
+            <span className="nav__name">Saumya Mirajkar</span>
           </a>
 
           <nav className="nav__links" aria-label="Primary">
@@ -99,19 +98,26 @@ export default function Navbar({ name }) {
                 href={l.href}
                 onClick={(e) => { e.preventDefault(); scrollTo(l.href); }}
                 className={`nav__link ${active === l.href ? "is-active" : ""}`}
+                style={{ position: "relative" }}
               >
-                {l.label}
-                <span className="nav__link-underline" aria-hidden="true" />
+                <span style={{ position: "relative", zIndex: 1 }}>{l.label}</span>
+                {active === l.href && (
+                  <motion.span
+                    layoutId="navActiveUnderline"
+                    className="nav__link-underline"
+                    transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                  />
+                )}
               </a>
             ))}
           </nav>
 
           <a
             href="#contact"
-            className="btn btn--primary btn--sm nav__cta"
+            className="nav__cta"
             onClick={(e) => { e.preventDefault(); scrollTo("#contact"); }}
           >
-            Contact
+            Let's Connect <span aria-hidden="true" style={{ marginLeft: "4px" }}>↗</span>
           </a>
 
           <button

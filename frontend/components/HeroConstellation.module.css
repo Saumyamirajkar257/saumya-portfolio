@@ -1,0 +1,109 @@
+.constel {
+  position: relative;
+  aspect-ratio: 1;
+  width: min(100%, 560px);
+  margin-inline: auto;
+}
+
+/* Rings — centered, dashed, gently rotating for a sense of motion */
+.ring {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: calc(2 * var(--cr));
+  height: calc(2 * var(--cr));
+  border-radius: 50%;
+  border: 1px dashed rgba(0, 229, 160, 0.22);
+  animation: constel-spin var(--cs) linear infinite;
+}
+.ring:nth-child(1) { border-color: rgba(0, 229, 160, 0.2); }
+.ring:nth-child(2) { border-color: rgba(79, 220, 180, 0.24); animation-direction: reverse; }
+.ring:nth-child(3) { border-color: rgba(0, 179, 122, 0.28); }
+
+@keyframes constel-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Node labels — static positions, always readable */
+.node {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translate(var(--ox), var(--oy));
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  letter-spacing: 0.05em;
+  color: var(--text);
+  background: rgba(10, 14, 18, 0.88);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 14px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  white-space: nowrap;
+  box-shadow: 0 8px 24px -12px rgba(0, 0, 0, 0.7);
+  z-index: 2;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.3s ease,
+              box-shadow 0.3s ease,
+              color 0.3s ease,
+              background 0.3s ease;
+  cursor: default;
+}
+.node:hover {
+  transform: translate(-50%, -50%) translate(var(--ox), var(--oy)) scale(1.18);
+  border-color: var(--accent);
+  color: #fff;
+  background: rgba(0, 229, 160, 0.16);
+  box-shadow: 0 0 24px rgba(0, 229, 160, 0.5), 0 0 40px rgba(0, 229, 160, 0.25);
+  z-index: 10;
+}
+
+/* Spark dot riding each ring (decorative motion only) */
+.spark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  margin-left: calc(var(--cr) * -1);
+  margin-top: calc(var(--cr) * -1);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 14px 3px rgba(0, 229, 160, 0.55);
+}
+
+/* Core label */
+.core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 3;
+}
+.coreName {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(20px, 2.4vw, 28px);
+  background: var(--grad-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.coreSub {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  margin-top: 4px;
+}
+
+@media (max-width: 560px) {
+  /* Radii are set in JS, so shrink the whole constellation on small screens
+     instead of letting the outer ring clip at the viewport edge. */
+  .constel { transform: scale(0.8); }
+  .node { font-size: 11px; padding: 4px 9px; }
+}

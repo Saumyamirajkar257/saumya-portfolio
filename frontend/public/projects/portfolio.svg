@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Personal Portfolio Website — Architecture &amp; UI</title>
+  <desc id="desc">Next.js, FastAPI, Framer Motion and Electric Blue design system architecture.</desc>
+
+  <defs>
+    <radialGradient id="portglow" cx="50%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#1683FF" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#030609" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cardGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0B1118"/>
+      <stop offset="100%" stop-color="#05080C"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternWnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#ffffff" stroke-opacity="0.03"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="675" fill="#05080C"/>
+  <rect width="1200" height="675" fill="url(#grid)"/>
+  <rect width="1200" height="675" fill="url(#portglow)"/>
+
+  <!-- Browser Frame -->
+  <rect x="180" y="80" width="840" height="515" rx="14" fill="#080D13" stroke="#1683FF" stroke-opacity="0.4" stroke-width="1.5"/>
+
+  <!-- Browser Header Bar -->
+  <path d="M 180 94 Q 110 80 194 80 L 1006 80 Q 1020 80 1020 94 L 1020 125 L 180 125 Z" fill="#0B1118" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+
+  <!-- Traffic Dots -->
+  <circle cx="210" cy="103" r="5" fill="#FF5F56" opacity="0.8"/>
+  <circle cx="228" cy="103" r="5" fill="#FFBD2E" opacity="0.8"/>
+  <circle cx="246" cy="103" r="5" fill="#27C93F" opacity="0.8"/>
+
+  <!-- URL Bar -->
+  <rect x="290" y="91" width="460" height="24" rx="6" fill="#05080C" stroke="#1683FF" stroke-opacity="0.3" stroke-width="1"/>
+  <text x="310" y="107" fill="#3EA6FF" font-family="monospace" font-size="11" letter-spacing="0.05em">https://saumyamirajkar.dev</text>
+  <circle cx="734" cy="103" r="3" fill="#1683FF"/>
+
+  <!-- Mini Navbar in preview -->
+  <rect x="210" y="145" width="780" height="36" rx="8" fill="#05080C" stroke="#ffffff" stroke-opacity="0.06"/>
+  <rect x="225" y="153" width="20" height="20" rx="4" fill="#080D13" stroke="#1683FF" stroke-width="1"/>
+  <text x="229" y="167" fill="#1683FF" font-family="monospace" font-weight="700" font-size="9">SM</text>
+  <line x1="280" y1="163" x2="320" y2="163" stroke="#ffffff" stroke-opacity="0.4" stroke-width="2" stroke-linecap="round"/>
+  <line x1="335" y1="163" x2="375" y2="163" stroke="#ffffff" stroke-opacity="0.4" stroke-width="2" stroke-linecap="round"/>
+  <line x1="390" y1="163" x2="430" y2="163" stroke="#ffffff" stroke-opacity="0.4" stroke-width="2" stroke-linecap="round"/>
+  <rect x="910" y="153" width="65" height="20" rx="6" fill="#1683FF" opacity="0.9"/>
+  <text x="922" y="166" fill="#FFFFFF" font-family="sans-serif" font-weight="600" font-size="8">Connect</text>
+
+  <!-- Hero Content Left -->
+  <rect x="210" y="200" width="120" height="10" rx="3" fill="#1683FF" opacity="0.7"/>
+  <rect x="210" y="222" width="220" height="22" rx="4" fill="#FFFFFF" opacity="0.9"/>
+  <rect x="210" y="254" width="280" height="14" rx="3" fill="#3EA6FF" opacity="0.8"/>
+  <rect x="210" y="280" width="260" height="8" rx="2" fill="#A7B0BD" opacity="0.4"/>
+  <rect x="210" y="294" width="230" height="8" rx="2" fill="#A7B0BD" opacity="0.4"/>
+  <rect x="210" y="308" width="180" height="8" rx="2" fill="#A7B0BD" opacity="0.4"/>
+
+  <!-- Hero Action Buttons -->
+  <rect x="210" y="335" width="90" height="28" rx="6" fill="#FFFFFF"/>
+  <text x="228" y="352" fill="#030609" font-family="sans-serif" font-weight="700" font-size="9">Projects ←</text>
+  <rect x="310" y="335" width="90" height="28" rx="6" fill="#080D13" stroke="#1683FF" stroke-width="1"/>
+  <text x="325" y="352" fill="#FFFFFF" font-family="sans-serif" font-weight="600" font-size="9">Resume ↓2</text>
+
+  <!-- Hero Digital Globe Visual Right -->
+  <g transform="translate(680, 290)">
+    <circle cx="0" cy="0" r="80" fill="#05080C" stroke="#1683FF" stroke-width="1.5" stroke-opacity="0.6"/>
+    <ellipse cx="0" cy="0" rx="80" ry="28" fill="none" stroke="#3EA6FF" stroke-width="1" stroke-opacity="0.4"/>
+    <ellipse cx="0" cy="0" rx="28" ry="80" fill="none" stroke="#3EA6FF" stroke-width="1" stroke-opacity="0.4"/>
+    <circle cx="-35" cy="-25" r="4" fill="#FFFFFF"/>
+    <circle cx="45" cy="-10" r="4" fill="#1683FF"/>
+    <circle cx="10" cy="40" r="4" fill="#3EA6FF"/>
+    <circle cx="-40" cy="30" r="3.5" fill="#1683FF"/>
+    <line x1="-35" y1="-25" x2="45" y2="-10" stroke="#1683FF" stroke-width="1" stroke-opacity="0.6" stroke-dasharray="3 3"/>
+    <line x1="45" y1="-10" x2="10" y2="40" stroke="#3EA6FF" stroke-width="1" stroke-opacity="0.6"/>
+    <line x1="10" y1="40" x2="-40" y2="30" stroke="#1683FF" stroke-width="1" stroke-opacity="0.6"/>
+  </g>
+
+  <!-- Stats Grid Below -->
+  <rect x="210" y="390" width="780" height="52" rx="8" fill="#05080C" stroke="#ffffff" stroke-opacity="0.08"/>
+  <g transform="translate(235, 405)">
+    <text x="0" y="16" fill="#FFFFFF" font-family="sans-serif" font-weight="800" font-size="14">3+</text>
+    <text x="0" y="28" fill="#A7B0BD" font-family="sans-serif" font-size="8">PROJECTS</text>
+  </g>
+  <g transform="translate(430, 405)">
+    <text x="0" y="16" fill="#FFFFFF" font-family="sans-serif" font-weight="800" font-size="14">5+</text>
+    <text x="0" y="28" fill="#A7B0BD" font-family="sans-serif" font-size="8">TECH STACK</text>
+  </g>
+  <g transform="translate(625, 405)">
+    <text x="0" y="16" fill="#FFFFFF" font-family="sans-serif" font-weight="800" font-size="14">∞</text>
+    <text x="0" y="28" fill="#A7B0BD" font-family="sans-serif" font-size="8">LEARNING</text>
+  </g>
+  <g transform="translate(820, 405)">
+    <text x="0" y="16" fill="#FFFFFF" font-family="sans-serif" font-weight="800" font-size="14">100%</text>
+    <text x="0" y="28" fill="#A7B0BD" font-family="sans-serif" font-size="8">PASSION</text>
+  </g>
+
+  <!-- Code / Tech Badges bottom -->
+  <g transform="translate(210, 465)">
+    <rect x="0" y="0" width="175" height="100" rx="8" fill="#080D13" stroke="#1683FF" stroke-opacity="0.3"/>
+    <text x="15" y="24" fill="#3EA6FF" font-family="monospace" font-size="10" font-weight="700">NEXT.JS 16</text>
+    <text x="15" y="45" fill="#F5F7FA" font-family="sans-serif" font-size="9">Turbopack Engine</text>
+    <text x="15" y="62" fill="#A7B0BD" font-family="sans-serif" font-size="8">SSR + Responsive</text>
+  </g>
+  <g transform="translate(410, 465)">
+    <rect x="0" y="0" width="175" height="100" rx="8" fill="#080D13" stroke="#1683FF" stroke-opacity="0.3"/>
+    <text x="15" y="24" fill="#3EA6FF" font-family="monospace" font-size="10" font-weight="700">FASTAPI</text>
+    <text x="15" y="45" fill="#F5F7FA" font-family="sans-serif" font-size="9">Python Backend</text>
+    <text x="15" y="62" fill="#A7B0BD" font-family="sans-serif" font-size="8">RESTful Endpoints</text>
+  </g>
+  <g transform="translate(610, 465)">
+    <rect x="0" y="0" width="175" height="100" rx="8" fill="#080D13" stroke="#1683FF" stroke-opacity="0.3"/>
+    <text x="15" y="24" fill="#3EA6FF" font-family="monospace" font-size="10" font-weight="700">FRAMER MOTION</text>
+    <text x="15" y="45" fill="#F5F7FA" font-family="sans-serif" font-size="9">Smooth Interactions</text>
+    <text x="15" y="62" fill="#A7B0BD" font-family="sans-serif" font-size="8">60fps Transitions</text>
+  </g>
+  <g transform="translate(810, 465)">
+    <rect x="0" y="0" width="180" height="100" rx="8" fill="#080D13" stroke="#1683FF" stroke-opacity="0.3"/>
+    <text x="15" y="24" fill="#3EA6FF" font-family="monospace" font-size="10" font-weight="700">ELECTRIC DESIGN</text>
+    <text x="15" y="45" fill="#F5F7FA" font-family="sans-serif" font-size="9">#030609 + #1683FF#</text>
+    <text x="15" y="62" fill="#A7B0BD" font-family="sans-serif" font-size="8">Minimalist Precision</text>
+  </g>
+</svg>

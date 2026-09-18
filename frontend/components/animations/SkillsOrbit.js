@@ -12,7 +12,7 @@ function categoryToRing(category) {
   return order.indexOf(category);
 }
 
-function ringRadius(ring, totalRings, minR = 110, maxR = 360) {
+function ringRadius(ring, totalRings, minR = 130, maxR = 430) {
   // exponential spread: inner rings tighter
   const t = ring / Math.max(1, totalRings - 1);
   return minR + (maxR - minR) * (t ** 1.3);

@@ -1,14 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "export",
   reactStrictMode: true,
   images: {
-    // Project images may come from a backend later; allow remote domains then.
+    unoptimized: true,
+    // Project covers are local, self-authored SVGs (schematic build diagrams).
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // Real product screenshots may come from the backend later; allow remote domains then.
     remotePatterns: [],
-  },
-  async rewrites() {
-    // In development we usually hit the API directly via NEXT_PUBLIC_API_URL.
-    // This optional proxy lets the frontend call /api/* internally if desired.
-    return [];
   },
 };
 

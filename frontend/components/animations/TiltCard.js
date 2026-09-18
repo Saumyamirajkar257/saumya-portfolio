@@ -12,15 +12,9 @@ export default function TiltCard({ children, className = "", max = 7, glare = tr
   const reduce = useReducedMotion();
   const ref = useRef(null);
 
-  // Only attach pointer logic on capable devices (defined lazily in effect).
-  const supported =
-    typeof window !== "undefined" &&
-    window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
-    !reduce;
-
   const onMove = useCallback(
     (e) => {
-      if (!supported) return;
+      if (reduce) return;
       const node = ref.current;
       if (!node) return;
       const rect = node.getBoundingClientRect();
@@ -36,7 +30,7 @@ export default function TiltCard({ children, className = "", max = 7, glare = tr
         node.style.setProperty("--glare-opacity", "1");
       }
     },
-    [supported, max, glare]
+    [reduce, max, glare]
   );
 
   const onLeave = useCallback(() => {
@@ -47,26 +41,21 @@ export default function TiltCard({ children, className = "", max = 7, glare = tr
     node.style.setProperty("--glare-opacity", "0");
   }, []);
 
-  const style = supported
-    ? {
-        transform:
-          "perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg))",
-        transformStyle: "preserve-3d",
-        transition: "transform 0.18s ease-out",
-        willChange: "transform",
-      }
-    : undefined;
-
   return (
     <motion.div
       ref={ref}
       onMouseMove={onMove}
       onMouseLeave={onLeave}
       className={`tilt-card ${className}`}
-      style={style}
+      style={{
+        transform: "perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg))",
+        transformStyle: "preserve-3d",
+        transition: "transform 0.18s ease-out",
+        willChange: "transform",
+      }}
     >
       {children}
-      {glare && supported ? (
+      {glare && (
         <span
           className="tilt-glare"
           aria-hidden="true"
@@ -75,7 +64,7 @@ export default function TiltCard({ children, className = "", max = 7, glare = tr
             opacity: "var(--glare-opacity, 0)",
           }}
         />
-      ) : null}
+      )}
     </motion.div>
   );
 }
