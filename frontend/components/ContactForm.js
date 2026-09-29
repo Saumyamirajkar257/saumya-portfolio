@@ -5,46 +5,79 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import styles from "./ContactForm.module.css";
 
+const COOLDOWN_SECONDS = 30;
+
+function withTimeout(promise, ms = 6000) {
+  const timeout = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error("Request timed out")), ms)
+  );
+  return Promise.race([promise, timeout]);
+}
+
 export default function ContactForm() {
-  const [status, setStatus] = useState("idle"); // idle | submitting | success | error
+  const [status, setStatus] = useState("idle"); // idle | submitting | success | error | ratelimited | offline
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Guard: Check online status
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      setStatus("offline");
+      return;
+    }
+
+    // Guard: Prevent duplicate submission spam (Client-side cooldown rate limit)
+    const lastSent = localStorage.getItem("portfolio_last_contact_ts");
+    const now = Date.now();
+    if (lastSent && now - Number(lastSent) < COOLDOWN_SECONDS * 1000) {
+      const remaining = Math.ceil((COOLDOWN_SECONDS * 1000 - (now - Number(lastSent))) / 1000);
+      setErrorMsg(`Please wait ${remaining}s before sending another message.`);
+      setStatus("ratelimited");
+      return;
+    }
+
     setStatus("submitting");
+    setErrorMsg("");
 
     const form = e.target;
     const data = Object.fromEntries(new FormData(form));
 
-    // Client-side honeypot check
+    // Honeypot check for automated bots
     if (data.honeypot) {
       setStatus("success");
       return;
     }
 
     try {
-      // Securely write directly to Firestore (protected by rules: only allows specific fields, lengths, and no HTML)
-      await addDoc(collection(db, "messages"), {
-        name: String(data.name).substring(0, 80).replace(/[<>]/g, ""),
-        email: String(data.email).substring(0, 254).replace(/[<>]/g, ""),
-        message: String(data.message).substring(0, 2000).replace(/[<>]/g, ""),
-        handled: false,
-        created_at: serverTimestamp(),
-      });
+      const sanitizedName = String(data.name || "").substring(0, 80).replace(/[<>]/g, "").trim();
+      const sanitizedEmail = String(data.email || "").substring(0, 254).replace(/[<>]/g, "").trim();
+      const sanitizedMessage = String(data.message || "").substring(0, 2000).replace(/[<>]/g, "").trim();
+
+      if (!sanitizedName || !sanitizedEmail || !sanitizedMessage) {
+        throw new Error("Please fill in all required fields.");
+      }
+
+      await withTimeout(
+        addDoc(collection(db, "messages"), {
+          name: sanitizedName,
+          email: sanitizedEmail,
+          message: sanitizedMessage,
+          handled: false,
+          created_at: serverTimestamp(),
+        }),
+        7000
+      );
+
+      // Record timestamp for rate limit cooldown
+      localStorage.setItem("portfolio_last_contact_ts", String(Date.now()));
 
       setStatus("success");
       form.reset();
     } catch (err) {
-      console.error(err);
-      // If Firestore write fails (e.g. rate limit / network), fallback to mailto
-      const mailBody = encodeURIComponent(
-        `${data.message}\n\n— ${data.name} (${data.email})`
-      );
-      window.open(
-        `mailto:saumyamir25@gmail.com?subject=Portfolio%20Contact&body=${mailBody}`,
-        "_self"
-      );
-      setStatus("success");
-      form.reset();
+      console.error("Submission error:", err);
+      setErrorMsg(err.message || "Unable to send message.");
+      setStatus("error");
     }
   };
 
@@ -52,8 +85,8 @@ export default function ContactForm() {
     return (
       <div className={styles.successMessage}>
         <div className={styles.successIcon}>✓</div>
-        <h3>Message Sent!</h3>
-        <p>Thanks for reaching out — I&apos;ll get back to you shortly.</p>
+        <h3>Message Sent</h3>
+        <p>Thank you for reaching out. I will get back to you shortly.</p>
         <button
           onClick={() => setStatus("idle")}
           className="btn btn--secondary btn--sm"
@@ -112,7 +145,7 @@ export default function ContactForm() {
         />
       </div>
 
-      {/* Honeypot */}
+      {/* Honeypot field */}
       <input
         type="text"
         name="honeypot"
@@ -137,13 +170,30 @@ export default function ContactForm() {
         )}
       </button>
 
-      {status === "error" && (
-        <p className={styles.errorText}>
-          Something went wrong. Try emailing me directly at{" "}
-          <a href="mailto:saumyamir25@gmail.com" style={{ color: "#FFFFFF", textDecoration: "underline" }}>
-            saumyamir25@gmail.com
-          </a>
+      {status === "ratelimited" && (
+        <p className={styles.errorText} style={{ color: "#FBBF24" }}>
+          {errorMsg}
         </p>
+      )}
+
+      {status === "offline" && (
+        <p className={styles.errorText}>
+          You appear to be offline. Please check your internet connection.
+        </p>
+      )}
+
+      {status === "error" && (
+        <div style={{ marginTop: "12px", textAlign: "center" }}>
+          <p className={styles.errorText}>
+            {errorMsg.includes("timed out")
+              ? "Connection timed out. "
+              : "Something went wrong. "}
+            You can email me directly at{" "}
+            <a href="mailto:saumyamir25@gmail.com" style={{ color: "#FFFFFF", textDecoration: "underline" }}>
+              saumyamir25@gmail.com
+            </a>
+          </p>
+        </div>
       )}
     </form>
   );
