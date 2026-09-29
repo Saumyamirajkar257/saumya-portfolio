@@ -30,7 +30,7 @@ export default function Education({ education = [] }) {
                 <div className={styles.edu__timelineContent}>
                   <div className={styles.edu__header}>
                     <h3 className={styles.edu__degree}>{ed.degree}</h3>
-                    <span className={`${styles.edu__years} text-mono`}>{ed.start_date} — {ed.end_date}</span>
+                    <span className={`${styles.edu__years} text-mono`}>{ed.start_date} - {ed.end_date}</span>
                   </div>
                   <p className={styles.edu__institution}>{ed.institution}</p>
                   
@@ -40,12 +40,21 @@ export default function Education({ education = [] }) {
 
                   {(ed.grades && Object.keys(ed.grades).length > 0) && (
                     <div className={styles.edu__grades}>
-                      {Object.entries(ed.grades).map(([k, v]) => (
-                        <span key={k} className={styles.edu__grade}>
-                          <span className={styles.edu__gradeKey}>{k}</span>
-                          <span className={styles.edu__gradeVal}>{v}</span>
-                        </span>
-                      ))}
+                      {Object.entries(ed.grades)
+                        .sort(([a], [b]) => {
+                          const numA = parseInt(a.replace(/\D/g, ""), 10);
+                          const numB = parseInt(b.replace(/\D/g, ""), 10);
+                          if (!isNaN(numA) && !isNaN(numB)) {
+                            return numA - numB;
+                          }
+                          return a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" });
+                        })
+                        .map(([k, v]) => (
+                          <span key={k} className={styles.edu__grade}>
+                            <span className={styles.edu__gradeKey}>{k}</span>
+                            <span className={styles.edu__gradeVal}>{v}</span>
+                          </span>
+                        ))}
                     </div>
                   )}
                 </div>
