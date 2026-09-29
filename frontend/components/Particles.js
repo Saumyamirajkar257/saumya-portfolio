@@ -4,11 +4,10 @@ import { useEffect, useRef } from "react";
 import { usePrefersReducedMotion } from "@/lib/hooks";
 
 /**
- * Particles — a lightweight canvas of drifting ember-like dots with subtle
- * connecting lines. GPU-friendly (transform offsets via 2d canvas), low count.
- * Respects prefers-reduced-motion (renders a static frame instead).
+ * Particles — a lightweight, high-performance canvas of ambient drifting particles.
+ * GPU-friendly, capped particle count, zero memory leaks, pauses completely when offscreen.
  */
-export default function Particles({ density = 46, className = "" }) {
+export default function Particles({ density = 32, className = "" }) {
   const canvasRef = useRef(null);
   const reduce = usePrefersReducedMotion();
 
@@ -22,31 +21,33 @@ export default function Particles({ density = 46, className = "" }) {
     let width = 0;
     let height = 0;
     let dpr = 1;
+    let isVisible = true;
 
-    const COLORS = ["255,176,84", "255,122,69", "255,94,98", "139,108,255"];
+    // Theme-aligned Electric Blue & Cyan palette
+    const COLORS = ["56,189,248", "22,131,255", "148,163,184", "12,104,212"];
 
     const resize = () => {
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      dpr = Math.min(window.devicePixelRatio || 1, 1.25);
       width = canvas.offsetWidth;
       height = canvas.offsetHeight;
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
     const particles = [];
     const makeParticles = () => {
       particles.length = 0;
-      const count = Math.max(8, Math.round((width * height) / 38000) * density / 46);
-      for (let i = 0; i < Math.min(count, 90); i++) {
+      const count = Math.min(Math.max(12, Math.round((width * height) / 50000)), 36);
+      for (let i = 0; i < count; i++) {
         particles.push({
           x: Math.random() * width,
           y: Math.random() * height,
-          r: Math.random() * 1.6 + 0.5,
-          vx: (Math.random() - 0.5) * 0.35,
-          vy: (Math.random() - 0.5) * 0.35,
+          r: Math.random() * 1.4 + 0.8,
+          vx: (Math.random() - 0.5) * 0.25,
+          vy: (Math.random() - 0.5) * 0.25,
           c: COLORS[Math.floor(Math.random() * COLORS.length)],
-          a: Math.random() * 0.5 + 0.2,
+          a: Math.random() * 0.35 + 0.15,
         });
       }
     };
@@ -54,18 +55,19 @@ export default function Particles({ density = 46, className = "" }) {
     const draw = (offset) => {
       ctx.clearRect(0, 0, width, height);
 
-      // Lines between close particles
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
+      const pLen = particles.length;
+      // Fast connecting lines
+      for (let i = 0; i < pLen; i++) {
+        for (let j = i + 1; j < pLen; j++) {
           const p = particles[i];
           const q = particles[j];
           const dx = p.x - q.x;
           const dy = p.y - q.y;
-          const dist = dx * dx + dy * dy;
-          if (dist < 120 * 120) {
-            const alpha = (1 - dist / (120 * 120)) * 0.16;
-            ctx.strokeStyle = `rgba(255,160,110,${alpha})`;
-            ctx.lineWidth = 1;
+          const distSq = dx * dx + dy * dy;
+          if (distSq < 100 * 100) {
+            const alpha = (1 - distSq / (100 * 100)) * 0.12;
+            ctx.strokeStyle = `rgba(56,189,248,${alpha})`;
+            ctx.lineWidth = 0.8;
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(q.x, q.y);
@@ -74,55 +76,73 @@ export default function Particles({ density = 46, className = "" }) {
         }
       }
 
-      // Dots with a soft glow
-      for (const p of particles) {
-        const twinkle = 0.75 + 0.25 * Math.sin(offset * 0.001 + p.r * 40);
-        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
-        grad.addColorStop(0, `rgba(${p.c},${p.a * twinkle})`);
-        grad.addColorStop(1, `rgba(${p.c},0)`);
-        ctx.fillStyle = grad;
+      // Draw particle circles
+      for (let i = 0; i < pLen; i++) {
+        const p = particles[i];
+        const twinkle = 0.85 + 0.15 * Math.sin(offset * 0.0015 + p.r * 20);
+        ctx.fillStyle = `rgba(${p.c},${p.a * twinkle})`;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, p.r * 1.8, 0, Math.PI * 2);
         ctx.fill();
       }
     };
 
     const update = () => {
-      for (const p of particles) {
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
         p.x += p.vx;
         p.y += p.vy;
-        if (p.x < -20) p.x = width + 20;
-        if (p.x > width + 20) p.x = -20;
-        if (p.y < -20) p.y = height + 20;
-        if (p.y > height + 20) p.y = -20;
+        if (p.x < -10) p.x = width + 10;
+        if (p.x > width + 10) p.x = -10;
+        if (p.y < -10) p.y = height + 10;
+        if (p.y > height + 10) p.y = -10;
       }
     };
 
     const loop = (time) => {
+      if (!isVisible) return;
       update();
       draw(time);
       raf = requestAnimationFrame(loop);
     };
 
-    const init = () => {
+    const handleResize = () => {
       resize();
       makeParticles();
-      if (reduce) {
-        draw(0); // static single frame
-        return;
-      }
-      loop(0);
+      if (reduce) draw(0);
     };
 
-    init();
-    window.addEventListener("resize", () => {
-      resize();
-      makeParticles();
-    });
+    resize();
+    makeParticles();
+
+    if (reduce) {
+      draw(0);
+    } else {
+      raf = requestAnimationFrame(loop);
+    }
+
+    // Pause canvas loop when Hero is out of viewport
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        isVisible = entry.isIntersecting;
+        if (isVisible && !reduce) {
+          cancelAnimationFrame(raf);
+          raf = requestAnimationFrame(loop);
+        } else {
+          cancelAnimationFrame(raf);
+        }
+      },
+      { threshold: 0.02 }
+    );
+    observer.observe(canvas);
+
+    window.addEventListener("resize", handleResize, { passive: true });
 
     return () => {
+      observer.disconnect();
       cancelAnimationFrame(raf);
-      window.removeEventListener("resize", init);
+      window.removeEventListener("resize", handleResize);
     };
   }, [reduce, density]);
 
@@ -131,7 +151,14 @@ export default function Particles({ density = 46, className = "" }) {
       ref={canvasRef}
       className={`particles ${className}`}
       aria-hidden="true"
-      style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}
+      style={{
+        position: "absolute",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        pointerEvents: "none",
+        willChange: "transform",
+      }}
     />
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { usePrefersReducedMotion, useMounted } from "@/lib/hooks";
 import styles from "./Preloader.module.css";
 
@@ -13,86 +13,66 @@ export default function Preloader() {
 
   useEffect(() => {
     if (reduce) {
-      setProgress(100);
       setLoaded(true);
       return;
     }
 
-    let resolved = false;
-    const timer = window.setInterval(() => {
-      setProgress((p) => {
-        const next = p + Math.random() * 12 + 4;
-        if (next >= 90) {
-          window.clearInterval(timer);
-          return 90;
-        }
-        return next;
-      });
-    }, 90);
+    let current = 0;
+    const interval = setInterval(() => {
+      current += Math.floor(Math.random() * 16) + 12;
+      if (current >= 100) {
+        current = 100;
+        clearInterval(interval);
+        setProgress(100);
+        setTimeout(() => setLoaded(true), 240);
+      } else {
+        setProgress(current);
+      }
+    }, 55);
 
-    const finish = () => {
-      if (resolved) return;
-      resolved = true;
-      window.clearInterval(timer);
-      setProgress(100);
-      setTimeout(() => setLoaded(true), 300);
-    };
-
-    if (document.readyState === "complete") {
-      finish();
-    } else {
-      window.addEventListener("load", finish, { once: true });
-    }
-
-    return () => { resolved = true; window.clearInterval(timer); };
+    return () => clearInterval(interval);
   }, [reduce]);
 
-  if (loaded || !isMounted) return null;
+  if (!isMounted || reduce) return null;
 
   return (
-    <motion.div
-      className={styles.preloader}
-      initial={false}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } }}
-      role="status"
-      aria-label="Loading portfolio"
-    >
-      <div className={styles.curtain} />
-      <div className={styles.content}>
+    <AnimatePresence>
+      {!loaded && (
         <motion.div
-          className={styles.loader}
-          animate={{ scale: [1, 1.02, 1] }}
-          transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+          className={styles.preloader}
+          initial={{ opacity: 1 }}
+          exit={{ opacity: 0, transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] } }}
+          role="status"
+          aria-label="Loading portfolio"
         >
-          <span className={styles.loader__mark}>SM</span>
-        </motion.div>
-
-        <motion.div
-          className={styles.counter}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.4 }}
-        >
-          <span className={styles.counter__num}>{progress}%</span>
-          <span className={styles.counter__bar}>
+          <div className={styles.curtain} />
+          <div className={styles.content}>
             <motion.div
-              className={styles.counter__fill}
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: progress / 100 }}
-              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-              style={{ transformOrigin: "left center" }}
-            />
-          </span>
-        </motion.div>
+              className={styles.loader}
+              animate={{ scale: [1, 1.03, 1] }}
+              transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <span className={styles.loader__mark}>SM</span>
+            </motion.div>
 
-        <motion.p
-          className={styles.hint}
-          animate={{ opacity: [0, 1, 0] }}
-          transition={{ duration: 2.5, repeat: Infinity }}
-        >
-          loading portfolio…
-        </motion.p>
-      </div>
-    </motion.div>
+            <div className={styles.counter}>
+              <span className={styles.counter__num}>{progress}%</span>
+              <span className={styles.counter__bar}>
+                <motion.div
+                  className={styles.counter__fill}
+                  animate={{ scaleX: progress / 100 }}
+                  transition={{ duration: 0.12, ease: "easeOut" }}
+                  style={{ transformOrigin: "left center" }}
+                />
+              </span>
+            </div>
+
+            <p className={styles.hint}>
+              loading portfolio…
+            </p>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

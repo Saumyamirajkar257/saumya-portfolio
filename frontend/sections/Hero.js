@@ -24,9 +24,15 @@ export default function Hero({ profile }) {
   const location = profile?.location || "Pune, Maharashtra";
 
   const scrollTo = (selector) => {
-    document.querySelector(selector)?.scrollIntoView({
-      behavior: reduce ? "auto" : "smooth",
-    });
+    const el = document.querySelector(selector);
+    if (!el) return;
+    if (window.__lenis) {
+      window.__lenis.scrollTo(el, { offset: -60, duration: 1.2 });
+    } else {
+      el.scrollIntoView({
+        behavior: reduce ? "auto" : "smooth",
+      });
+    }
   };
 
   return (
@@ -106,14 +112,12 @@ export default function Hero({ profile }) {
 
             <Magnetic>
               <a
-                href="#contact"
+                href="/resume/Saumya_Mirajkar_Resume.pdf"
+                target="_blank"
+                rel="noreferrer"
                 className="btn btn--secondary btn--lg"
-                onClick={(e) => {
-                  e.preventDefault();
-                  scrollTo("#contact");
-                }}
               >
-                Get In Touch
+                Download Résumé <span aria-hidden="true">↓</span>
               </a>
             </Magnetic>
           </motion.div>

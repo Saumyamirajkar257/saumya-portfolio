@@ -1,0 +1,29 @@
+/*
+  Cloudflare Pages / Workers Assets edge security headers.
+  These headers are injected at the CDN edge for ALL requests to the static site.
+  They complement the headers() in next.config.mjs (which only apply in dev).
+*/
+
+/*
+  Apply to every route
+*/
+https://saumya-portfolio-acv.pages.dev/*
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  X-XSS-Protection: 1; mode=block
+  Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline' https://api.fontshare.com https://fonts.googleapis.com; font-src 'self' https://api.fontshare.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://plausible.io; img-src 'self' data: blob:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firestore.googleapis.com https://api.web3forms.com https://plausible.io https://identitytoolkit.googleapis.com https://securetoken.googleapis.com; media-src 'self'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests
+
+/*
+  Also apply to workers.dev URL
+*/
+https://saumya-portfolio.saumyamir25.workers.dev/*
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  X-XSS-Protection: 1; mode=block
+  Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline' https://api.fontshare.com https://fonts.googleapis.com; font-src 'self' https://api.fontshare.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://plausible.io; img-src 'self' data: blob:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firestore.googleapis.com https://api.web3forms.com https://plausible.io https://identitytoolkit.googleapis.com https://securetoken.googleapis.com; media-src 'self'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests

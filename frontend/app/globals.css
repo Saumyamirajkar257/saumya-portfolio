@@ -21,7 +21,7 @@
   --line-accent: rgba(22, 131, 255, 0.45);
 
   /* Text — Crisp White & Balanced Muted Slate */
-  --text: #94A3B8;
+  --text: #CBD5E1;
   --text-heading: #FFFFFF;
   --text-dim: #94A3B8;
   --text-mute: #64748B;
@@ -44,7 +44,7 @@
   --grad-hero: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(22, 131, 255, 0.08), transparent 70%);
 
   --font-display: 'Satoshi', var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-body: 'Satoshi', var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: var(--font-inter), 'Satoshi', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: 'Space Mono', var(--font-mono-jb), monospace;
   --font-signature: 'Caveat', cursive;
 
@@ -58,13 +58,32 @@
   --header-h: 72px;
 }
 
-/* ------------ Reset ------------ */
+/* ------------ Reset & Lenis Integration ------------ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html {
-  scroll-behavior: smooth;
   scroll-padding-top: calc(var(--header-h) + 8px);
   -webkit-text-size-adjust: 100%;
+}
+
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
 }
 
 body {
@@ -194,7 +213,7 @@ section.block {
 
 .prose { color: var(--text-dim); max-width: 62ch; }
 .prose strong { color: var(--text); font-weight: 600; }
-.prose a { color: var(--accent); border-bottom: 1px solid rgba(0, 229, 160, 0.4); transition: border-color 0.25s; }
+.prose a { color: var(--accent); border-bottom: 1px solid rgba(56, 189, 248, 0.4); transition: border-color 0.25s; }
 .prose a:hover { border-color: var(--accent); }
 
 /* ------------ Buttons ------------ */
@@ -307,10 +326,10 @@ section.block {
 .orb {
   position: fixed;
   border-radius: 50%;
-  filter: blur(100px);
   opacity: 0.25;
   z-index: 0;
   pointer-events: none;
+  transform: translateZ(0);
   will-change: transform;
 }
 .orb--emerald,
@@ -638,6 +657,7 @@ section.block {
    ============================================================ */
 @media (max-width: 860px) {
   .nav__links { display: none; }
+  .nav__actions { display: none !important; }
   .nav__cta { display: none; }
   .nav__burger { display: flex; }
 }

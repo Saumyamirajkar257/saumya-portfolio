@@ -58,7 +58,7 @@ export default function ScrollRail() {
   useEffect(() => {
     if (reduce) return;
     const unsub = scrollY.on("change", (v) => {
-      setVisible(v > 0.08); // appears after ~8% scroll
+      setVisible(v > 120); // appears after 120px scroll
     });
     return unsub;
   }, [reduce, scrollY]);
@@ -67,7 +67,12 @@ export default function ScrollRail() {
 
   const scrollTo = (id) => {
     const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth" });
+    if (!el) return;
+    if (window.__lenis) {
+      window.__lenis.scrollTo(el, { offset: -60, duration: 1.2 });
+    } else {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   return (

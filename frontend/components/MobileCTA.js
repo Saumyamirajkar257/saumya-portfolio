@@ -25,7 +25,13 @@ export default function MobileCTA() {
         style={{ flex: 1 }}
         onClick={(e) => {
           e.preventDefault();
-          document.querySelector("#projects")?.scrollIntoView({ behavior: "smooth" });
+          const el = document.querySelector("#projects");
+          if (!el) return;
+          if (window.__lenis) {
+            window.__lenis.scrollTo(el, { offset: -60, duration: 1.2 });
+          } else {
+            el.scrollIntoView({ behavior: "smooth" });
+          }
         }}
       >
         View Work
@@ -36,7 +42,13 @@ export default function MobileCTA() {
         style={{ flex: 1 }}
         onClick={(e) => {
           e.preventDefault();
-          document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" });
+          const el = document.querySelector("#contact");
+          if (!el) return;
+          if (window.__lenis) {
+            window.__lenis.scrollTo(el, { offset: -60, duration: 1.2 });
+          } else {
+            el.scrollIntoView({ behavior: "smooth" });
+          }
         }}
       >
         Contact

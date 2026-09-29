@@ -24,7 +24,12 @@ export default function Footer() {
 
   const scrollTo = (href) => {
     const el = document.querySelector(href);
-    if (el) el.scrollIntoView({ behavior: "smooth" });
+    if (!el) return;
+    if (window.__lenis) {
+      window.__lenis.scrollTo(el, { offset: -60, duration: 1.2 });
+    } else {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   // Triple-click on the SM monogram to open secret place

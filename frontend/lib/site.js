@@ -13,7 +13,7 @@
 
 const PROD_HOST =
   process.env.VERCEL_PROJECT_PRODUCTION_URL ||
-  "frontend-kappa-cyan-44.vercel.app";
+  "saumya-portfolio-acv.pages.dev";
 
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ||
@@ -21,5 +21,5 @@ export const SITE_URL =
     ? `https://${PROD_HOST}`
     : "http://localhost:3000");
 
-/** Bare hostname, e.g. "frontend-kappa-cyan-44.vercel.app" — useful for analytics domains. */
+/** Bare hostname, e.g. "saumya-portfolio-acv.pages.dev" — useful for analytics domains. */
 export const SITE_HOST = SITE_URL.replace(/^https?:\/\//, "").split("/")[0];

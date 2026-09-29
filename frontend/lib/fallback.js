@@ -28,7 +28,7 @@ export const fallbackContent = {
     highlights: [
       { value: "4", label: "Semesters Completed" },
       { value: "3", label: "Programming Languages" },
-      { value: "10", label: "Certifications Earned" },
+      { value: "1", label: "Certification Earned" },
       { value: "2", label: "Academic Projects Built" },
     ],
     socials: {
@@ -58,61 +58,70 @@ export const fallbackContent = {
   projects: [
     {
       id: 1,
-      title: "Automatic Car Wiper System",
-      category: "IoT & Embedded",
+      title: "LifeTrackr — Personal Life OS",
+      category: "Full-Stack Web App",
       short_description:
-        "Arduino-based wiper system that detects rainfall and activates the wiper automatically.",
+        "A personal Life OS unifying tasks, habits, finance tracking, daily journaling, and analytics.",
       description:
-        "Designed and built an Arduino-based automatic wiper system using rain and moisture sensors to detect real-time weather conditions. Engineered the control logic so the wiper activates the moment rainfall is detected, removing the need for manual operation and making driving safer in changing conditions.",
+        "Architected and built LifeTrackr, a personal operating system designed to streamline daily productivity, track financial habits, manage personal tasks, log daily reflections, and deliver actionable productivity analytics in one cohesive dashboard.",
       problem:
-        "Manual wipers demand constant attention the moment rain starts.",
+        "Personal productivity tools are often fragmented across multiple disconnected apps, making it hard to maintain consistent habits, track finances, and analyze progress.",
       approach:
-        "Detected rain with moisture and rain sensors wired to an Arduino, then automated the wiper activation logic.",
+        "Unified tasks, habit streaks, expense/income tracking, daily journaling, and performance analytics into a single responsive web interface with dark theme customization and state persistence.",
       result:
-        "The wiper engages on its own the instant rain is sensed, so the driver never scrambles for the stalk.",
+        "A unified personal productivity dashboard delivering real-time progress tracking, habit streaks, financial clarity, and daily logging.",
       summary:
-        "Rain and moisture sensors feed an Arduino that fires the wiper motor the moment rain is detected — so the driver never scrambles for the stalk.",
+        "Unified tasks, habit loops, expense tracking, daily journaling, and performance analytics into a single responsive personal dashboard.",
       features: [
-        "Automatic wiper activation on rainfall detection",
-        "Rain & moisture sensor signal processing",
-        "Real-time weather condition sensing",
-        "Removes the need for manual wiper operation",
+        "Task Management with priority lists and status workflows",
+        "Habit Tracker with streak calculations and daily completion logs",
+        "Personal Finance Tracker for income, expenses, and savings goals",
+        "Daily Journaling and reflection log",
+        "Productivity Analytics with visual progress trends",
+        "User Profile and authentication flow",
+        "Custom Themes and application settings",
       ],
+      learned:
+        "Mastered state management patterns for multi-domain dashboards, persistent user settings, responsive layout composition, and custom SVG analytics visualization.",
       contribution:
-        "Designed the circuit, engineered the Arduino control logic, and integrated the sensors with the wiper mechanism.",
-      technologies: ["Arduino", "C", "C++", "Sensor Integration"],
-      github_url: "",
+        "Designed the UI/UX, implemented state management, built dashboard widgets, and engineered analytics visualizations.",
+      technologies: ["Next.js", "React", "JavaScript", "Tailwind CSS", "Framer Motion"],
+      github_url: "https://github.com/saumyamirajkar",
       live_url: "",
-      image: "/projects/car-wiper.svg",
+      image: "/projects/lifetrackr.svg",
       featured: true,
       order: 0,
     },
     {
       id: 2,
-      title: "Library Management System",
-      category: "Software",
+      title: "Automatic Car Wiper System",
+      category: "Hardware + IoT",
       short_description:
-        "Python-based system for managing book records, members, and issue/return tracking.",
+        "Arduino-based wiper system that detects rainfall and activates the wiper automatically.",
       description:
-        "Built a Python-based Library Management System to manage book records, member registration, and issue/return tracking. Implemented full CRUD operations with structured data handling so records stay reliable and easy to maintain.",
+        "Designed and built an Arduino-based automatic wiper system using rain and moisture sensors to detect real-time weather conditions. Engineered the control logic so the wiper activates the moment rainfall is detected, removing the need for manual operation and making driving safer in changing conditions.",
       problem:
-        "Paper-based records made books, members, and issue/return tracking unreliable.",
+        "Manual wipers demand constant driver attention the moment rain starts, causing distraction in adverse weather conditions.",
       approach:
-        "Designed a clean data model and a Python CRUD flow for books, members, and transactions.",
+        "Detected rain with moisture and rain sensors wired to an Arduino microcontroller, then automated the motor drive logic.",
       result:
-        "Records stay accurate and searchable, with a clear audit trail for every issue and return.",
+        "The wiper engages automatically the instant rain is sensed, removing driver distraction.",
       summary:
-        "Paper records became a Python CRUD flow for books, members and issue/return — so every record stays accurate, searchable and auditable.",
+        "Rain and moisture sensors feed an Arduino microcontroller that fires the wiper motor the moment rain is detected.",
       features: [
-        "Book record management",
-        "Member registration & accounts",
-        "Issue / return tracking",
-        "Full CRUD operations with reliable data handling",
+        "Automatic wiper activation on rainfall detection",
+        "Rain & moisture sensor signal processing",
+        "Real-time weather condition sensing",
+        "Removes manual wiper stalk operation",
       ],
-      technologies: ["Python", "File Handling", "OOP"],
-      github_url: "https://github.com/saumyamirajkar",
+      learned:
+        "Gained deep hands-on experience with analog-to-digital sensor signal interpretation, relay control circuits, and embedded C/C++ control logic.",
+      contribution:
+        "Designed the circuit schematics, engineered the Arduino control logic, and integrated physical sensors with the wiper motor mechanism.",
+      technologies: ["Arduino", "C", "C++", "Sensor Integration", "Embedded Control"],
+      github_url: "",
       live_url: "",
-      image: "/projects/library.svg",
+      image: "/projects/car-wiper.svg",
       featured: true,
       order: 1,
     },
@@ -121,31 +130,66 @@ export const fallbackContent = {
       title: "Personal Portfolio Website",
       category: "Web Development",
       short_description:
-        "A modern and responsive portfolio to showcase my work and skills.",
+        "A modern, interactive portfolio showcase built with Next.js, Framer Motion, and 3D WebGL.",
       description:
-        "Designed and developed a premium, responsive developer portfolio built with Next.js and FastAPI. Features dynamic content management, interactive UI animations, and automated contact handling.",
+        "Designed and developed a premium, responsive developer portfolio featuring an interactive 3D MacBook Pro model, fluid micro-interactions, dark dark-navy engineering aesthetics, and lightweight case study presentations.",
       problem:
-        "Need for a modern, high-performance portfolio to display IoT and software builds.",
+        "Need for a high-performance, modern platform to present hardware and software engineering builds to recruiters and collaborators.",
       approach:
-        "Built with Next.js App Router, Framer Motion, and a FastAPI backend with SQLite.",
+        "Built with Next.js App Router, Three.js GLTF WebGL rendering, Framer Motion springs, and accessible CSS design tokens.",
       result:
-        "A fast, accessible, and cinematic portfolio presenting projects and technical skills.",
+        "A fast, responsive, and cinematic developer portfolio highlighting technical projects and engineering foundation.",
       summary:
-        "Next.js frontend with FastAPI backend delivering dynamic content, smooth interactions, and live contact capability.",
+        "Next.js frontend with Three.js 3D WebGL model, Framer Motion micro-interactions, and responsive dark aesthetics.",
       features: [
-        "Dynamic API content rendering",
-        "Responsive Black & Electric Blue design",
-        "Working contact form with spam protection",
-        "Interactive project showcases and case studies",
+        "Interactive 3D WebGL MacBook Pro M5 model with subtle mouse parallax",
+        "Fluid section reveals and subtle top scroll progress line",
+        "Lightweight interactive case study modal experience",
+        "Responsive across all viewports from 320px to 1400px",
       ],
+      learned:
+        "Optimized WebGL render loops, capped device pixel ratios, integrated spring motion physics, and refined typography systems.",
       contribution:
-        "Architected the frontend and backend, implemented interactive components, and designed the UI/UX.",
-      technologies: ["Next.js", "React", "FastAPI", "Python", "JavaScript"],
+        "Architected frontend layout, integrated Three.js model, engineered motion physics, and styled design system.",
+      technologies: ["Next.js", "React", "Three.js", "Framer Motion", "JavaScript"],
       github_url: "https://github.com/saumyamirajkar",
-      live_url: "http://localhost:3000",
+      live_url: "https://saumya-portfolio-acv.pages.dev",
       image: "/projects/portfolio.svg",
       featured: true,
       order: 2,
+    },
+    {
+      id: 4,
+      title: "Library Management System",
+      category: "Python Software",
+      short_description:
+        "Python-based system for managing book records, member registrations, and transaction tracking.",
+      description:
+        "Built a Python-based Library Management System to manage book records, member registrations, and issue/return tracking. Implemented full CRUD operations with structured data handling so records stay reliable and easy to maintain.",
+      problem:
+        "Paper-based records made books, members, and issue/return tracking error-prone and difficult to search.",
+      approach:
+        "Designed a clean data model and a Python CRUD workflow for book inventories, member accounts, and transactions.",
+      result:
+        "Library records stay accurate and searchable, with a clear audit trail for every issue and return.",
+      summary:
+        "Paper records replaced with a Python CRUD workflow for books, members, and issue/return tracking.",
+      features: [
+        "Book record management and inventory tracking",
+        "Member registration & account profiles",
+        "Issue / return tracking with transaction history",
+        "Full CRUD operations with structured error handling",
+      ],
+      learned:
+        "Strengthened object-oriented programming principles, structured file handling, and modular code architecture in Python.",
+      contribution:
+        "Designed data schemas, implemented CRUD business logic, and built the command-line/file-persistence engine.",
+      technologies: ["Python", "OOP", "File Handling", "Data Management"],
+      github_url: "https://github.com/saumyamirajkar",
+      live_url: "",
+      image: "/projects/library.svg",
+      featured: false,
+      order: 3,
     },
   ],
   experience: [
@@ -196,16 +240,7 @@ export const fallbackContent = {
     },
   ],
   certifications: [
-    { id: 1, name: "Google AI Professional Certificate", organization: "Google", date: "Jul 2026", credential_url: "" },
-    { id: 2, name: "Introduction to Cloud Computing", organization: "IBM", date: "Aug 2026", credential_url: "" },
-    { id: 3, name: "Python Essentials 1", organization: "Cisco Networking Academy", date: "Jul 2026", credential_url: "" },
-    { id: 4, name: "AI Fundamentals", organization: "Google", date: "Jul 2026", credential_url: "" },
-    { id: 5, name: "AI for Brainstorming and Planning", organization: "Google", date: "Jul 2026", credential_url: "" },
-    { id: 6, name: "AI for Research and Insights", organization: "Google", date: "Jul 2026", credential_url: "" },
-    { id: 7, name: "AI for Writing and Communicating", organization: "Google", date: "Jul 2026", credential_url: "" },
-    { id: 8, name: "AI for Content Creation", organization: "Google", date: "Jul 2026", credential_url: "" },
-    { id: 9, name: "AI for Data Analysis", organization: "Google", date: "Jul 2026", credential_url: "" },
-    { id: 10, name: "AI for App Building", organization: "Google", date: "Jul 2026", credential_url: "" },
+    { id: 1, name: "Introduction to Software Engineering", organization: "IBM / Coursera", date: "2026", credential_url: "" },
   ],
   testimonials: [
     { id: 1, name: "Prof. Anand Kulkarni", role: "HOD, Computer Engineering — CWIT", text: "Saumya is one of the most dedicated students I've taught. His work on the automatic car wiper system showed genuine problem-solving ability.", relation: "Professor" },

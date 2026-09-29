@@ -89,7 +89,7 @@ export default async function Image() {
             zIndex: 1,
           }}
         >
-          Computer Engineering & IoT Student, open to internships
+          Computer Engineering & IoT Student, Pune
         </span>
       </div>
     ),

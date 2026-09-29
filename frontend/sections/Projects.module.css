@@ -82,9 +82,14 @@
 
 
 .project:hover {
-  transform: translateY(-8px);
-  border-color: rgba(56, 189, 248, 0.6);
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.15), 0 24px 48px -12px rgba(0, 0, 0, 0.9), 0 0 24px rgba(56, 189, 248, 0.2);
+  transform: translateY(-6px);
+  border-color: rgba(56, 189, 248, 0.5);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.12), 0 24px 48px -12px rgba(0, 0, 0, 0.9), 0 0 28px rgba(56, 189, 248, 0.18);
+}
+
+.project:focus-visible {
+  outline: 2px solid #38BDF8;
+  outline-offset: 3px;
 }
 
 
@@ -106,7 +111,40 @@
 
 
 .project:hover .project__shot {
-  transform: scale(1.04);
+  transform: scale(1.06);
+}
+
+.project__playOverlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(5, 8, 14, 0.35);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.project:hover .project__playOverlay {
+  opacity: 1;
+}
+
+.project__playBtn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(22, 131, 255, 0.85);
+  backdrop-filter: blur(8px);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 0 24px rgba(22, 131, 255, 0.6);
+  transform: scale(0.85);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.project:hover .project__playBtn {
+  transform: scale(1);
 }
 
 
@@ -179,11 +217,12 @@
 
 .project__title {
   font-family: var(--font-display);
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 700;
   color: #FFFFFF;
   line-height: 1.25;
   margin-bottom: 8px;
+  letter-spacing: -0.02em;
 }
 
 
@@ -241,7 +280,11 @@
 }
 
 .project:hover .project__arrow {
-  transform: translateX(4px);
+  transform: translateX(5px);
+}
+
+.project:hover .project__linkText {
+  color: #38BDF8;
 }
 
 .project__ghIcon {

@@ -9,19 +9,21 @@ export async function getContent() {
       return { ...fallbackContent, _source: "fallback" };
     }
     
-    // We expect profile to be one document.
     const profile = profileSnap.docs[0].data();
     profile.id = profileSnap.docs[0].id;
     
     const collectionsToFetch = ["skills", "projects", "experience", "education", "certifications"];
     const content = { profile, _source: "firebase" };
     
-    for (const c of collectionsToFetch) {
-      const snap = await getDocs(collection(db, c));
-      content[c] = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      // Sort them by order if it exists
+    const results = await Promise.all(
+      collectionsToFetch.map((c) => getDocs(collection(db, c)))
+    );
+
+    collectionsToFetch.forEach((c, idx) => {
+      const snap = results[idx];
+      content[c] = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       content[c].sort((a, b) => (a.order || 0) - (b.order || 0));
-    }
+    });
     
     return content;
   } catch (err) {

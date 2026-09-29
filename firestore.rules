@@ -1,18 +1,73 @@
-rules_version='2'
+rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // -----------------------------------------------------------------------
+    // Helper — only a signed-in Firebase user (your admin account) may write
+    // -----------------------------------------------------------------------
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // -----------------------------------------------------------------------
+    // Public portfolio content — ANYONE may read, ONLY admin may write
+    // profile, skills, projects, experience, education, certifications
+    // -----------------------------------------------------------------------
+    match /profile/{docId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    match /skills/{docId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    match /projects/{docId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    match /experience/{docId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    match /education/{docId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    match /certifications/{docId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    // -----------------------------------------------------------------------
+    // Contact messages — ANYONE may create (submit form), ONLY admin may read
+    // -----------------------------------------------------------------------
+    match /messages/{docId} {
+      // Anyone can submit a contact form message
+      allow create: if
+        // Must have required fields
+        request.resource.data.keys().hasAll(['name', 'email', 'message']) &&
+        // Enforce field types and max lengths to prevent abuse
+        request.resource.data.name is string &&
+        request.resource.data.name.size() <= 80 &&
+        request.resource.data.email is string &&
+        request.resource.data.email.size() <= 254 &&
+        request.resource.data.message is string &&
+        request.resource.data.message.size() <= 2000;
+      // Only admin can read, update (mark handled), or delete messages
+      allow read, update, delete: if isSignedIn();
+    }
+
+    // -----------------------------------------------------------------------
+    // Deny everything else by default
+    // -----------------------------------------------------------------------
     match /{document=**} {
-      // This rule allows anyone with your database reference to view, edit,
-      // and delete all data in your database. It is useful for getting
-      // started, but it is configured to expire after 30 days because it
-      // leaves your app open to attackers. At that time, all client
-      // requests to your database will be denied.
-      //
-      // Make sure to write security rules for your app before that time, or
-      // else all client requests to your database will be denied until you
-      // update your rules.
-      allow read, write: if request.time < timestamp.date(2026, 10, 18);
+      allow read, write: if false;
     }
   }
 }

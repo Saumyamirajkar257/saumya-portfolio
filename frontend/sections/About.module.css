@@ -104,9 +104,9 @@
 }
 
 .aboutDesc {
-  font-size: clamp(15px, 1.1vw, 16.5px);
-  color: #8F9CAE;
-  line-height: 1.7;
+  font-size: clamp(15.5px, 1.15vw, 17px);
+  color: #94A3B8;
+  line-height: 1.75;
   margin-top: 20px;
   margin-bottom: 28px;
 }
@@ -132,9 +132,10 @@
 }
 
 .statBox:hover {
-  border-color: rgba(22, 131, 255, 0.4);
-  background: rgba(14, 22, 36, 0.9);
-  transform: translateY(-2px);
+  border-color: rgba(56, 189, 248, 0.5);
+  background: rgba(14, 22, 36, 0.95);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 16px rgba(22, 131, 255, 0.12);
 }
 
 .statVal {

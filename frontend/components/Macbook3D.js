@@ -204,7 +204,7 @@ export default function Macbook3D({ interactive = true }) {
       powerPreference: "high-performance",
     });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isTouch ? 1 : 1.5));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.05;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -281,10 +281,11 @@ export default function Macbook3D({ interactive = true }) {
     finalScreenCanvas.height = 640;
     eng.screenCtx = finalScreenCanvas.getContext("2d");
     eng.screenCtx.drawImage(eng.projects[0], 0, 0);
+    eng.activeProjectIndex = 0;
     
     eng.screenTex = new THREE.CanvasTexture(finalScreenCanvas);
     eng.screenTex.colorSpace = THREE.SRGBColorSpace;
-    eng.screenTex.flipY = false; // GLTF models usually need this false
+    eng.screenTex.flipY = false;
 
     // 7. Load 3D GLB Model
     const loader = new GLTFLoader();
@@ -311,25 +312,18 @@ export default function Macbook3D({ interactive = true }) {
             child.castShadow = true;
             child.receiveShadow = true;
             
-            // Screen Material replacement (Index 27 or name "HlQwFCAPWzetDQy")
-            // A safer approach is to check for the material name if possible, or just index 27.
-            // But if it's a multi-material, we might need to be careful.
-            // We know from previous inspection it's material index 27. Let's just find it by name or replace all emissive black materials.
-            // In the M5 model, the screen usually has a specific name or is the only one emitting nothing but is placed on the screen.
-            // The previous summary explicitly says: "Material index 27 (HlQwFCAPWzetDQy)".
             if (Array.isArray(child.material)) {
-                // If it's an array of materials
-                for (let i = 0; i < child.material.length; i++) {
-                    if (child.material[i].name === 'HlQwFCAPWzetDQy' || i === 27) {
-                        child.material[i] = new THREE.MeshBasicMaterial({
-                            map: eng.screenTex
-                        });
-                    }
-                }
-            } else if (child.material.name === 'HlQwFCAPWzetDQy') {
-                child.material = new THREE.MeshBasicMaterial({
+              for (let i = 0; i < child.material.length; i++) {
+                if (child.material[i].name === 'HlQwFCAPWzetDQy' || i === 27) {
+                  child.material[i] = new THREE.MeshBasicMaterial({
                     map: eng.screenTex
-                });
+                  });
+                }
+              }
+            } else if (child.material.name === 'HlQwFCAPWzetDQy') {
+              child.material = new THREE.MeshBasicMaterial({
+                map: eng.screenTex
+              });
             }
 
             if (child.material && !child.material.map) {
@@ -355,21 +349,27 @@ export default function Macbook3D({ interactive = true }) {
       }
     );
     
-    // Scroll Listener
+    // Scroll Listener with cached layout height (prevents DOM layout thrashing on scroll)
+    let maxScroll = 1;
+    const updateMaxScroll = () => {
+      maxScroll = Math.max(1, document.body.scrollHeight - window.innerHeight);
+    };
+    updateMaxScroll();
+
     const onScroll = () => {
-      // Calculate scroll progress (0 to 1) across the whole page, or specific sections
-      const maxScroll = document.body.scrollHeight - window.innerHeight;
-      if (maxScroll > 0) {
-         eng.targetScrollProgress = window.scrollY / maxScroll;
-      }
+      eng.targetScrollProgress = window.scrollY / maxScroll;
     };
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", updateMaxScroll, { passive: true });
     onScroll();
 
-    // 8. 60 FPS Animation Loop
+    // 8. 60 FPS Animation Loop with Offscreen Pausing
     let startTime = performance.now();
+    eng.isVisible = true;
 
     const animate = (now) => {
+      if (!eng.isVisible) return;
+
       eng.rafId = requestAnimationFrame(animate);
       const elapsedSec = (now - startTime) * 0.001;
 
@@ -383,37 +383,35 @@ export default function Macbook3D({ interactive = true }) {
       
       // Rim light brightening on hover
       if (eng.rimLight) {
-         const targetRim = eng.isHovered ? 2.5 : 1.4;
-         eng.rimLight.intensity += (targetRim - eng.rimLight.intensity) * 0.1;
+        const targetRim = eng.isHovered ? 2.5 : 1.4;
+        eng.rimLight.intensity += (targetRim - eng.rimLight.intensity) * 0.1;
       }
       
       // Light Sweep (every 10 seconds)
       const sweepCycle = elapsedSec % 10.0;
       if (sweepCycle > 8.0 && sweepCycle < 9.5) {
-         // Active sweep
-         const t = (sweepCycle - 8.0) / 1.5; // 0 to 1
-         eng.sweepLight.intensity = Math.sin(t * Math.PI) * 5.0; // Peak at 5.0
-         eng.sweepLight.position.set(-2.0 + (t * 4.0), 1.0, 1.0); // Sweep from -2 to +2 X
+        const t = (sweepCycle - 8.0) / 1.5;
+        eng.sweepLight.intensity = Math.sin(t * Math.PI) * 5.0;
+        eng.sweepLight.position.set(-2.0 + (t * 4.0), 1.0, 1.0);
       } else {
-         eng.sweepLight.intensity = 0;
+        eng.sweepLight.intensity = 0;
       }
 
       // Scroll damping
       eng.scrollProgress += (eng.targetScrollProgress - eng.scrollProgress) * 0.05;
       
-      // Update screen texture based on scroll
+      // Only update screen texture when active project actually changes (prevents 60 FPS canvas redraw)
       if (eng.screenCtx && eng.screenTex) {
-         // Project section is roughly around 30% to 60% scroll
-         // 0-0.3: portfolio, 0.3-0.45: lifetrackr, >0.45: hog
-         let currentProj = 0;
-         if (eng.scrollProgress > 0.45) currentProj = 2;
-         else if (eng.scrollProgress > 0.25) currentProj = 1;
-         
-         // In a real scenario we'd crossfade based on exact progress, but drawing the active one is very fast
-         // We can do a simple fade by drawing a black rect with low alpha, then the project
-         eng.screenCtx.globalAlpha = 1.0;
-         eng.screenCtx.drawImage(eng.projects[currentProj], 0, 0);
-         eng.screenTex.needsUpdate = true;
+        let currentProj = 0;
+        if (eng.scrollProgress > 0.45) currentProj = 2;
+        else if (eng.scrollProgress > 0.25) currentProj = 1;
+        
+        if (eng.activeProjectIndex !== currentProj) {
+          eng.activeProjectIndex = currentProj;
+          eng.screenCtx.globalAlpha = 1.0;
+          eng.screenCtx.drawImage(eng.projects[currentProj], 0, 0);
+          eng.screenTex.needsUpdate = true;
+        }
       }
 
       eng.clickImpulse.x *= 0.92;
@@ -428,20 +426,15 @@ export default function Macbook3D({ interactive = true }) {
       const parallaxRotX = !prefersReduced ? -eng.currentMouse.y * 0.07 : 0;
 
       if (modelGroup) {
-        // Apply scroll-based rotation overrides
-        // Starts at DEFAULT_HERO_POSE, rotates slowly as user scrolls down
-        const scrollRotX = eng.scrollProgress * 0.5; // tilts up slightly
-        const scrollRotY = eng.scrollProgress * -1.2; // rotates to the left
+        const scrollRotX = eng.scrollProgress * 0.5;
+        const scrollRotY = eng.scrollProgress * -1.2;
 
         modelGroup.rotation.x = DEFAULT_HERO_POSE.baseRot.x + idleTiltX + parallaxRotX + eng.clickImpulse.x + scrollRotX;
         modelGroup.rotation.y = DEFAULT_HERO_POSE.baseRot.y + idleSwayY + parallaxRotY + eng.clickImpulse.y + scrollRotY;
         modelGroup.rotation.z = DEFAULT_HERO_POSE.baseRot.z;
 
         modelGroup.position.y = idleBobY;
-        
-        // Also move camera slightly back on scroll
         camera.position.z = DEFAULT_HERO_POSE.cameraPos[2] + (eng.scrollProgress * 1.5);
-
         modelGroup.scale.setScalar(eng.currentScale);
       }
 
@@ -449,6 +442,23 @@ export default function Macbook3D({ interactive = true }) {
     };
 
     eng.rafId = requestAnimationFrame(animate);
+
+    // Pause rendering loop when MacBook is out of viewport
+    const intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        eng.isVisible = entry.isIntersecting;
+        if (eng.isVisible) {
+          if (eng.rafId) cancelAnimationFrame(eng.rafId);
+          eng.rafId = requestAnimationFrame(animate);
+        } else if (eng.rafId) {
+          cancelAnimationFrame(eng.rafId);
+          eng.rafId = null;
+        }
+      },
+      { threshold: 0.05 }
+    );
+    intersectionObserver.observe(container);
 
     const handleResize = () => {
       if (!container || !renderer || !camera) return;
@@ -464,6 +474,8 @@ export default function Macbook3D({ interactive = true }) {
 
     return () => {
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", updateMaxScroll);
+      intersectionObserver.disconnect();
       resizeObserver.disconnect();
       if (eng.rafId) {
         cancelAnimationFrame(eng.rafId);

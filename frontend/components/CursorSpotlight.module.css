@@ -1,15 +1,22 @@
 .spotlight {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 680px;
+  height: 680px;
+  margin-top: -340px;
+  margin-left: -340px;
   pointer-events: none;
   z-index: 1;
-  background:
-    radial-gradient(
-      400px 400px at var(--cx, 50%) var(--cy, 50%),
-      rgba(0, 229, 160, 0.035) 0%,
-      rgba(22, 201, 160, 0.025) 35%,
-      transparent 65%
-    );
-  transition: opacity 0.4s ease-out;
-  will-change: opacity;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle closest-side,
+    rgba(56, 189, 248, 0.04) 0%,
+    rgba(22, 131, 255, 0.02) 40%,
+    transparent 70%
+  );
+  transform: translate3d(-9999px, -9999px, 0);
+  will-change: transform, opacity;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }

@@ -117,10 +117,10 @@
 }
 
 .hero__desc {
-  font-size: clamp(14.5px, 1.05vw, 16px);
-  color: #8F9CAE;
-  line-height: 1.65;
-  max-width: 480px;
+  font-size: clamp(15px, 1.1vw, 16.5px);
+  color: #94A3B8;
+  line-height: 1.7;
+  max-width: 500px;
   margin-bottom: 32px;
 }
 

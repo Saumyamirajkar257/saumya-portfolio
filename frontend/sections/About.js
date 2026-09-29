@@ -64,7 +64,6 @@ export default function About({ profile }) {
                 <span className={styles.credIcon}>📍</span>
                 <div className={styles.credText}>
                   <span className={styles.credMain}>{location}</span>
-                  <span className={styles.credSub}>Available for Full-Time Roles &amp; Internships</span>
                 </div>
               </div>
             </div>
@@ -119,7 +118,13 @@ export default function About({ profile }) {
                 className="btn btn--secondary btn--lg"
                 onClick={(e) => {
                   e.preventDefault();
-                  document.querySelector("#projects")?.scrollIntoView({ behavior: "smooth" });
+                  const el = document.querySelector("#projects");
+                  if (!el) return;
+                  if (window.__lenis) {
+                    window.__lenis.scrollTo(el, { offset: -60, duration: 1.2 });
+                  } else {
+                    el.scrollIntoView({ behavior: "smooth" });
+                  }
                 }}
               >
                 Explore My Work <span className="btn-arrow" aria-hidden="true">→</span>

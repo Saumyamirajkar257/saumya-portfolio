@@ -68,7 +68,13 @@ export default function Navbar({ name }) {
     setOpen(false);
     setActive(href);
     setTimeout(() => {
-      document.querySelector(href)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
+      const el = document.querySelector(href);
+      if (!el) return;
+      if (window.__lenis) {
+        window.__lenis.scrollTo(el, { offset: -60, duration: 1.2 });
+      } else {
+        el.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
+      }
     }, open ? 80 : 0);
   };
 
@@ -112,13 +118,24 @@ export default function Navbar({ name }) {
             ))}
           </nav>
 
-          <a
-            href="#contact"
-            className="nav__cta"
-            onClick={(e) => { e.preventDefault(); scrollTo("#contact"); }}
-          >
-            Let's Connect <span aria-hidden="true" style={{ marginLeft: "4px" }}>↗</span>
-          </a>
+          <div style={{ display: "flex", alignItems: "center", gap: "16px" }} className="nav__actions">
+            <a
+              href="/resume/Saumya_Mirajkar_Resume.pdf"
+              target="_blank"
+              rel="noreferrer"
+              className="nav__link"
+              style={{ fontWeight: 600 }}
+            >
+              Résumé <span aria-hidden="true">↓</span>
+            </a>
+            <a
+              href="#contact"
+              className="nav__cta"
+              onClick={(e) => { e.preventDefault(); scrollTo("#contact"); }}
+            >
+              Let's Connect <span aria-hidden="true" style={{ marginLeft: "4px" }}>↗</span>
+            </a>
+          </div>
 
           <button
             className={`nav__burger ${open ? "is-open" : ""}`}
@@ -163,8 +180,18 @@ export default function Navbar({ name }) {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.7, duration: 0.5 }}
                 className="nav-overlay__foot"
+                style={{ display: "flex", flexDirection: "column", gap: "16px" }}
               >
-                <span className="text-mono nav-overlay__tag">Open to internships</span>
+                <a
+                  href="/resume/Saumya_Mirajkar_Resume.pdf"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn btn--primary btn--lg"
+                  style={{ width: "fit-content" }}
+                >
+                  Download Résumé ↓
+                </a>
+                <span className="text-mono nav-overlay__tag">Pune, Maharashtra</span>
               </motion.div>
             </nav>
           </motion.div>

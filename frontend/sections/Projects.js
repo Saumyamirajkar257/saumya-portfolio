@@ -7,7 +7,7 @@ import SectionHeading from "@/components/SectionHeading";
 import Reveal from "@/components/animations/Reveal";
 import styles from "./Projects.module.css";
 
-const FILTERS = ["All", "Hardware + IoT", "Python", "Web Development"];
+const FILTERS = ["All", "Hardware + IoT", "Full-Stack & Web", "Python Software"];
 
 function ProjectCard({ project, index, onOpen }) {
   const initial = (project.title || "P").trim()[0].toUpperCase();
@@ -15,11 +15,11 @@ function ProjectCard({ project, index, onOpen }) {
 
   return (
     <motion.article
-      layout
-      initial={{ opacity: 0, y: 28 }}
+      layout="position"
+      initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "0px 0px -8% 0px" }}
-      transition={{ duration: 0.5, delay: Math.min(index * 0.08, 0.24), ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.45, delay: Math.min(index * 0.06, 0.2), ease: [0.22, 1, 0.36, 1] }}
       className={styles.project}
       onClick={() => onOpen(project)}
       data-cursor
@@ -54,6 +54,15 @@ function ProjectCard({ project, index, onOpen }) {
           <span className={styles.project__tagDot} />
           <span>{project.category || "PROJECT"}</span>
         </div>
+        {(project.live_url || project.video) && (
+          <div className={styles.project__playOverlay} aria-hidden="true">
+            <div className={styles.project__playBtn}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff">
+                <polygon points="6 3 20 12 6 21" />
+              </svg>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Body */}
@@ -113,6 +122,8 @@ export default function Projects({ projects = [] }) {
     ? projects
     : projects.filter((p) => {
         if (filter === "Hardware + IoT") return p.category === "Hardware + IoT" || p.category === "IoT & Embedded";
+        if (filter === "Full-Stack & Web") return p.category === "Full-Stack Web App" || p.category === "Web Development";
+        if (filter === "Python Software") return p.category === "Python Software" || p.category === "Software";
         return p.category === filter;
       });
 
@@ -180,7 +191,7 @@ export default function Projects({ projects = [] }) {
         </Reveal>
 
         {/* 3-column Grid */}
-        <motion.div layout className={styles.projects__grid}>
+        <motion.div layout="position" className={styles.projects__grid}>
           {sorted.map((p, i) => (
             <ProjectCard key={p.id ?? `${p.title}`} project={p} index={i} onOpen={setActiveProject} />
           ))}
@@ -237,16 +248,16 @@ export default function Projects({ projects = [] }) {
 
                 {(activeProject.problem || activeProject.approach || activeProject.result) && (
                   <div className={styles.modal__section}>
-                    <h4 className={styles.modal__h4}>Problem → Approach → Result</h4>
+                    <h4 className={styles.modal__h4}>Problem → Idea → Result</h4>
                     <ul className={styles.modal__nar}>
                       {activeProject.problem && (
-                        <li><b>Problem:</b> <span>{activeProject.problem}</span></li>
+                        <li><b>The Problem:</b> <span>{activeProject.problem}</span></li>
                       )}
                       {activeProject.approach && (
-                        <li><b>Approach:</b> <span>{activeProject.approach}</span></li>
+                        <li><b>The Concept &amp; Approach:</b> <span>{activeProject.approach}</span></li>
                       )}
                       {activeProject.result && (
-                        <li><b>Result:</b> <span>{activeProject.result}</span></li>
+                        <li><b>Result &amp; State:</b> <span>{activeProject.result}</span></li>
                       )}
                     </ul>
                   </div>
@@ -254,7 +265,7 @@ export default function Projects({ projects = [] }) {
 
                 {activeProject.features?.length > 0 && (
                   <div className={styles.modal__section}>
-                    <h4 className={styles.modal__h4}>Key Features</h4>
+                    <h4 className={styles.modal__h4}>What I Built &amp; Key Features</h4>
                     <ul className={styles.modal__list}>
                       {activeProject.features.map((f) => (
                         <li key={f} className={styles.modal__listItem}>
@@ -265,15 +276,22 @@ export default function Projects({ projects = [] }) {
                   </div>
                 )}
 
+                {activeProject.learned && (
+                  <div className={styles.modal__section}>
+                    <h4 className={styles.modal__h4}>What I Learned</h4>
+                    <p className={styles.modal__text}>{activeProject.learned}</p>
+                  </div>
+                )}
+
                 {activeProject.contribution && (
                   <div className={styles.modal__section}>
-                    <h4 className={styles.modal__h4}>My Contribution</h4>
+                    <h4 className={styles.modal__h4}>My Role &amp; Contribution</h4>
                     <p className={styles.modal__text}>{activeProject.contribution}</p>
                   </div>
                 )}
 
                 <div className={styles.modal__section}>
-                  <h4 className={styles.modal__h4}>Technologies Used</h4>
+                  <h4 className={styles.modal__h4}>Technologies</h4>
                   <div className={styles.modal__chips}>
                     {(activeProject.technologies || []).map((t) => (
                       <span key={t} className={styles.project__chip}>{t}</span>
@@ -289,7 +307,7 @@ export default function Projects({ projects = [] }) {
                   )}
                   {activeProject.live_url && (
                     <a href={activeProject.live_url} target="_blank" rel="noreferrer noopener" className="btn btn--primary btn--sm">
-                      Visit Live Site →
+                      Visit Live Demo →
                     </a>
                   )}
                 </div>

@@ -16,37 +16,21 @@ export default function ScrollProgress() {
   if (!isMounted || reduce || pathname?.startsWith("/ielts") || pathname?.startsWith("/secret") || pathname?.startsWith("/vault")) return null;
 
   return (
-    <>
-      <motion.div
-        aria-hidden="true"
-        style={{
-          scaleX,
-          transformOrigin: "0% 50%",
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 4,
-          zIndex: 9998,
-          background: "linear-gradient(90deg, #0070F3, #00d4ff, #38bdf8)",
-          boxShadow: "0 0 20px rgba(0, 112, 243, 0.6), 0 0 40px rgba(0, 212, 255, 0.3)",
-        }}
-      />
-      <motion.div
-        aria-hidden="true"
-        style={{
-          x: dotX,
-          position: "fixed",
-          top: -3,
-          width: 10,
-          height: 10,
-          borderRadius: "50%",
-          background: "#00d4ff",
-          boxShadow: "0 0 12px rgba(0, 212, 255, 0.8), 0 0 24px rgba(0, 112, 243, 0.4)",
-          zIndex: 9999,
-          pointerEvents: "none",
-        }}
-      />
-    </>
+    <motion.div
+      aria-hidden="true"
+      style={{
+        scaleX,
+        transformOrigin: "0% 50%",
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        height: 2,
+        zIndex: 9998,
+        background: "linear-gradient(90deg, #1683FF, #38BDF8)",
+        boxShadow: "0 0 8px rgba(56, 189, 248, 0.4)",
+        pointerEvents: "none",
+      }}
+    />
   );
 }

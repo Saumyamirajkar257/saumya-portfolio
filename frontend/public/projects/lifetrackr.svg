@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#05080E"/>
+      <stop offset="50%" stop-color="#090F1B"/>
+      <stop offset="100%" stop-color="#0D1629"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1683FF"/>
+      <stop offset="100%" stop-color="#38BDF8"/>
+    </linearGradient>
+    <linearGradient id="chartGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(56, 189, 248, 0.35)"/>
+      <stop offset="100%" stop-color="rgba(56, 189, 248, 0.0)"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="800" height="500" fill="url(#bgGrad)"/>
+  
+  <!-- Subtle Grid lines -->
+  <g stroke="rgba(255, 255, 255, 0.03)" stroke-width="1">
+    <line x1="0" y1="100" x2="800" y2="100"/>
+    <line x1="0" y1="200" x2="800" y2="200"/>
+    <line x1="0" y1="300" x2="800" y2="300"/>
+    <line x1="0" y1="400" x2="800" y2="400"/>
+    <line x1="200" y1="0" x2="200" y2="500"/>
+    <line x1="400" y1="0" x2="400" y2="500"/>
+    <line x1="600" y1="0" x2="600" y2="500"/>
+  </g>
+
+  <!-- Window Frame -->
+  <rect x="40" y="35" width="720" height="430" rx="12" fill="#0A0F1A" stroke="rgba(255, 255, 255, 0.1)" stroke-width="1" filter="url(#shadow)"/>
+
+  <!-- Title bar -->
+  <rect x="40" y="35" width="720" height="42" rx="12" fill="#0F172A"/>
+  <rect x="40" y="65" width="720" height="12" fill="#0F172A"/>
+  <circle cx="64" cy="56" r="5" fill="#EF4444"/>
+  <circle cx="80" cy="56" r="5" fill="#F59E0B"/>
+  <circle cx="96" cy="56" r="5" fill="#10B981"/>
+  <text x="400" y="61" fill="#94A3B8" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" text-anchor="middle">LifeTrackr — Personal Life OS</text>
+
+  <!-- Sidebar -->
+  <rect x="40" y="77" width="160" height="388" fill="#070C16" stroke="rgba(255, 255, 255, 0.05)" stroke-width="1"/>
+  <rect x="56" y="98" width="128" height="28" rx="6" fill="url(#accentGrad)" opacity="0.2"/>
+  <text x="88" y="116" fill="#38BDF8" font-family="-apple-system, sans-serif" font-size="11" font-weight="700">⚡ Overview</text>
+  <text x="88" y="152" fill="#64748B" font-family="-apple-system, sans-serif" font-size="11" font-weight="500">✓ Tasks</text>
+  <text x="88" y="188" fill="#64748B" font-family="-apple-system, sans-serif" font-size="11" font-weight="500">🔥 Habits</text>
+  <text x="88" y="224" fill="#64748B" font-family="-apple-system, sans-serif" font-size="11" font-weight="500">💳 Finance</text>
+  <text x="88" y="260" fill="#64748B" font-family="-apple-system, sans-serif" font-size="11" font-weight="500">📖 Journal</text>
+  <text x="88" y="296" fill="#64748B" font-family="-apple-system, sans-serif" font-size="11" font-weight="500">📊 Analytics</text>
+  <text x="88" y="420" fill="#475569" font-family="-apple-system, sans-serif" font-size="11" font-weight="500">⚙ Settings</text>
+
+  <!-- Dashboard Main Body -->
+  <!-- Stat Cards Row -->
+  <rect x="220" y="98" width="160" height="74" rx="8" fill="#111A2E" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1"/>
+  <text x="236" y="118" fill="#64748B" font-family="-apple-system, sans-serif" font-size="10" font-weight="600">TASKS COMPLETED</text>
+  <text x="236" y="148" fill="#FFFFFF" font-family="-apple-system, sans-serif" font-size="22" font-weight="800">28 / 32</text>
+  <text x="320" y="148" fill="#10B981" font-family="-apple-system, sans-serif" font-size="11" font-weight="700">+87%</text>
+
+  <rect x="396" y="98" width="160" height="74" rx="8" fill="#111A2E" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1"/>
+  <text x="412" y="118" fill="#64748B" font-family="-apple-system, sans-serif" font-size="10" font-weight="600">HABIT STREAK</text>
+  <text x="412" y="148" fill="#38BDF8" font-family="-apple-system, sans-serif" font-size="22" font-weight="800">14 Days</text>
+  <text x="510" y="148" fill="#F59E0B" font-family="-apple-system, sans-serif" font-size="12">🔥</text>
+
+  <rect x="572" y="98" width="168" height="74" rx="8" fill="#111A2E" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1"/>
+  <text x="588" y="118" fill="#64748B" font-family="-apple-system, sans-serif" font-size="10" font-weight="600">MONTHLY SAVINGS</text>
+  <text x="588" y="148" fill="#FFFFFF" font-family="-apple-system, sans-serif" font-size="22" font-weight="800">₹14,500</text>
+
+  <!-- Analytics Chart Area -->
+  <rect x="220" y="188" width="336" height="254" rx="8" fill="#111A2E" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1"/>
+  <text x="236" y="214" fill="#FFFFFF" font-family="-apple-system, sans-serif" font-size="12" font-weight="700">Productivity &amp; Activity Stream</text>
+  
+  <!-- Chart Line & Area -->
+  <path d="M 245,390 Q 285,310 325,350 T 405,270 T 485,310 T 535,250 L 535,400 L 245,400 Z" fill="url(#chartGrad)"/>
+  <path d="M 245,390 Q 285,310 325,350 T 405,270 T 485,310 T 535,250" fill="none" stroke="#38BDF8" stroke-width="3"/>
+  <circle cx="535" cy="250" r="4" fill="#38BDF8" stroke="#FFFFFF" stroke-width="2"/>
+
+  <!-- Right Tasks Column -->
+  <rect x="572" y="188" width="168" height="254" rx="8" fill="#111A2E" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1"/>
+  <text x="588" y="214" fill="#FFFFFF" font-family="-apple-system, sans-serif" font-size="12" font-weight="700">Daily Focus</text>
+  
+  <rect x="584" y="232" width="144" height="34" rx="6" fill="#0A0F1D"/>
+  <circle cx="598" cy="249" r="6" fill="#10B981"/>
+  <text x="612" y="253" fill="#E2E8F0" font-family="-apple-system, sans-serif" font-size="10">System Test</text>
+
+  <rect x="584" y="274" width="144" height="34" rx="6" fill="#0A0F1D"/>
+  <circle cx="598" cy="291" r="6" fill="#10B981"/>
+  <text x="612" y="295" fill="#E2E8F0" font-family="-apple-system, sans-serif" font-size="10">Journal Log</text>
+
+  <rect x="584" y="316" width="144" height="34" rx="6" fill="#0A0F1D"/>
+  <circle cx="598" cy="333" r="6" fill="#38BDF8"/>
+  <text x="612" y="337" fill="#E2E8F0" font-family="-apple-system, sans-serif" font-size="10">Budget Review</text>
+
+  <rect x="584" y="358" width="144" height="34" rx="6" fill="#0A0F1D"/>
+  <circle cx="598" cy="375" r="6" fill="#64748B"/>
+  <text x="612" y="379" fill="#94A3B8" font-family="-apple-system, sans-serif" font-size="10">Habit Checklist</text>
+</svg>
