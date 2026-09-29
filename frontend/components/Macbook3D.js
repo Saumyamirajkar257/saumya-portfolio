@@ -47,11 +47,11 @@ function createProjectCanvas(type) {
     ctx.fillRect(660, 100, 320, 140);
     ctx.fillRect(660, 260, 320, 140);
     
-    ctx.fillStyle = "#38bdf8";
+    ctx.fillStyle = "#FFFFFF";
     ctx.fillText("Activity Overview", 80, 150);
     
     // Chart lines
-    ctx.strokeStyle = "#38bdf8";
+    ctx.strokeStyle = "#FFFFFF";
     ctx.lineWidth = 5;
     ctx.beginPath();
     ctx.moveTo(80, 340);
@@ -64,7 +64,7 @@ function createProjectCanvas(type) {
     // Fill under chart
     ctx.lineTo(600, 400);
     ctx.lineTo(80, 400);
-    ctx.fillStyle = "rgba(56, 189, 248, 0.1)";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
     ctx.fill();
   } else if (type === 'hog') {
     ctx.fillText("House of Gamers", 110, 38);

@@ -33,9 +33,9 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: #080D14;
+  background: #121215;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #E2E8F0;
+  color: #E4E4E7;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
   transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
               color 0.3s ease,
@@ -47,18 +47,18 @@
 .skillIcon.hovered,
 .skillNode:hover .skillIcon {
   transform: scale(1.18);
-  color: #38BDF8;
-  border-color: rgba(56, 189, 248, 0.6);
-  box-shadow: 0 0 24px rgba(56, 189, 248, 0.35);
-  background: #0C131D;
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 24px rgba(255, 255, 255, 0.3);
+  background: #18181C;
 }
 
 .skillLabel {
   font-family: var(--font-mono);
   font-size: 11.5px;
   font-weight: 600;
-  color: #94A3B8;
-  background: rgba(8, 13, 20, 0.85);
+  color: #A1A1AA;
+  background: rgba(18, 18, 22, 0.85);
   padding: 3px 10px;
   border-radius: 6px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -69,8 +69,8 @@
 
 .skillNode:hover .skillLabel {
   color: #FFFFFF;
-  border-color: rgba(56, 189, 248, 0.4);
-  background: rgba(12, 18, 29, 0.95);
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(28, 28, 34, 0.95);
   transform: translateY(2px);
 }
 
@@ -82,17 +82,17 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #38BDF8 0%, #1683FF 100%);
+  background: #FFFFFF;
   display: grid;
   place-items: center;
-  box-shadow: 0 0 30px rgba(22, 131, 255, 0.5);
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.35);
   z-index: 1;
 }
 
 .centerText {
   font-family: var(--font-display);
   font-weight: 800;
-  color: #030609;
+  color: #09090B;
   font-size: 13.5px;
   letter-spacing: -0.01em;
 }
@@ -101,7 +101,7 @@
   position: absolute;
   inset: -6px;
   border-radius: 50%;
-  border: 1.5px solid rgba(56, 189, 248, 0.4);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
   animation: pulseCore 3s ease-out infinite;
   pointer-events: none;
 }
@@ -125,10 +125,10 @@
   align-items: center;
   gap: 16px;
   padding: 16px;
-  background: #080D14;
+  background: #121215;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-m);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 .mobileSkillIcon {
@@ -138,9 +138,9 @@
   height: 44px;
   flex-shrink: 0;
   border-radius: 10px;
-  background: rgba(22, 131, 255, 0.1);
-  border: 1px solid rgba(56, 189, 248, 0.2);
-  color: #38BDF8;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #FFFFFF;
 }
 
 .mobileSkillInfo {
@@ -167,13 +167,13 @@
 .mobileSkillCat {
   font-family: var(--font-mono);
   font-size: 10.5px;
-  color: #38BDF8;
+  color: #A1A1AA;
   letter-spacing: 0.02em;
 }
 
 .mobileSkillDesc {
   font-size: 12.5px;
-  color: #94A3B8;
+  color: var(--text-dim);
   line-height: 1.4;
 }
 
@@ -187,9 +187,9 @@
   text-align: center;
   padding: 36px 24px;
   border-radius: var(--radius-m);
-  background: #080D14;
+  background: #121215;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06), 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06), 0 20px 40px -15px rgba(0, 0, 0, 0.8);
   margin-top: 32px;
 }
 
@@ -197,7 +197,7 @@
   font-family: var(--font-display);
   font-size: 42px;
   line-height: 1;
-  color: #1683FF;
+  color: #FFFFFF;
   margin-bottom: 4px;
 }
 
@@ -214,7 +214,7 @@
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.14em;
-  color: #38BDF8;
+  color: #A1A1AA;
   text-transform: uppercase;
 }
 

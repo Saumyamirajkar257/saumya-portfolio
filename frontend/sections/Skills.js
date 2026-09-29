@@ -146,8 +146,8 @@ export default function Skills({ skills = [] }) {
             {/* Ambient Radial Gradient Background in SVG */}
             <defs>
               <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#1683FF" stopOpacity="0" />
+                <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.08" />
+                <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
               </radialGradient>
             </defs>
             <circle cx="0" cy="0" r="280" fill="url(#centerGlow)" />
@@ -166,7 +166,7 @@ export default function Skills({ skills = [] }) {
                   y1="0"
                   x2={n.x}
                   y2={n.y}
-                  stroke={isHovered ? "rgba(56, 189, 248, 0.6)" : "rgba(255, 255, 255, 0.08)"}
+                  stroke={isHovered ? "rgba(255, 255, 255, 0.7)" : "rgba(255, 255, 255, 0.08)"}
                   strokeWidth={isHovered ? "2" : "1"}
                   initial={{ pathLength: 0 }}
                   whileInView={{ pathLength: 1 }}
@@ -189,7 +189,7 @@ export default function Skills({ skills = [] }) {
                     y1={prev.y}
                     x2={n.x}
                     y2={n.y}
-                    stroke={isHovered ? "rgba(56, 189, 248, 0.4)" : "rgba(255, 255, 255, 0.04)"}
+                    stroke={isHovered ? "rgba(255, 255, 255, 0.45)" : "rgba(255, 255, 255, 0.04)"}
                     strokeWidth="1"
                     initial={{ pathLength: 0 }}
                     whileInView={{ pathLength: 1 }}

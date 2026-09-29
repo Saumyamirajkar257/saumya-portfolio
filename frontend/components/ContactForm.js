@@ -140,7 +140,7 @@ export default function ContactForm() {
       {status === "error" && (
         <p className={styles.errorText}>
           Something went wrong. Try emailing me directly at{" "}
-          <a href="mailto:saumyamir25@gmail.com" style={{ color: "#38BDF8" }}>
+          <a href="mailto:saumyamir25@gmail.com" style={{ color: "#FFFFFF", textDecoration: "underline" }}>
             saumyamir25@gmail.com
           </a>
         </p>

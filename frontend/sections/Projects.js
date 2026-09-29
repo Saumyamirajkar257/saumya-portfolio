@@ -70,7 +70,7 @@ function ProjectCard({ project, index, onOpen }) {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
           <span className={styles.project__cat}>{project.category}</span>
           {isFeatured && (
-            <span style={{ fontSize: "10px", color: "#38BDF8", fontFamily: "var(--font-mono)", fontWeight: "600" }}>
+            <span style={{ fontSize: "10px", color: "#FFFFFF", fontFamily: "var(--font-mono)", fontWeight: "600" }}>
               ★ FEATURED
             </span>
           )}

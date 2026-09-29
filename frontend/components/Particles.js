@@ -23,8 +23,8 @@ export default function Particles({ density = 32, className = "" }) {
     let dpr = 1;
     let isVisible = true;
 
-    // Theme-aligned Electric Blue & Cyan palette
-    const COLORS = ["56,189,248", "22,131,255", "148,163,184", "12,104,212"];
+    // Theme-aligned Monochrome Silver & Platinum palette
+    const COLORS = ["255,255,255", "228,228,231", "161,161,170", "113,113,122"];
 
     const resize = () => {
       dpr = Math.min(window.devicePixelRatio || 1, 1.25);
@@ -65,8 +65,8 @@ export default function Particles({ density = 32, className = "" }) {
           const dy = p.y - q.y;
           const distSq = dx * dx + dy * dy;
           if (distSq < 100 * 100) {
-            const alpha = (1 - distSq / (100 * 100)) * 0.12;
-            ctx.strokeStyle = `rgba(56,189,248,${alpha})`;
+            const alpha = (1 - distSq / (100 * 100)) * 0.08;
+            ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
             ctx.lineWidth = 0.8;
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
