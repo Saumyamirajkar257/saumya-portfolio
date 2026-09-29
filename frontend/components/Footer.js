@@ -113,26 +113,31 @@ export default function Footer() {
         </div>
 
         <div className="footer__bottom">
-          <span>
-            © {year} Saumya Mirajkar. All rights reserved
-            {/* Hidden secret period trigger that only you know */}
-            <span
-              onClick={() => {
-                window.location.href = "/ielts";
-              }}
-              style={{
-                cursor: "default",
-                userSelect: "none",
-                display: "inline-block",
-                padding: "0 1px",
-              }}
-              title=""
-            >
-              .
+          <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
+            <span>
+              © {year} Saumya Mirajkar. All rights reserved
+              <span
+                onClick={() => {
+                  window.location.href = "/ielts";
+                }}
+                style={{
+                  cursor: "default",
+                  userSelect: "none",
+                  display: "inline-block",
+                  padding: "0 1px",
+                }}
+                title=""
+              >
+                .
+              </span>
             </span>
-          </span>
+            <span style={{ color: "var(--line-strong)" }}>•</span>
+            <a href="/privacy" className="footer__link" style={{ fontSize: "12px" }}>Privacy Policy</a>
+            <span style={{ color: "var(--line-strong)" }}>•</span>
+            <a href="/terms" className="footer__link" style={{ fontSize: "12px" }}>Terms of Service</a>
+          </div>
           <span className="text-mono" style={{ fontSize: "11.5px", color: "var(--text-faint)" }}>
-            Next.js • FastAPI • IoT &amp; Software Engineering
+            Computer Engineering &amp; IoT Portfolio
           </span>
         </div>
       </div>

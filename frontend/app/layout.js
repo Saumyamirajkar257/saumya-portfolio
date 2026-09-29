@@ -113,10 +113,6 @@ export default function RootLayout({ children }) {
 
         {/* Smooth scroll provider wraps everything */}
         <SmoothScrollProvider>
-          {/* Subtle ambient lighting */}
-          <span className="orb orb--blue" aria-hidden="true" />
-          <span className="orb orb--cyan" aria-hidden="true" />
-
           <ScrollProgress />
           <CursorSpotlight />
           <ScrollRail />

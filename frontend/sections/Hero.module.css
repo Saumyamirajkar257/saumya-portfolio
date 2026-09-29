@@ -178,12 +178,11 @@
 .hero__scrollArrow {
   color: #FFFFFF;
   font-size: 13px;
-  animation: bounceDown 2s infinite;
+  transition: transform 0.2s ease;
 }
 
-@keyframes bounceDown {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(4px); }
+.hero__scrollText:hover .hero__scrollArrow {
+  transform: translateY(2px);
 }
 
 /* --------- Right Column: MacBook Mockup --------- */

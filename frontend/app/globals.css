@@ -68,8 +68,6 @@ html {
 
 body {
   background: var(--bg);
-  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-  background-size: 32px 32px;
   color: var(--text);
   font-family: var(--font-body);
   font-size: 16px;
@@ -298,40 +296,6 @@ section.block {
   border-radius: var(--radius-m);
   box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06), 0 20px 40px -15px rgba(0, 0, 0, 0.8);
 }
-
-/* ------------ Ambient orbs (Monochrome Silver Glow) ------------ */
-.orb {
-  position: fixed;
-  border-radius: 50%;
-  opacity: 0.2;
-  z-index: 0;
-  pointer-events: none;
-  transform: translateZ(0);
-  will-change: transform;
-}
-.orb--emerald,
-.orb--blue {
-  width: 50vw;
-  height: 50vw;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.04), transparent 70%);
-  top: -15vw;
-  left: 25vw;
-  animation: orb-drift-a 28s ease-in-out infinite alternate;
-  opacity: 0.25;
-}
-.orb--mint,
-.orb--cyan {
-  width: 40vw;
-  height: 40vw;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.03), transparent 70%);
-  top: 40vh;
-  right: -10vw;
-  animation: orb-drift-b 32s ease-in-out infinite alternate;
-  opacity: 0.2;
-}
-
-@keyframes orb-drift-a { to { transform: translate(9vw, 7vh) scale(1.12); } }
-@keyframes orb-drift-b { to { transform: translate(-8vw, -6vh) scale(1.15); } }
 
 /* ------------ Marquee ------------ */
 .marquee {

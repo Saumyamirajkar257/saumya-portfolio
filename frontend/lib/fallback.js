@@ -242,9 +242,4 @@ export const fallbackContent = {
   certifications: [
     { id: 1, name: "Introduction to Software Engineering", organization: "IBM / Coursera", date: "2026", credential_url: "" },
   ],
-  testimonials: [
-    { id: 1, name: "Prof. Anand Kulkarni", role: "HOD, Computer Engineering — CWIT", text: "Saumya is one of the most dedicated students I've taught. His work on the automatic car wiper system showed genuine problem-solving ability.", relation: "Professor" },
-    { id: 2, name: "Riya Deshpande", role: "Team Lead — Big Bang Tech Solutions", text: "During his internship, Saumya consistently delivered clean, well-tested code ahead of schedule. He'd be a strong addition to any development team.", relation: "Manager" },
-    { id: 3, name: "Aditya Patil", role: "Classmate & Project Partner", text: "I worked with Saumya on multiple academic projects. He's the kind of teammate who takes ownership — his reliability and technical curiosity make him stand out.", relation: "Peer" },
-  ],
 };
