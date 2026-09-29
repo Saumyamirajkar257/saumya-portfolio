@@ -5,6 +5,7 @@ import Link from "next/link";
 import { auth, db } from "@/lib/firebase";
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
 import { collection, getDocs, doc, setDoc, deleteDoc, updateDoc } from "firebase/firestore";
+import { fallbackContent } from "@/lib/fallback";
 import "./admin.css";
 
 /* ------------------------------------------------------------------ */
@@ -14,7 +15,7 @@ import "./admin.css";
 const parseLines = (s) => (s || "").split("\n").map((x) => x.trim()).filter(Boolean);
 const joinLines = (arr = []) => (Array.isArray(arr) ? arr.join("\n") : "");
 
-/* Field config -> auto-generated forms. type: text|textarea|lines|json|checkbox */
+/* Field config -> auto-generated forms. type: text|textarea|lines|json|checkbox|number */
 const MODELS = {
   profile: {
     label: "About / Profile", singular: "Profile", collection: "profile", isSingleton: true,
@@ -40,6 +41,7 @@ const MODELS = {
       { key: "category", label: "Category", type: "text" },
       { key: "icon", label: "Icon key", type: "text" },
       { key: "keywords", label: "Keywords (one per line)", type: "lines" },
+      { key: "order", label: "Display Priority / Sequence (0 = Top / First)", type: "number" },
     ],
   },
   projects: {
@@ -58,8 +60,9 @@ const MODELS = {
       { key: "technologies", label: "Technologies (one per line)", type: "lines" },
       { key: "github_url", label: "GitHub URL", type: "text" },
       { key: "live_url", label: "Live URL", type: "text" },
-      { key: "image", label: "Cover image path (e.g. /projects/car-wiper.svg)", type: "text" },
+      { key: "image", label: "Cover image path (e.g. /projects/portfolio-preview.png)", type: "text" },
       { key: "featured", label: "Featured (larger card)", type: "checkbox" },
+      { key: "order", label: "Display Priority / Sequence (0 = Top / First)", type: "number" },
     ],
   },
   experience: {
@@ -73,6 +76,7 @@ const MODELS = {
       { key: "current", label: "Current role", type: "checkbox" },
       { key: "responsibilities", label: "Responsibilities (one per line)", type: "lines" },
       { key: "technologies", label: "Technologies (one per line)", type: "lines" },
+      { key: "order", label: "Display Priority / Sequence (0 = Top / First)", type: "number" },
     ],
   },
   education: {
@@ -86,6 +90,7 @@ const MODELS = {
       { key: "current", label: "Currently enrolled", type: "checkbox" },
       { key: "details", label: "Details (one per line)", type: "lines" },
       { key: "grades", label: "Grades (JSON e.g. {\"Sem 1\":\"70.82%\"})", type: "json" },
+      { key: "order", label: "Display Priority / Sequence (0 = Top / First)", type: "number" },
     ],
   },
   certifications: {
@@ -97,6 +102,7 @@ const MODELS = {
       { key: "date", label: "Date (e.g. Jul 2026)", type: "text" },
       { key: "credential_url", label: "Credential URL", type: "text" },
       { key: "logo", label: "Logo URL / Path (e.g. /logos/ibm.svg)", type: "text" },
+      { key: "order", label: "Display Priority / Sequence (0 = Top / First, 1 = Second...)", type: "number" },
     ],
   },
 };
@@ -157,6 +163,17 @@ function FieldInput({ field, value, onChange }) {
   if (field.type === "checkbox") {
     return <input type="checkbox" checked={Boolean(value)} onChange={(e) => onChange(e.target.checked)} />;
   }
+  if (field.type === "number") {
+    return (
+      <input 
+        type="number" 
+        min="0"
+        value={value === undefined || value === null ? "" : value} 
+        onChange={(e) => onChange(e.target.value === "" ? "" : Number(e.target.value))} 
+        placeholder="0"
+      />
+    );
+  }
   return <input type="text" value={value === undefined || value === null ? "" : value} onChange={(e) => onChange(e.target.value)} />;
 }
 
@@ -167,6 +184,8 @@ function buildPayload(model, values) {
     let v = values[f.key];
     if (f.type === "lines") {
       v = parseLines(v);
+    } else if (f.type === "number") {
+      v = v === "" || v === undefined || v === null ? 0 : Number(v);
     } else if (f.type === "json") {
       const raw = String(v || "").trim();
       if (!raw) {
@@ -191,7 +210,7 @@ function valuesFromItem(fields, item) {
     let v = item?.[f.key];
     if (f.type === "lines") v = joinLines(v);
     else if (f.type === "json") v = JSON.stringify(v ?? (f.key === "socials" || f.key === "highlights" ? (Array.isArray(v) ? [] : {}) : {}), null, 1);
-    out[f.key] = v === undefined ? (f.type === "checkbox" ? false : "") : v;
+    out[f.key] = v === undefined ? (f.type === "checkbox" ? false : f.type === "number" ? 0 : "") : v;
   }
   return out;
 }
@@ -213,7 +232,7 @@ function ContentManager({ modelKey }) {
     try {
       const snap = await getDocs(collection(db, model.collection));
       const fetched = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      fetched.sort((a, b) => (a.order || 0) - (b.order || 0));
+      fetched.sort((a, b) => (Number(a.order ?? 999) - Number(b.order ?? 999)));
       setItems(fetched);
     } catch (err) {
       setError(err.message);
@@ -224,10 +243,15 @@ function ContentManager({ modelKey }) {
   useEffect(() => { refresh(); }, [refresh]);
 
   const beginNew = () => {
-    setValues(valuesFromItem(model.fields, null));
+    const initial = valuesFromItem(model.fields, null);
+    if ("order" in initial) {
+      initial.order = items.length;
+    }
+    setValues(initial);
     setEditing("new");
     setError("");
   };
+
   const beginEdit = (item) => {
     setValues(valuesFromItem(model.fields, item));
     setEditing(item);
@@ -240,15 +264,16 @@ function ContentManager({ modelKey }) {
 
     try {
       if (editing === "new") {
-        payload.order = items.length;
-        // generate a random id or rely on firestore
+        if (payload.order === undefined || payload.order === null) {
+          payload.order = items.length;
+        }
         const docRef = doc(collection(db, model.collection));
         await setDoc(docRef, payload);
       } else if (model.isSingleton) {
         const targetId = editing.id || "main";
         await setDoc(doc(db, model.collection, targetId), payload, { merge: true });
       } else {
-        await updateDoc(doc(db, model.collection, editing.id), payload);
+        await setDoc(doc(db, model.collection, String(editing.id)), payload, { merge: true });
       }
 
       setNotice(`${model.singular} saved ✓`);
@@ -260,13 +285,38 @@ function ContentManager({ modelKey }) {
     }
   };
 
+  const moveItem = async (index, direction) => {
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= items.length) return;
+
+    const currentItem = items[index];
+    const targetItem = items[targetIndex];
+
+    try {
+      await updateDoc(doc(db, model.collection, String(currentItem.id)), { order: targetIndex });
+      await updateDoc(doc(db, model.collection, String(targetItem.id)), { order: index });
+      setNotice(`Reordered sequence ✓`);
+      refresh();
+      setTimeout(() => setNotice(""), 2500);
+    } catch (err) {
+      setError("Reorder failed: " + err.message);
+    }
+  };
+
   const remove = async (item) => {
     if (model.isSingleton) return;
-    if (!window.confirm(`Delete "${item.name || item.title || item.position || item.institution}"?`)) return;
+    const confirmName = item.name || item.title || item.position || item.institution || "this item";
+    if (!window.confirm(`Are you sure you want to delete "${confirmName}"?`)) return;
+    
     try {
-      await deleteDoc(doc(db, model.collection, item.id));
+      setError("");
+      await deleteDoc(doc(db, model.collection, String(item.id)));
+      setItems((prev) => prev.filter((i) => String(i.id) !== String(item.id)));
+      setNotice(`Deleted ${model.singular} ✓`);
+      setTimeout(() => setNotice(""), 3000);
       refresh();
     } catch (err) {
+      console.error("Delete error:", err);
       setError("Delete failed: " + err.message);
     }
   };
@@ -306,13 +356,43 @@ function ContentManager({ modelKey }) {
         </div>
       ) : (
         <ul className="admin-list">
-          {items.map((item) => (
+          {items.map((item, idx) => (
             <li key={item.id} className="admin-list__item">
-              <div className="admin-list__main">
-                <strong>{headline(item)}</strong>
-                <span className="admin-muted">{item.category || item.company || item.institution || item.organization || ""}</span>
+              <div className="admin-list__left">
+                {!model.isSingleton && (
+                  <span className="admin-list__orderBadge" title={`Priority / Order: ${item.order ?? idx}`}>
+                    #{idx + 1}
+                  </span>
+                )}
+                <div className="admin-list__main">
+                  <strong>{headline(item)}</strong>
+                  <span className="admin-muted">{item.organization || item.issuer || item.category || item.company || item.institution || ""}</span>
+                </div>
               </div>
+
               <div className="admin-list__tools">
+                {!model.isSingleton && (
+                  <div className="admin-reorder-btns">
+                    <button 
+                      type="button" 
+                      className="admin-reorder-btn" 
+                      onClick={() => moveItem(idx, -1)}
+                      disabled={idx === 0}
+                      title="Move up (Show higher on website)"
+                    >
+                      ↑
+                    </button>
+                    <button 
+                      type="button" 
+                      className="admin-reorder-btn" 
+                      onClick={() => moveItem(idx, 1)}
+                      disabled={idx === items.length - 1}
+                      title="Move down (Show lower on website)"
+                    >
+                      ↓
+                    </button>
+                  </div>
+                )}
                 <button className="admin-btn admin-btn--sm" onClick={() => beginEdit(item)}>Edit</button>
                 {!model.isSingleton && (
                   <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(item)}>Delete</button>
@@ -320,7 +400,7 @@ function ContentManager({ modelKey }) {
               </div>
             </li>
           ))}
-          {!loading && items.length === 0 && <p className="admin-muted">Nothing here yet — create one.</p>}
+          {!loading && items.length === 0 && <p className="admin-muted">Nothing in Firestore yet. Click "+ New" to add, or sync default data from the Overview tab.</p>}
         </ul>
       )}
     </div>
@@ -394,6 +474,59 @@ function MessagesManager() {
 }
 
 function Overview({ onLogout }) {
+  const [seeding, setSeeding] = useState(false);
+  const [seedMsg, setSeedMsg] = useState("");
+
+  const seedDatabase = async () => {
+    if (!window.confirm("This will write/sync default profile, skills, projects, experience, education, and certifications into Firestore. Continue?")) return;
+    setSeeding(true);
+    setSeedMsg("");
+    try {
+      // 1. Profile
+      await setDoc(doc(db, "profile", "main"), fallbackContent.profile, { merge: true });
+
+      // 2. Skills
+      for (let i = 0; i < fallbackContent.skills.length; i++) {
+        const skill = fallbackContent.skills[i];
+        const id = String(skill.id || `skill-${i}`);
+        await setDoc(doc(db, "skills", id), { ...skill, order: i }, { merge: true });
+      }
+
+      // 3. Projects
+      for (let i = 0; i < fallbackContent.projects.length; i++) {
+        const proj = fallbackContent.projects[i];
+        const id = String(proj.id || `proj-${i}`);
+        await setDoc(doc(db, "projects", id), { ...proj, order: i }, { merge: true });
+      }
+
+      // 4. Experience
+      for (let i = 0; i < fallbackContent.experience.length; i++) {
+        const exp = fallbackContent.experience[i];
+        const id = String(exp.id || `exp-${i}`);
+        await setDoc(doc(db, "experience", id), { ...exp, order: i }, { merge: true });
+      }
+
+      // 5. Education
+      for (let i = 0; i < fallbackContent.education.length; i++) {
+        const edu = fallbackContent.education[i];
+        const id = String(edu.id || `edu-${i}`);
+        await setDoc(doc(db, "education", id), { ...edu, order: i }, { merge: true });
+      }
+
+      // 6. Certifications
+      for (let i = 0; i < fallbackContent.certifications.length; i++) {
+        const cert = fallbackContent.certifications[i];
+        const id = String(cert.id || `cert-${i}`);
+        await setDoc(doc(db, "certifications", id), { ...cert, order: i }, { merge: true });
+      }
+
+      setSeedMsg("Successfully synced all default content to Firestore! You can now edit, reorder, or delete any item ✓");
+    } catch (err) {
+      setSeedMsg("Sync failed: " + err.message);
+    }
+    setSeeding(false);
+  };
+
   return (
     <div className="admin-panel">
       <div className="admin-overview">
@@ -402,9 +535,29 @@ function Overview({ onLogout }) {
           <button className="admin-btn" onClick={onLogout}>Sign out</button>
         </div>
         <p className="admin-muted admin-tip">
-          Welcome to the new Firebase-powered Serverless Admin Panel!
-          Content changes here are instantly saved to Firestore and live on the public site.
+          Welcome to your Firebase Serverless Admin Panel!
+          Content changes here are instantly saved to Firestore and live on the public site in real time.
         </p>
+
+        <div style={{ marginTop: "32px", padding: "24px", background: "var(--surface)", border: "1px solid var(--line)", borderRadius: "14px" }}>
+          <h3 style={{ fontSize: "17px", marginBottom: "8px", color: "#FFFFFF" }}>Initialize / Sync Firestore Database</h3>
+          <p className="admin-muted" style={{ marginBottom: "16px", fontSize: "13.5px" }}>
+            If your Firestore collections are empty or you want all initial skills, projects, and certifications available in Firestore for editing and deleting, click below:
+          </p>
+          <button 
+            type="button" 
+            className="admin-btn admin-btn--primary" 
+            onClick={seedDatabase}
+            disabled={seeding}
+          >
+            {seeding ? "Syncing..." : "⚡ Sync Default Content to Firestore"}
+          </button>
+          {seedMsg && (
+            <p style={{ marginTop: "14px", fontSize: "13.5px", color: seedMsg.includes("failed") ? "#ff8086" : "var(--cyan)" }}>
+              {seedMsg}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -430,12 +583,6 @@ export default function AdminPage() {
 
   if (!user) return <LoginScreen onLogin={setUser} />;
 
-  const TABS = ["overview", ...Object.keys(MODELS), "messages"];
-
-  const handleLogout = () => {
-    signOut(auth);
-  };
-
   return (
     <div className="admin">
       <aside className="admin__side">
@@ -453,16 +600,13 @@ export default function AdminPage() {
           <button className={`admin__navBtn ${tab === "messages" ? "is-active" : ""}`} onClick={() => setTab("messages")}>Messages</button>
         </nav>
         <div className="admin__foot">
-          <Link href="/" className="admin-btn">← View site</Link>
+          <Link href="/" className="admin-btn" style={{ width: "100%", justifyContent: "center" }}>View site ↗</Link>
         </div>
       </aside>
-
       <main className="admin__main">
-        {tab === "overview" && <Overview onLogout={handleLogout} />}
+        {tab === "overview" && <Overview onLogout={() => signOut(auth)} />}
+        {tab in MODELS && <ContentManager modelKey={tab} />}
         {tab === "messages" && <MessagesManager />}
-        {TABS.filter((t) => t !== "overview" && t !== "messages").map((k) =>
-          tab === k ? <ContentManager key={k} modelKey={k} /> : null
-        )}
       </main>
     </div>
   );

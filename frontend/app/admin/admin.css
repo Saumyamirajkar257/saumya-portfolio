@@ -110,14 +110,68 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 15px 18px;
+  padding: 14px 18px;
   border: 1px solid var(--line);
   border-radius: 12px;
   background: var(--surface);
+  transition: border-color 0.2s;
+}
+.admin-list__item:hover {
+  border-color: var(--line-strong);
+}
+.admin-list__left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.admin-list__orderBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 26px;
+  padding-inline: 6px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
 }
 .admin-list__main { display: grid; gap: 3px; }
 .admin-list__main strong { font-size: 15px; }
-.admin-list__tools { display: flex; gap: 8px; }
+.admin-list__tools { display: flex; align-items: center; gap: 6px; }
+
+.admin-reorder-btns {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: 6px;
+}
+.admin-reorder-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid var(--line-strong);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.admin-reorder-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #FFFFFF;
+  color: #FFFFFF;
+}
+.admin-reorder-btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
 
 /* edit form */
 .admin-edit {

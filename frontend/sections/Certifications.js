@@ -7,7 +7,8 @@ import styles from "./Certifications.module.css";
 
 export default function Certifications({ certifications = [] }) {
   const [showAll, setShowAll] = useState(false);
-  const visible = showAll ? certifications : certifications.slice(0, 6);
+  const sorted = [...certifications].sort((a, b) => Number(a.order ?? 999) - Number(b.order ?? 999));
+  const visible = showAll ? sorted : sorted.slice(0, 6);
 
   if (!certifications.length) return null;
 
