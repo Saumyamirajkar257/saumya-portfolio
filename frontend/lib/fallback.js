@@ -154,7 +154,7 @@ export const fallbackContent = {
       technologies: ["Next.js", "React", "Three.js", "Framer Motion", "JavaScript"],
       github_url: "https://github.com/saumyamirajkar",
       live_url: "https://saumya-portfolio-acv.pages.dev",
-      image: "/projects/portfolio.svg",
+      image: "/projects/portfolio-preview.png",
       featured: true,
       order: 2,
     },

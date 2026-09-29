@@ -21,13 +21,11 @@ export default function ContactForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Guard: Check online status
     if (typeof navigator !== "undefined" && !navigator.onLine) {
       setStatus("offline");
       return;
     }
 
-    // Guard: Prevent duplicate submission spam (Client-side cooldown rate limit)
     const lastSent = localStorage.getItem("portfolio_last_contact_ts");
     const now = Date.now();
     if (lastSent && now - Number(lastSent) < COOLDOWN_SECONDS * 1000) {
@@ -43,35 +41,38 @@ export default function ContactForm() {
     const form = e.target;
     const data = Object.fromEntries(new FormData(form));
 
-    // Honeypot check for automated bots
     if (data.honeypot) {
       setStatus("success");
       return;
     }
 
     try {
-      const sanitizedName = String(data.name || "").substring(0, 80).replace(/[<>]/g, "").trim();
-      const sanitizedEmail = String(data.email || "").substring(0, 254).replace(/[<>]/g, "").trim();
-      const sanitizedMessage = String(data.message || "").substring(0, 2000).replace(/[<>]/g, "").trim();
+      const firstName = String(data.firstName || "").substring(0, 50).replace(/[<>]/g, "").trim();
+      const lastName = String(data.lastName || "").substring(0, 50).replace(/[<>]/g, "").trim();
+      const name = `${firstName} ${lastName}`.trim();
+      const email = String(data.email || "").substring(0, 254).replace(/[<>]/g, "").trim();
+      const subject = String(data.subject || "").substring(0, 150).replace(/[<>]/g, "").trim();
+      const message = String(data.message || "").substring(0, 2000).replace(/[<>]/g, "").trim();
 
-      if (!sanitizedName || !sanitizedEmail || !sanitizedMessage) {
-        throw new Error("Please fill in all required fields.");
+      if (!firstName || !email || !message) {
+        throw new Error("Please fill in your name, email, and message.");
       }
 
-      await withTimeout(
-        addDoc(collection(db, "messages"), {
-          name: sanitizedName,
-          email: sanitizedEmail,
-          message: sanitizedMessage,
-          handled: false,
-          created_at: serverTimestamp(),
-        }),
-        7000
-      );
+      if (db) {
+        await withTimeout(
+          addDoc(collection(db, "messages"), {
+            name,
+            email,
+            subject: subject || "General Inquiry",
+            message,
+            handled: false,
+            created_at: serverTimestamp(),
+          }),
+          7000
+        );
+      }
 
-      // Record timestamp for rate limit cooldown
       localStorage.setItem("portfolio_last_contact_ts", String(Date.now()));
-
       setStatus("success");
       form.reset();
     } catch (err) {
@@ -85,8 +86,8 @@ export default function ContactForm() {
     return (
       <div className={styles.successMessage}>
         <div className={styles.successIcon}>✓</div>
-        <h3>Message Sent</h3>
-        <p>Thank you for reaching out. I will get back to you shortly.</p>
+        <h3>Message Received</h3>
+        <p>Thank you for reaching out. I'll get back to you shortly.</p>
         <button
           onClick={() => setStatus("idle")}
           className="btn btn--secondary btn--sm"
@@ -100,46 +101,71 @@ export default function ContactForm() {
 
   return (
     <form className={styles.form} onSubmit={handleSubmit} autoComplete="on">
+      {/* Row 1: First Name & Last Name */}
       <div className={styles.formRow}>
         <div className={styles.formGroup}>
-          <label htmlFor="cf-name" className={styles.label}>Name</label>
           <input
             type="text"
-            id="cf-name"
-            name="name"
+            id="cf-first-name"
+            name="firstName"
             required
             minLength={2}
-            maxLength={80}
-            placeholder="Your name"
+            maxLength={50}
+            placeholder="Your first name"
             className={styles.input}
             disabled={status === "submitting"}
           />
         </div>
         <div className={styles.formGroup}>
-          <label htmlFor="cf-email" className={styles.label}>Email</label>
           <input
-            type="email"
-            id="cf-email"
-            name="email"
-            required
-            maxLength={254}
-            placeholder="you@example.com"
+            type="text"
+            id="cf-last-name"
+            name="lastName"
+            maxLength={50}
+            placeholder="Your last name"
             className={styles.input}
             disabled={status === "submitting"}
           />
         </div>
       </div>
 
+      {/* Row 2: Email */}
       <div className={styles.formGroup}>
-        <label htmlFor="cf-message" className={styles.label}>Message</label>
+        <input
+          type="email"
+          id="cf-email"
+          name="email"
+          required
+          maxLength={254}
+          placeholder="you@example.com"
+          className={styles.input}
+          disabled={status === "submitting"}
+        />
+      </div>
+
+      {/* Row 3: How can I help? */}
+      <div className={styles.formGroup}>
+        <input
+          type="text"
+          id="cf-subject"
+          name="subject"
+          maxLength={150}
+          placeholder="How can I help?"
+          className={styles.input}
+          disabled={status === "submitting"}
+        />
+      </div>
+
+      {/* Row 4: Message Textarea */}
+      <div className={styles.formGroup}>
         <textarea
           id="cf-message"
           name="message"
           required
           minLength={10}
           maxLength={2000}
-          rows={5}
-          placeholder="Tell me about your project, team, or idea..."
+          rows={4}
+          placeholder="Write your message here"
           className={styles.textarea}
           disabled={status === "submitting"}
         />
@@ -157,7 +183,7 @@ export default function ContactForm() {
 
       <button
         type="submit"
-        className={`btn btn--primary btn--lg ${styles.submitBtn}`}
+        className={styles.submitBtn}
         disabled={status === "submitting"}
       >
         {status === "submitting" ? (
@@ -166,7 +192,7 @@ export default function ContactForm() {
             Sending…
           </span>
         ) : (
-          <>Send Message <span className="btn-arrow" aria-hidden="true">→</span></>
+          <span>Send Message →</span>
         )}
       </button>
 
@@ -183,7 +209,7 @@ export default function ContactForm() {
       )}
 
       {status === "error" && (
-        <div style={{ marginTop: "12px", textAlign: "center" }}>
+        <div style={{ marginTop: "10px", textAlign: "center" }}>
           <p className={styles.errorText}>
             {errorMsg.includes("timed out")
               ? "Connection timed out. "

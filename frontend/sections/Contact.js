@@ -1,16 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 import ContactForm from "@/components/ContactForm";
 import styles from "./Contact.module.css";
 
 export default function Contact({ profile }) {
   const socials = profile?.socials || {};
-  const email = profile?.email || "Saumyamirajkar25@icloud.com";
+  const email = profile?.email || "saumyamir25@gmail.com";
 
   return (
-    <section id="contact" className="block">
+    <section id="contact" className={styles.section}>
       <div className="wrap">
         <motion.div
           className={styles.contactWrapper}
@@ -19,7 +18,7 @@ export default function Contact({ profile }) {
           viewport={{ once: true }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         >
-          {/* Left — Heading & Links */}
+          {/* Left Column — Heading, Bio & Links */}
           <div className={styles.contactLeft}>
             <div className={styles.contactBadge}>
               <span className={styles.statusDot} />
@@ -28,12 +27,11 @@ export default function Contact({ profile }) {
 
             <h2 className={styles.minimalTitle}>
               Let's Build<br />
-              <span className="gradient-text">Something.</span>
+              <span style={{ color: "#FFFFFF" }}>Something Great.</span>
             </h2>
 
             <p className={styles.minimalDesc}>
-              Got a hardware/IoT challenge, a software project, or just want to talk tech?
-              Drop a message or reach out directly.
+              Got a hardware/IoT challenge, a software project, or an internship opportunity? Drop a message or reach out directly.
             </p>
 
             <div className={styles.directLinks}>
@@ -72,7 +70,7 @@ export default function Contact({ profile }) {
             </div>
           </div>
 
-          {/* Right — Contact Form */}
+          {/* Right Column — Clean Contact Form */}
           <div className={styles.contactRight}>
             <ContactForm />
           </div>
