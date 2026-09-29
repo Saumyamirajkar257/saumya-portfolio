@@ -19,15 +19,15 @@ function createProjectCanvas(type) {
   c.width = 1024;
   c.height = 640;
   const ctx = c.getContext("2d");
-  
+
   // Background
   ctx.fillStyle = "#0A0A0A";
   ctx.fillRect(0, 0, 1024, 640);
-  
+
   // Header (macOS style)
   ctx.fillStyle = "#111111";
   ctx.fillRect(0, 0, 1024, 60);
-  
+
   // Window controls
   ctx.fillStyle = "#FF5F56";
   ctx.beginPath(); ctx.arc(30, 30, 8, 0, Math.PI * 2); ctx.fill();
@@ -35,72 +35,91 @@ function createProjectCanvas(type) {
   ctx.beginPath(); ctx.arc(55, 30, 8, 0, Math.PI * 2); ctx.fill();
   ctx.fillStyle = "#27C93F";
   ctx.beginPath(); ctx.arc(80, 30, 8, 0, Math.PI * 2); ctx.fill();
-  
+
   ctx.font = "bold 22px -apple-system, BlinkMacSystemFont, sans-serif";
   ctx.fillStyle = "#ffffff";
-  
-  if (type === 'lifetrackr') {
-    ctx.fillText("LifeTrackr Dashboard", 110, 38);
+
+  if (type === "lifetrackr") {
+    ctx.fillText("LifeTrackr - Health & Vitals Dashboard", 110, 38);
     // UI elements
-    ctx.fillStyle = "#151515";
+    ctx.fillStyle = "#141417";
     ctx.fillRect(40, 100, 600, 300);
     ctx.fillRect(660, 100, 320, 140);
     ctx.fillRect(660, 260, 320, 140);
-    
+
     ctx.fillStyle = "#FFFFFF";
-    ctx.fillText("Activity Overview", 80, 150);
-    
+    ctx.font = "600 18px -apple-system, sans-serif";
+    ctx.fillText("Real-time Sensor Telemetry", 70, 140);
+
     // Chart lines
     ctx.strokeStyle = "#FFFFFF";
-    ctx.lineWidth = 5;
+    ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.moveTo(80, 340);
-    ctx.lineTo(200, 260);
-    ctx.lineTo(350, 300);
-    ctx.lineTo(500, 180);
-    ctx.lineTo(600, 220);
+    ctx.moveTo(70, 320);
+    ctx.lineTo(180, 240);
+    ctx.lineTo(320, 280);
+    ctx.lineTo(460, 190);
+    ctx.lineTo(580, 230);
     ctx.stroke();
-    
+
     // Fill under chart
-    ctx.lineTo(600, 400);
-    ctx.lineTo(80, 400);
-    ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
+    ctx.lineTo(580, 360);
+    ctx.lineTo(70, 360);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.08)";
     ctx.fill();
-  } else if (type === 'hog') {
-    ctx.fillText("House of Gamers", 110, 38);
-    // Grid of cards
-    for(let i=0; i<3; i++) {
-       for(let j=0; j<2; j++) {
-         ctx.fillStyle = "#151515";
-         ctx.fillRect(40 + i*320, 100 + j*260, 290, 230);
-         // Image placeholder
-         ctx.fillStyle = i % 2 === 0 ? "#4338ca" : "#6d28d9";
-         ctx.fillRect(40 + i*320, 100 + j*260, 290, 140);
-       }
-    }
-  } else if (type === 'portfolio') {
-    ctx.fillText("Saumya.dev - VS Code", 110, 38);
-    ctx.fillStyle = "#1e1e1e";
+
+    // Right widgets
+    ctx.fillStyle = "#FFFFFF";
+    ctx.font = "bold 28px -apple-system, sans-serif";
+    ctx.fillText("98.6°F", 690, 160);
+    ctx.font = "14px monospace";
+    ctx.fillStyle = "#A1A1AA";
+    ctx.fillText("Body Temp · Normal", 690, 190);
+
+    ctx.fillStyle = "#FFFFFF";
+    ctx.font = "bold 28px -apple-system, sans-serif";
+    ctx.fillText("74 BPM", 690, 320);
+    ctx.font = "14px monospace";
+    ctx.fillStyle = "#A1A1AA";
+    ctx.fillText("Heart Rate · Resting", 690, 350);
+  } else if (type === "wiper") {
+    ctx.fillText("Automatic Rain Sensing Wiper (Embedded C++)", 110, 38);
+    ctx.fillStyle = "#121215";
     ctx.fillRect(0, 60, 1024, 580);
-    
-    ctx.fillStyle = "#252526"; // sidebar
-    ctx.fillRect(0, 60, 220, 580);
-    
-    ctx.font = "20px monospace";
-    ctx.fillStyle = "#4ec9b0"; // class color
-    ctx.fillText("function", 260, 120);
-    ctx.fillStyle = "#dcdcaa"; // function color
-    ctx.fillText("Macbook3D", 360, 120);
-    ctx.fillStyle = "#d4d4d4"; 
-    ctx.fillText("() {", 470, 120);
-    ctx.fillStyle = "#569cd6"; // keyword
-    ctx.fillText("return", 300, 170);
-    ctx.fillStyle = "#ce9178"; // string
-    ctx.fillText("<Canvas />", 380, 170);
-    ctx.fillStyle = "#d4d4d4"; 
-    ctx.fillText("}", 260, 220);
+
+    ctx.font = "19px monospace";
+    ctx.fillStyle = "#A1A1AA";
+    ctx.fillText("// Arduino / ESP32 Rain Sensor Controller", 60, 120);
+
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillText("#define RAIN_PIN A0", 60, 160);
+    ctx.fillText("#define SERVO_PIN 9", 60, 195);
+    ctx.fillText("Servo wiperServo;", 60, 230);
+
+    ctx.fillText("void loop() {", 60, 280);
+    ctx.fillText("  int val = analogRead(RAIN_PIN);", 90, 315);
+    ctx.fillText("  int speed = map(val, 1023, 0, 0, 180);", 90, 350);
+    ctx.fillText("  wiperServo.write(speed);", 90, 385);
+    ctx.fillText("  delay(speed > 50 ? 200 : 800);", 90, 420);
+    ctx.fillText("}", 60, 455);
+  } else {
+    ctx.fillText("Saumya Mirajkar · Developer Terminal", 110, 38);
+    ctx.fillStyle = "#121215";
+    ctx.fillRect(0, 60, 1024, 580);
+
+    ctx.font = "18px monospace";
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillText("saumya@portfolio:~$ neofetch --engineer", 60, 120);
+
+    ctx.fillStyle = "#A1A1AA";
+    ctx.fillText("---------------------------------------", 60, 150);
+    ctx.fillText("OS: IoT & Embedded Systems (C/C++, Python)", 60, 185);
+    ctx.fillText("Host: Cusrow Wadia Institute of Technology", 60, 220);
+    ctx.fillText("Hardware: Arduino, ESP8266/ESP32, Microcontrollers", 60, 255);
+    ctx.fillText("Web: Next.js, React, FastAPI, Node.js", 60, 290);
+    ctx.fillText("Status: Available for Internships & Projects ✓", 60, 325);
   }
-  
+
   return c;
 }
 
@@ -114,67 +133,105 @@ export default function Macbook3D({ interactive = true }) {
   const [loadProgress, setLoadProgress] = useState(0);
   const [loadError, setLoadError] = useState(null);
 
-  // Animation & Physics Engine Refs (Zero React re-render overhead)
+  // Animation & Physics Engine Refs
   const engine = useRef({
     scene: null,
     camera: null,
     renderer: null,
     modelGroup: null,
+    lidMesh: null,
     keyLight: null,
     rimLight: null,
     sweepLight: null,
     rafId: null,
 
-    // Mouse Parallax Physics
+    // Smooth Unfold / Open Animation
+    openProgress: 0.0,
+    targetOpenProgress: 1.0,
+
+    // Mouse Parallax & Drag Orbit Physics
     targetMouse: { x: 0, y: 0 },
     currentMouse: { x: 0, y: 0 },
     isHovered: false,
+    isDragging: false,
+    dragStart: { x: 0, y: 0 },
+    dragDelta: { x: 0, y: 0 },
 
-    // Scale Hover Physics (1.0 -> 1.02)
+    // Scale Hover Physics
     targetScale: 1.0,
     currentScale: 1.0,
 
     // Click Impulse
     clickImpulse: { x: 0, y: 0 },
-    
+
     // Scroll state
     scrollProgress: 0,
     targetScrollProgress: 0,
-    
+
     // Screen texture
     screenCtx: null,
     screenTex: null,
-    projects: []
+    projects: [],
+    activeProjectIndex: 0,
   });
 
-  // Mouse Parallax Handlers
+  // Pointer Movement Handlers
   const handlePointerMove = (e) => {
     if (prefersReduced || isTouch || !interactive) return;
     const container = containerRef.current;
     if (!container) return;
 
     const rect = container.getBoundingClientRect();
-    const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1; // -1 to 1
-    const ny = -(((e.clientY - rect.top) / rect.height) * 2 - 1); // -1 to 1
+    const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    const ny = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
 
     engine.current.targetMouse.x = Math.max(-1, Math.min(1, nx));
     engine.current.targetMouse.y = Math.max(-1, Math.min(1, ny));
+
+    if (engine.current.isDragging) {
+      const dx = (e.clientX - engine.current.dragStart.x) * 0.005;
+      const dy = (e.clientY - engine.current.dragStart.y) * 0.005;
+      engine.current.dragDelta.x = dx;
+      engine.current.dragDelta.y = dy;
+    }
+  };
+
+  const handlePointerDown = (e) => {
+    if (prefersReduced || isTouch || !interactive) return;
+    engine.current.isDragging = true;
+    engine.current.dragStart.x = e.clientX;
+    engine.current.dragStart.y = e.clientY;
+  };
+
+  const handlePointerUp = () => {
+    engine.current.isDragging = false;
+  };
+
+  const handlePointerEnter = () => {
     engine.current.isHovered = true;
-    engine.current.targetScale = 1.02; // +2% subtle depth on hover
+    engine.current.targetScale = 1.02;
   };
 
   const handlePointerLeave = () => {
+    engine.current.isHovered = false;
+    engine.current.isDragging = false;
     engine.current.targetMouse.x = 0;
     engine.current.targetMouse.y = 0;
-    engine.current.isHovered = false;
     engine.current.targetScale = 1.0;
   };
 
-  // Subtle click tactile micro-nudge
   const handleClick = () => {
-    if (!interactive || prefersReduced) return;
-    engine.current.clickImpulse.y += 0.025;
-    engine.current.clickImpulse.x += 0.01;
+    if (!interactive) return;
+    engine.current.clickImpulse.x = 0.06;
+    engine.current.clickImpulse.y = -0.04;
+
+    // Cycle through project screens
+    const eng = engine.current;
+    if (eng.screenCtx && eng.screenTex && eng.projects.length) {
+      eng.activeProjectIndex = (eng.activeProjectIndex + 1) % eng.projects.length;
+      eng.screenCtx.drawImage(eng.projects[eng.activeProjectIndex], 0, 0);
+      eng.screenTex.needsUpdate = true;
+    }
   };
 
   useEffect(() => {
@@ -183,20 +240,28 @@ export default function Macbook3D({ interactive = true }) {
     if (!container || !canvas) return;
 
     const eng = engine.current;
-    let width = container.clientWidth || 520;
-    let height = container.clientHeight || 440;
+    const width = container.clientWidth;
+    const height = container.clientHeight;
 
     // 1. Scene
     const scene = new THREE.Scene();
     eng.scene = scene;
 
     // 2. Camera
-    const camera = new THREE.PerspectiveCamera(32, width / height, 0.1, 100);
-    camera.position.set(...DEFAULT_HERO_POSE.cameraPos);
-    camera.lookAt(...DEFAULT_HERO_POSE.cameraTarget);
+    const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100);
+    camera.position.set(
+      DEFAULT_HERO_POSE.cameraPos[0],
+      DEFAULT_HERO_POSE.cameraPos[1],
+      DEFAULT_HERO_POSE.cameraPos[2] + 0.8 // starts slightly further and zooms in smoothly
+    );
+    camera.lookAt(
+      DEFAULT_HERO_POSE.cameraTarget[0],
+      DEFAULT_HERO_POSE.cameraTarget[1],
+      DEFAULT_HERO_POSE.cameraTarget[2]
+    );
     eng.camera = camera;
 
-    // 3. WebGL Renderer
+    // 3. Renderer
     const renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: true,
@@ -212,7 +277,7 @@ export default function Macbook3D({ interactive = true }) {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     eng.renderer = renderer;
 
-    // 4. Space Black Studio Lighting
+    // 4. Lighting Setup
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
     scene.add(ambientLight);
 
@@ -221,16 +286,15 @@ export default function Macbook3D({ interactive = true }) {
     scene.add(keyLight);
     eng.keyLight = keyLight;
 
-    const cyanRim = new THREE.DirectionalLight(0x38bdf8, 1.4);
-    cyanRim.position.set(-4.0, 3.0, -3.0);
-    scene.add(cyanRim);
-    eng.rimLight = cyanRim;
+    const rimLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    rimLight.position.set(-4.0, 3.0, -3.0);
+    scene.add(rimLight);
+    eng.rimLight = rimLight;
 
-    const softFill = new THREE.DirectionalLight(0xffffff, 0.45);
+    const softFill = new THREE.DirectionalLight(0xffffff, 0.4);
     softFill.position.set(-3.0, 1.5, 3.0);
     scene.add(softFill);
-    
-    // Cinematic Sweep Light (moves across laptop)
+
     const sweepLight = new THREE.PointLight(0xffffff, 0, 4.0);
     scene.add(sweepLight);
     eng.sweepLight = sweepLight;
@@ -259,30 +323,30 @@ export default function Macbook3D({ interactive = true }) {
     shadowMesh.position.y = -0.38;
     scene.add(shadowMesh);
 
-    // 6. Model Container Group
+    // 6. Model Container Group (starts angled & unfolds on load)
     const modelGroup = new THREE.Group();
     modelGroup.rotation.set(
-      DEFAULT_HERO_POSE.baseRot.x,
-      DEFAULT_HERO_POSE.baseRot.y,
+      DEFAULT_HERO_POSE.baseRot.x + 0.45, // starts tilted forward
+      DEFAULT_HERO_POSE.baseRot.y - 0.25,
       DEFAULT_HERO_POSE.baseRot.z
     );
     scene.add(modelGroup);
     eng.modelGroup = modelGroup;
-    
+
     // Prepare screen textures
     eng.projects = [
-      createProjectCanvas('portfolio'),
-      createProjectCanvas('lifetrackr'),
-      createProjectCanvas('hog')
+      createProjectCanvas("terminal"),
+      createProjectCanvas("lifetrackr"),
+      createProjectCanvas("wiper"),
     ];
-    
+
     const finalScreenCanvas = document.createElement("canvas");
     finalScreenCanvas.width = 1024;
     finalScreenCanvas.height = 640;
     eng.screenCtx = finalScreenCanvas.getContext("2d");
     eng.screenCtx.drawImage(eng.projects[0], 0, 0);
     eng.activeProjectIndex = 0;
-    
+
     eng.screenTex = new THREE.CanvasTexture(finalScreenCanvas);
     eng.screenTex.colorSpace = THREE.SRGBColorSpace;
     eng.screenTex.flipY = false;
@@ -311,23 +375,19 @@ export default function Macbook3D({ interactive = true }) {
           if (child.isMesh) {
             child.castShadow = true;
             child.receiveShadow = true;
-            
+
             if (Array.isArray(child.material)) {
               for (let i = 0; i < child.material.length; i++) {
-                if (child.material[i].name === 'HlQwFCAPWzetDQy' || i === 27) {
+                if (child.material[i].name === "HlQwFCAPWzetDQy" || i === 27) {
                   child.material[i] = new THREE.MeshBasicMaterial({
-                    map: eng.screenTex
+                    map: eng.screenTex,
                   });
                 }
               }
-            } else if (child.material.name === 'HlQwFCAPWzetDQy') {
+            } else if (child.material && child.material.name === "HlQwFCAPWzetDQy") {
               child.material = new THREE.MeshBasicMaterial({
-                map: eng.screenTex
+                map: eng.screenTex,
               });
-            }
-
-            if (child.material && !child.material.map) {
-              child.material.envMapIntensity = 0.9;
             }
           }
         });
@@ -348,8 +408,8 @@ export default function Macbook3D({ interactive = true }) {
         setLoading(false);
       }
     );
-    
-    // Scroll Listener with cached layout height (prevents DOM layout thrashing on scroll)
+
+    // Scroll Listener
     let maxScroll = 1;
     const updateMaxScroll = () => {
       maxScroll = Math.max(1, document.body.scrollHeight - window.innerHeight);
@@ -363,7 +423,7 @@ export default function Macbook3D({ interactive = true }) {
     window.addEventListener("resize", updateMaxScroll, { passive: true });
     onScroll();
 
-    // 8. 60 FPS Animation Loop with Offscreen Pausing
+    // 8. 60 FPS Animation Loop
     let startTime = performance.now();
     eng.isVisible = true;
 
@@ -373,42 +433,34 @@ export default function Macbook3D({ interactive = true }) {
       eng.rafId = requestAnimationFrame(animate);
       const elapsedSec = (now - startTime) * 0.001;
 
-      // Mouse parallax damping
+      // Smooth Opening Unfold Animation (Spring from 0 to 1)
+      eng.openProgress += (eng.targetOpenProgress - eng.openProgress) * 0.035;
+
+      // Mouse parallax & drag damping
       const mouseDamp = 0.045;
       eng.currentMouse.x += (eng.targetMouse.x - eng.currentMouse.x) * mouseDamp;
       eng.currentMouse.y += (eng.targetMouse.y - eng.currentMouse.y) * mouseDamp;
 
+      // Drag decay
+      if (!eng.isDragging) {
+        eng.dragDelta.x *= 0.94;
+        eng.dragDelta.y *= 0.94;
+      }
+
       // Scale damping
       eng.currentScale += (eng.targetScale - eng.currentScale) * 0.06;
-      
-      // Rim light brightening on hover
-      if (eng.rimLight) {
-        const targetRim = eng.isHovered ? 2.5 : 1.4;
-        eng.rimLight.intensity += (targetRim - eng.rimLight.intensity) * 0.1;
-      }
-      
-      // Light Sweep (every 10 seconds)
-      const sweepCycle = elapsedSec % 10.0;
-      if (sweepCycle > 8.0 && sweepCycle < 9.5) {
-        const t = (sweepCycle - 8.0) / 1.5;
-        eng.sweepLight.intensity = Math.sin(t * Math.PI) * 5.0;
-        eng.sweepLight.position.set(-2.0 + (t * 4.0), 1.0, 1.0);
-      } else {
-        eng.sweepLight.intensity = 0;
-      }
 
       // Scroll damping
       eng.scrollProgress += (eng.targetScrollProgress - eng.scrollProgress) * 0.05;
-      
-      // Only update screen texture when active project actually changes (prevents 60 FPS canvas redraw)
+
+      // Automatic screen texture update on scroll
       if (eng.screenCtx && eng.screenTex) {
         let currentProj = 0;
         if (eng.scrollProgress > 0.45) currentProj = 2;
-        else if (eng.scrollProgress > 0.25) currentProj = 1;
-        
+        else if (eng.scrollProgress > 0.2) currentProj = 1;
+
         if (eng.activeProjectIndex !== currentProj) {
           eng.activeProjectIndex = currentProj;
-          eng.screenCtx.globalAlpha = 1.0;
           eng.screenCtx.drawImage(eng.projects[currentProj], 0, 0);
           eng.screenTex.needsUpdate = true;
         }
@@ -417,25 +469,38 @@ export default function Macbook3D({ interactive = true }) {
       eng.clickImpulse.x *= 0.92;
       eng.clickImpulse.y *= 0.92;
 
+      // Idle breathing physics
       const idleTime = elapsedSec * 0.52;
-      const idleSwayY = !prefersReduced ? Math.sin(idleTime) * 0.055 : 0;
-      const idleTiltX = !prefersReduced ? Math.cos(idleTime * 0.8) * 0.016 : 0;
-      const idleBobY = !prefersReduced ? Math.sin(idleTime * 1.2) * 0.010 : 0;
+      const idleSwayY = !prefersReduced ? Math.sin(idleTime) * 0.04 : 0;
+      const idleTiltX = !prefersReduced ? Math.cos(idleTime * 0.8) * 0.012 : 0;
+      const idleBobY = !prefersReduced ? Math.sin(idleTime * 1.2) * 0.008 : 0;
 
-      const parallaxRotY = !prefersReduced ? eng.currentMouse.x * 0.14 : 0;
-      const parallaxRotX = !prefersReduced ? -eng.currentMouse.y * 0.07 : 0;
+      const parallaxRotY = !prefersReduced ? (eng.currentMouse.x * 0.16 + eng.dragDelta.x) : 0;
+      const parallaxRotX = !prefersReduced ? (-eng.currentMouse.y * 0.09 + eng.dragDelta.y) : 0;
 
       if (modelGroup) {
-        const scrollRotX = eng.scrollProgress * 0.5;
-        const scrollRotY = eng.scrollProgress * -1.2;
+        // Unfold interpolation: from initial folded angle to final pose
+        const unfoldRotX = (1 - eng.openProgress) * 0.45;
+        const unfoldRotY = (1 - eng.openProgress) * -0.25;
 
-        modelGroup.rotation.x = DEFAULT_HERO_POSE.baseRot.x + idleTiltX + parallaxRotX + eng.clickImpulse.x + scrollRotX;
-        modelGroup.rotation.y = DEFAULT_HERO_POSE.baseRot.y + idleSwayY + parallaxRotY + eng.clickImpulse.y + scrollRotY;
+        // Scroll response: subtle dynamic tilt forward
+        const scrollRotX = eng.scrollProgress * 0.6;
+        const scrollRotY = eng.scrollProgress * -1.0;
+
+        modelGroup.rotation.x =
+          DEFAULT_HERO_POSE.baseRot.x + unfoldRotX + idleTiltX + parallaxRotX + eng.clickImpulse.x + scrollRotX;
+        modelGroup.rotation.y =
+          DEFAULT_HERO_POSE.baseRot.y + unfoldRotY + idleSwayY + parallaxRotY + eng.clickImpulse.y + scrollRotY;
         modelGroup.rotation.z = DEFAULT_HERO_POSE.baseRot.z;
 
         modelGroup.position.y = idleBobY;
-        camera.position.z = DEFAULT_HERO_POSE.cameraPos[2] + (eng.scrollProgress * 1.5);
-        modelGroup.scale.setScalar(eng.currentScale);
+
+        // Camera zoom: smoothly zooms in as the lid unfolds
+        const cameraZ =
+          DEFAULT_HERO_POSE.cameraPos[2] + (1 - eng.openProgress) * 0.8 + eng.scrollProgress * 1.4;
+        camera.position.z = cameraZ;
+
+        modelGroup.scale.setScalar(eng.currentScale * (0.9 + eng.openProgress * 0.1));
       }
 
       renderer.render(scene, camera);
@@ -490,11 +555,15 @@ export default function Macbook3D({ interactive = true }) {
       className={styles.wrapper}
       ref={containerRef}
       onPointerMove={handlePointerMove}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
       onClick={handleClick}
-      aria-label="Interactive 3D MacBook Pro"
+      aria-label="Interactive 3D MacBook Pro (Click to switch screens, scroll to inspect)"
+      style={{ cursor: "grab" }}
     >
-      {/* Cinematic subtle background glow */}
+      {/* Subtle background ambient backlight */}
       <div className={styles.ambientGlow} />
 
       {/* Top Spec Badge */}
@@ -504,7 +573,7 @@ export default function Macbook3D({ interactive = true }) {
         </svg>
         <div className={styles.specText}>
           <span className={styles.specTitle}>MacBook Pro 14″</span>
-          <span className={styles.specChip}>Apple M5 · Space Black</span>
+          <span className={styles.specChip}>Click screen to switch · Drag to tilt</span>
         </div>
       </div>
 
@@ -516,7 +585,7 @@ export default function Macbook3D({ interactive = true }) {
         <div className={styles.loaderOverlay}>
           <div className={styles.loaderSpinner} />
           <span className={styles.loaderText}>
-            Loading 3D Model ({loadProgress}%)
+            Loading 3D MacBook ({loadProgress}%)
           </span>
           <div className={styles.progressBar}>
             <div className={styles.progressFill} style={{ width: `${loadProgress}%` }} />
