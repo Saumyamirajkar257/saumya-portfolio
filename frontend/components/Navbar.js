@@ -24,6 +24,7 @@ export default function Navbar({ name }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("#home");
+  const [toggled, setToggled] = useState(true);
   const reduce = useReducedMotion();
   const touch = useIsTouch();
 
@@ -93,8 +94,9 @@ export default function Navbar({ name }) {
             onClick={(e) => { e.preventDefault(); scrollTo("#home"); }}
             aria-label="Back to top"
           >
-            <span className="nav__monogram">SM</span>
-            <span className="nav__name">Saumya Mirajkar</span>
+            <span style={{ fontFamily: "'Anton', 'Syne', sans-serif", fontSize: "17px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#FFFFFF" }}>
+              SAUMYA MIRAJKAR
+            </span>
           </a>
 
           <nav className="nav__links" aria-label="Primary">
@@ -128,13 +130,17 @@ export default function Navbar({ name }) {
             >
               Résumé <span aria-hidden="true">↓</span>
             </a>
-            <a
-              href="#contact"
-              className="nav__cta"
-              onClick={(e) => { e.preventDefault(); scrollTo("#contact"); }}
+
+            {/* Pill Toggle Switch */}
+            <button
+              type="button"
+              className={`nav__toggleSwitch ${toggled ? "is-toggled" : ""}`}
+              onClick={() => setToggled(!toggled)}
+              aria-label="Toggle studio mode"
+              title={toggled ? "Studio Noir Active" : "Color Pop Active"}
             >
-              Let's Connect <span aria-hidden="true" style={{ marginLeft: "4px" }}>↗</span>
-            </a>
+              <span className="nav__toggleKnob" />
+            </button>
           </div>
 
           <button

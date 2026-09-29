@@ -1,4 +1,4 @@
-import { Syne, Inter, JetBrains_Mono } from "next/font/google";
+import { Syne, Inter, JetBrains_Mono, Anton } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
@@ -10,6 +10,13 @@ import CursorSpotlight from "@/components/CursorSpotlight";
 import ScrollRail from "@/components/ScrollRail";
 import MobileCTA from "@/components/MobileCTA";
 import { SITE_URL, SITE_HOST } from "@/lib/site";
+
+const anton = Anton({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-anton",
+  display: "swap",
+});
 
 const syne = Syne({
   subsets: ["latin"],
@@ -73,7 +80,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${syne.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en" className={`${syne.variable} ${inter.variable} ${jetbrainsMono.variable} ${anton.variable}`}>
       <body>
         {/* Plausible analytics */}
         <Script

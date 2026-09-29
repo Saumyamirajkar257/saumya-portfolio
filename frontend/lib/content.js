@@ -16,6 +16,10 @@ function withTimeout(promise, ms = 5000) {
 }
 
 export async function getContent(forceRefresh = false) {
+  if (!db) {
+    return { ...fallbackContent, _source: "fallback" };
+  }
+
   const now = Date.now();
   if (!forceRefresh && contentCache && now - lastFetchTime < CACHE_TTL_MS) {
     return contentCache;
