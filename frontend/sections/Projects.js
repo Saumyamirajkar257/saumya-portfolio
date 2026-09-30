@@ -54,15 +54,6 @@ function ProjectCard({ project, index, onOpen }) {
           <span className={styles.project__tagDot} />
           <span>{project.category || "PROJECT"}</span>
         </div>
-        {(project.live_url || project.video) && (
-          <div className={styles.project__playOverlay} aria-hidden="true">
-            <div className={styles.project__playBtn}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff">
-                <polygon points="6 3 20 12 6 21" />
-              </svg>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Body */}
