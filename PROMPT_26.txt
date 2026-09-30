@@ -1,0 +1,398 @@
+? MOBILE RESPONSIVE OVERHAUL — SAUMYA MIRAJKAR PORTFOLIO
+You are a senior frontend engineer + interaction designer specializing in high-end responsive websites, mobile UX, fluid animations, and performance.
+I already have a portfolio website:
+https://saumya-mirajkar-portfolio.pages.dev/
+Your job is NOT to create a new portfolio from scratch.
+Your job is to take my existing website and perform a complete mobile-responsive engineering overhaul so the experience feels intentionally designed for phones — not like a desktop website squeezed into a smaller screen.
+
+? PRIMARY GOAL
+Make the website feel:
+    • insanely smooth
+    • premium
+    • responsive
+    • fluid
+    • fast
+    • touch-friendly
+    • visually balanced
+    • effortless to navigate
+    • perfect on small phones
+    • perfect on large phones
+    • still excellent on tablets
+    • unchanged/improved on desktop
+The mobile version should feel like a native premium mobile experience, while still clearly being the same portfolio.
+DO NOT simply stack desktop elements vertically.
+Re-design the responsive behavior of every section.
+
+? RESPONSIVE BREAKPOINT STRATEGY
+Do not design only for:
+desktop ? mobile
+Build a genuinely fluid system.
+Test and optimize for:
+    • 320px
+    • 360px
+    • 375px
+    • 390px
+    • 414px
+    • 430px
+    • 480px
+    • 600px
+    • 768px
+    • 834px
+    • 1024px
+    • desktop
+The layout must gracefully interpolate between these sizes.
+Avoid hardcoded layouts that only look good at one phone width.
+Use:
+    • CSS clamp()
+    • fluid typography
+    • responsive spacing
+    • CSS Grid
+    • Flexbox
+    • minmax()
+    • container queries where useful
+    • dynamic viewport units
+    • max-width constraints
+Avoid unnecessary fixed pixel dimensions.
+
+? IMPORTANT RULE
+Every component must answer:
+"What should this component become on a 375px phone?"
+before deciding how it behaves on desktop.
+Mobile is NOT an afterthought.
+
+? MOBILE NAVIGATION
+Completely optimize the navigation for touch.
+Requirements:
+    • compact header
+    • no cramped navigation links
+    • comfortable touch targets
+    • minimum ~44px touch area
+    • smooth menu animation
+    • no accidental clicks
+    • menu should never overflow the viewport
+    • body must not scroll horizontally
+    • menu should feel extremely smooth
+If a hamburger/menu is appropriate, make it feel intentional and premium.
+When the menu opens:
+    • animate smoothly
+    • prevent unwanted background interaction
+    • maintain scroll behavior correctly
+    • close when selecting a navigation item
+    • support Escape
+    • respect reduced-motion preferences
+Do NOT use a generic template hamburger menu.
+
+? HERO SECTION
+The hero is one of the most important areas.
+On mobile:
+    • eliminate awkward empty space
+    • prevent text wrapping into ugly lines
+    • maintain strong visual hierarchy
+    • ensure the main heading fits naturally
+    • use fluid typography
+    • buttons should become comfortable touch targets
+    • prevent buttons from overflowing
+    • keep visual elements properly positioned
+Use something similar to:
+font-size: clamp(...)
+instead of:
+font-size: 64px;
+The hero should feel designed for a phone, not compressed from desktop.
+
+? TYPOGRAPHY
+Audit EVERY text element.
+Fix:
+    • oversized headings
+    • tiny body text
+    • bad line-height
+    • awkward word wrapping
+    • excessive letter spacing
+    • text touching screen edges
+    • inconsistent hierarchy
+Use a fluid type scale.
+Example philosophy:
+font-size: clamp(2rem, 8vw, 5rem);
+but choose values appropriate to each actual component.
+Headings should never create:
+    • 1-word orphan lines
+    • awkward 3-line headings
+    • text touching the viewport edge
+    • unnecessary huge vertical gaps
+Use:
+text-wrap: balance;
+where appropriate.
+
+?? IMAGES / PROJECTS
+Every project image must be responsive.
+Requirements:
+    • never stretch
+    • never distort
+    • never overflow
+    • preserve intended aspect ratio
+    • lazy-load where appropriate
+    • optimize image sizes
+    • avoid layout shifts
+    • use object-fit correctly
+On mobile, project cards should have an intentional composition.
+DO NOT blindly make every desktop card:
+1 column
+1 column
+1 column
+Instead, determine the best mobile presentation for each project.
+
+?? ANIMATIONS
+This is VERY important.
+I want the mobile website to feel smooth, not overloaded.
+Audit every animation.
+Use:
+    • transform
+    • opacity
+    • scale
+    • translate
+    • GPU-friendly properties
+Avoid animating:
+    • width
+    • height
+    • top
+    • left
+    • expensive box-shadow changes
+    • layout-heavy properties
+Animations should feel:
+fast ? fluid ? controlled ? premium
+No excessive bouncing.
+No cheesy effects.
+No animation that blocks interaction.
+
+? TOUCH INTERACTIONS
+Assume the website will primarily be used with a thumb.
+Audit:
+    • buttons
+    • links
+    • project cards
+    • navigation
+    • social links
+    • interactive elements
+    • hover-dependent interactions
+Desktop hover effects MUST NOT be required for understanding or interacting with content.
+Use appropriate mobile states.
+For example:
+@media (hover: hover) {
+   /* hover interactions */
+}
+Do not force desktop hover behavior onto touch devices.
+
+?? SCROLL EXPERIENCE
+Make scrolling feel natural.
+Fix:
+    • horizontal overflow
+    • weird nested scrolling
+    • sticky elements covering content
+    • scroll-jank
+    • oversized sections
+    • accidental sideways movement
+Use:
+overflow-x: clip;
+where appropriate rather than blindly hiding problems.
+Find the actual source of overflow and fix it.
+
+? MOBILE SPACING
+Audit the entire vertical rhythm.
+Do NOT simply use:
+padding: 100px;
+everywhere.
+Use responsive spacing such as:
+padding: clamp(3rem, 10vw, 8rem);
+Create a consistent mobile spacing system.
+The page should breathe without wasting screen space.
+
+? COMPONENT RESPONSIVENESS
+Every major component needs its own responsive behavior.
+Audit:
+    • Navbar
+    • Hero
+    • About
+    • Skills
+    • Experience
+    • Projects
+    • Education
+    • Achievements
+    • Contact
+    • Footer
+    • buttons
+    • cards
+    • images
+    • animations
+    • decorative elements
+Do not apply one universal mobile rule to everything.
+Each component should have a deliberate mobile composition.
+
+? PRESERVE MY DESIGN IDENTITY
+VERY IMPORTANT:
+Do NOT turn this portfolio into a generic:
+    • SaaS landing page
+    • bento grid
+    • AI portfolio template
+    • purple gradient website
+    • glassmorphism template
+    • generic developer portfolio
+Preserve the existing visual identity, personality, colors, typography direction, content and creative concept.
+Improve the engineering and responsive behavior, not the identity.
+
+? PERFORMANCE
+Mobile performance matters heavily.
+Optimize:
+    • images
+    • fonts
+    • JavaScript
+    • animation workload
+    • unnecessary rerenders
+    • event listeners
+    • scroll handlers
+    • expensive effects
+Use:
+    • lazy loading
+    • responsive images
+    • content-visibility where appropriate
+    • passive listeners
+    • IntersectionObserver where appropriate
+    • reduced motion support
+Do not sacrifice performance for visual effects.
+
+? REAL DEVICE MINDSET
+Do NOT assume Chrome desktop resizing is enough.
+Think about:
+Small phone
+320 × 568
+Standard phone
+375 × 667
+Modern large phone
+390 × 844
+Large phone
+430 × 932
+Tablet
+768 × 1024
+Desktop
+1440 × 900
+Check every breakpoint for:
+    • clipping
+    • overflow
+    • broken alignment
+    • text wrapping
+    • buttons
+    • navigation
+    • image proportions
+    • animation behavior
+    • spacing
+    • tap targets
+
+? SAFE AREA SUPPORT
+Support modern phones with notches and home indicators.
+Consider:
+env(safe-area-inset-top)
+env(safe-area-inset-bottom)
+env(safe-area-inset-left)
+env(safe-area-inset-right)
+especially for fixed/sticky mobile navigation.
+
+? ACCESSIBILITY
+Do not sacrifice accessibility.
+Implement:
+    • visible focus states
+    • keyboard navigation
+    • semantic HTML
+    • appropriate aria labels
+    • sufficient contrast
+    • reduced-motion support
+    • accessible buttons
+    • accessible navigation
+Respect:
+@media (prefers-reduced-motion: reduce)
+and significantly reduce non-essential animations.
+
+? ANTI-VIBE-CODING RULES
+DO NOT:
+    • randomly add gradients
+    • add unnecessary cards
+    • add emojis
+    • add fake testimonials
+    • add fake statistics
+    • add excessive glassmorphism
+    • add huge border radiuses everywhere
+    • add unnecessary shadows
+    • add decorative elements just to fill space
+    • add a mobile bottom navbar unless genuinely useful
+    • create horizontal scrolling just because it looks cool
+    • hide content on mobile simply to make the layout easier
+    • duplicate content for mobile and desktop unnecessarily
+Every design decision must have a purpose.
+
+? THE "NATIVE APP" TEST
+After implementation, ask:
+If I opened this portfolio on an iPhone for the first time, would I feel like someone intentionally designed this experience for mobile?
+If the answer is no, keep iterating.
+The mobile version should feel closer to a premium interactive product than a responsive webpage.
+
+? CLEAN THE EXISTING CODE
+While implementing:
+    • remove obsolete responsive CSS
+    • eliminate conflicting media queries
+    • consolidate duplicate styles
+    • fix specificity issues
+    • remove unnecessary !important
+    • remove dead CSS
+    • avoid patching problems with random margins
+    • avoid negative-margin hacks unless genuinely necessary
+    • keep components maintainable
+Do not create a pile of breakpoint-specific hacks.
+
+? FINAL QA
+Before finishing, perform a complete responsive audit.
+Check:
+Layout
+    • No horizontal scrolling
+    • No clipped content
+    • No overlapping elements
+    • No unexpected whitespace
+    • No broken grids
+Typography
+    • Headings wrap naturally
+    • Body text is readable
+    • No orphan words
+    • Correct line heights
+Interaction
+    • Buttons are easy to tap
+    • Navigation works perfectly
+    • Links work
+    • Touch interactions don't depend on hover
+Animation
+    • Smooth
+    • No jank
+    • No excessive motion
+    • Reduced-motion supported
+Performance
+    • Images optimized
+    • Lazy loading where appropriate
+    • No unnecessary expensive effects
+    • No obvious layout shifts
+Devices
+    • 320px
+    • 360px
+    • 375px
+    • 390px
+    • 414px
+    • 430px
+    • 768px
+    • 1024px
+    • 1440px
+
+? FINAL REQUIREMENT
+Do not just tell me what should be changed.
+Actually modify the existing website/code.
+First inspect the existing structure and identify the responsive weaknesses.
+Then implement the improvements.
+Do not rebuild the entire website unless the current architecture genuinely prevents a high-quality responsive implementation.
+The final result should feel like:
+"This portfolio was designed mobile-first by someone who understands interaction design."
+Not:
+"This desktop website was made responsive with media queries."
+

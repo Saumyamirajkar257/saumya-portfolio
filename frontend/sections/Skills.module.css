@@ -30,8 +30,8 @@
 .skillIcon {
   display: grid;
   place-items: center;
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   background: #121215;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -44,13 +44,15 @@
               background 0.3s ease;
 }
 
-.skillIcon.hovered,
-.skillNode:hover .skillIcon {
-  transform: scale(1.18);
-  color: #FFFFFF;
-  border-color: rgba(255, 255, 255, 0.7);
-  box-shadow: 0 0 24px rgba(255, 255, 255, 0.3);
-  background: #18181C;
+@media (hover: hover) and (pointer: fine) {
+  .skillIcon.hovered,
+  .skillNode:hover .skillIcon {
+    transform: scale(1.18);
+    color: #FFFFFF;
+    border-color: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 0 24px rgba(255, 255, 255, 0.3);
+    background: #18181C;
+  }
 }
 
 .skillLabel {
@@ -116,7 +118,7 @@
 .mobileSkillsGrid {
   display: none;
   grid-template-columns: 1fr;
-  gap: 12px;
+  gap: clamp(12px, 2vw, 16px);
   margin-block: 24px;
 }
 
@@ -124,18 +126,34 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 16px;
+  padding: 18px;
   background: #121215;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-m);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  transition: all 0.25s ease;
+  min-height: 48px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .mobileSkillCard:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .mobileSkillCard:active {
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: scale(0.98);
+  }
 }
 
 .mobileSkillIcon {
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   flex-shrink: 0;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.08);
@@ -218,12 +236,38 @@
   text-transform: uppercase;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .constellationContainer {
     display: none;
   }
   .mobileSkillsGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .mobileSkillsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .mobileSkillCard {
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .mobileSkillIcon {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (max-width: 375px) {
+  .quoteCard {
+    padding: 28px 18px;
+  }
+
+  .quoteText {
+    font-size: clamp(15px, 4vw, 18px);
   }
 }
