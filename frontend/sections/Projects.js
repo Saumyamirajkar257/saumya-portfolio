@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import SectionHeading from "@/components/SectionHeading";
-import Reveal from "@/components/animations/Reveal";
+import { EASE, TIMING, HoverLift, BorderGlow } from "@/components/animations/MotionSystem";
 import styles from "./Projects.module.css";
 
 const FILTERS = ["All", "Hardware + IoT", "Full-Stack & Web", "Python Software"];
@@ -12,14 +12,15 @@ const FILTERS = ["All", "Hardware + IoT", "Full-Stack & Web", "Python Software"]
 function ProjectCard({ project, index, onOpen }) {
   const initial = (project.title || "P").trim()[0].toUpperCase();
   const isFeatured = project.featured;
+  const reduce = useReducedMotion();
 
   return (
     <motion.article
       layout="position"
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 32 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "0px 0px -8% 0px" }}
-      transition={{ duration: 0.45, delay: Math.min(index * 0.06, 0.2), ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: reduce ? 0.01 : TIMING.component + 0.1, delay: reduce ? 0 : Math.min(index * 0.07, 0.25), ease: EASE.premium }}
       className={styles.project}
       onClick={() => onOpen(project)}
       data-cursor
@@ -32,6 +33,8 @@ function ProjectCard({ project, index, onOpen }) {
         }
       }}
       aria-label={`Open ${project.title} details`}
+      whileHover={reduce ? {} : { y: -8, transition: { duration: TIMING.button, ease: EASE.premium } }}
+      whileTap={reduce ? {} : { scale: 0.98 }}
     >
       {/* 16:9 Cover Image / Visual */}
       <div className={styles.project__cover}>
@@ -61,7 +64,7 @@ function ProjectCard({ project, index, onOpen }) {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
           <span className={styles.project__cat}>{project.category}</span>
           {isFeatured && (
-            <span style={{ fontSize: "10px", color: "#FFFFFF", fontFamily: "var(--font-mono)", fontWeight: "600" }}>
+            <span style={{ fontSize: "10px", color: "#FFFFFF", fontFamily: "var(--font-mono)", fontWeight: "700", letterSpacing: "0.05em" }}>
               ★ FEATURED
             </span>
           )}
@@ -85,8 +88,8 @@ function ProjectCard({ project, index, onOpen }) {
             Explore Case Study <span className={styles.project__arrow}>→</span>
           </span>
           {project.github_url && (
-            <span 
-              className={styles.project__ghIcon} 
+            <span
+              className={styles.project__ghIcon}
               title="GitHub available"
               onClick={(e) => {
                 e.stopPropagation();
@@ -107,6 +110,7 @@ function ProjectCard({ project, index, onOpen }) {
 export default function Projects({ projects = [] }) {
   const [filter, setFilter] = useState("All");
   const [activeProject, setActiveProject] = useState(null);
+  const reduce = useReducedMotion();
 
   // Normalize categories for matching filter
   const filtered = filter === "All"
@@ -157,29 +161,27 @@ export default function Projects({ projects = [] }) {
         </div>
 
         {/* Filter Pills */}
-        <Reveal delay={0.08}>
-          <div className={styles.projects__filters} role="tablist" aria-label="Filter projects">
-            {FILTERS.map((f) => (
-              <button
-                key={f}
-                role="tab"
-                aria-selected={filter === f}
-                className={`${styles.projects__filter} ${filter === f ? styles.isActive : ""}`}
-                onClick={() => setFilter(f)}
-                style={{ position: "relative" }}
-              >
-                {filter === f && (
-                  <motion.span
-                    layoutId="projectTabActiveBg"
-                    className={styles.projects__activeBg}
-                    transition={{ type: "spring", stiffness: 420, damping: 32 }}
-                  />
-                )}
-                <span style={{ position: "relative", zIndex: 1 }}>{f}</span>
-              </button>
-            ))}
-          </div>
-        </Reveal>
+        <div className={styles.projects__filters} role="tablist" aria-label="Filter projects">
+          {FILTERS.map((f) => (
+            <button
+              key={f}
+              role="tab"
+              aria-selected={filter === f}
+              className={`${styles.projects__filter} ${filter === f ? styles.isActive : ""}`}
+              onClick={() => setFilter(f)}
+              style={{ position: "relative" }}
+            >
+              {filter === f && (
+                <motion.span
+                  layoutId="projectTabActiveBg"
+                  className={styles.projects__activeBg}
+                  transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                />
+              )}
+              <span style={{ position: "relative", zIndex: 1 }}>{f}</span>
+            </button>
+          ))}
+        </div>
 
         {/* 3-column Grid */}
         <motion.div layout="position" className={styles.projects__grid}>
@@ -197,6 +199,7 @@ export default function Projects({ projects = [] }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
             onClick={closeModal}
             role="dialog"
             aria-modal="true"
@@ -204,10 +207,10 @@ export default function Projects({ projects = [] }) {
           >
             <motion.div
               className={styles.modal__panel}
-              initial={{ opacity: 0, y: 30, scale: 0.96 }}
+              initial={{ opacity: 0, y: 40, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.97 }}
-              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              exit={{ opacity: 0, y: 24, scale: 0.96 }}
+              transition={{ duration: reduce ? 0.01 : 0.4, ease: EASE.premium }}
               onClick={(e) => e.stopPropagation()}
             >
               <button className={styles.modal__close} onClick={closeModal} aria-label="Close dialog">

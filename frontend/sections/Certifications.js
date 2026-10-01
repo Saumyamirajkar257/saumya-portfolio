@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import SectionHeading from "@/components/SectionHeading";
+import { EASE, TIMING, HoverLift } from "@/components/animations/MotionSystem";
 import styles from "./Certifications.module.css";
 
 export default function Certifications({ certifications = [] }) {
   const [showAll, setShowAll] = useState(false);
+  const reduce = useReducedMotion();
   const sorted = [...certifications].sort((a, b) => Number(a.order ?? 999) - Number(b.order ?? 999));
   const visible = showAll ? sorted : sorted.slice(0, 6);
 
@@ -25,10 +27,11 @@ export default function Certifications({ certifications = [] }) {
           {visible.map((cert, i) => (
             <motion.div
               key={cert.id ?? i}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "0px 0px -6% 0px" }}
-              transition={{ duration: 0.45, delay: Math.min(i * 0.05, 0.25), ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: TIMING.component, delay: reduce ? 0 : Math.min(i * 0.06, 0.24), ease: EASE.premium }}
+              whileHover={reduce ? {} : { y: -6, transition: { duration: TIMING.button, ease: EASE.premium } }}
               className={styles.certCard}
             >
               <div className={styles.certTop}>

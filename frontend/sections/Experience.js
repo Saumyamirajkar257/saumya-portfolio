@@ -1,14 +1,15 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import SectionHeading from "@/components/SectionHeading";
-import Reveal from "@/components/animations/Reveal";
+import { EASE, TIMING } from "@/components/animations/MotionSystem";
 import styles from "./Experience.module.css";
 
 export default function Experience({ experience = [] }) {
   const containerRef = useRef(null);
-  
+  const reduce = useReducedMotion();
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start center", "end center"],
@@ -26,25 +27,29 @@ export default function Experience({ experience = [] }) {
         />
 
         <div className={styles.timeline} ref={containerRef}>
-          <motion.div className={styles.timelineLine} style={{ height: lineHeight }} aria-hidden="true" />
+          <motion.div
+            className={styles.timelineLine}
+            style={reduce ? { height: "100%" } : { height: lineHeight }}
+            aria-hidden="true"
+          />
 
           {experience.map((item, i) => (
             <motion.div
               key={item.id ?? i}
-              initial={{ opacity: 0, y: 24 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "0px 0px -8% 0px" }}
-              transition={{ duration: 0.5, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: TIMING.component + 0.1, delay: reduce ? 0 : i * 0.12, ease: EASE.premium }}
               className={styles.timelineItem}
             >
-              {/* Blue Circular Node */}
+              {/* Circular Node */}
               <div className={styles.nodeWrapper}>
                 <span className={styles.timelineNode}>
                   <span className={styles.timelineDot} />
                 </span>
               </div>
 
-              {/* Content Card */}
+              {/* Content Card with Interactive Hover */}
               <div className={styles.timelineContent}>
                 <div className={styles.itemHeader}>
                   <span className={styles.itemDates}>

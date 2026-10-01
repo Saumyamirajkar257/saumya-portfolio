@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import SectionHeading from "@/components/SectionHeading";
-import Reveal from "@/components/animations/Reveal";
+import { EASE, TIMING, HoverLift, GlowPulse } from "@/components/animations/MotionSystem";
 import styles from "./Skills.module.css";
 
 const ICON_MAP = {
@@ -140,6 +140,7 @@ const TECH_LIST = [
 ];
 
 export default function Skills({ skills = [] }) {
+  const reduce = useReducedMotion();
   const sorted = [...skills].sort((a, b) => Number(a.order ?? 999) - Number(b.order ?? 999));
   const rawList = sorted.length > 0 ? sorted : TECH_LIST;
   const list = rawList.map((item) => ({
@@ -205,12 +206,12 @@ export default function Skills({ skills = [] }) {
                   y1="0"
                   x2={n.x}
                   y2={n.y}
-                  stroke={isHovered ? "rgba(255, 255, 255, 0.7)" : "rgba(255, 255, 255, 0.08)"}
+                  stroke={isHovered ? "rgba(255, 255, 255, 0.85)" : "rgba(255, 255, 255, 0.08)"}
                   strokeWidth={isHovered ? "2" : "1"}
                   initial={{ pathLength: 0 }}
                   whileInView={{ pathLength: 1 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: i * 0.06 }}
+                  transition={{ duration: reduce ? 0.01 : 0.8, delay: reduce ? 0 : i * 0.06, ease: EASE.premium }}
                 />
               );
             })}
@@ -228,12 +229,12 @@ export default function Skills({ skills = [] }) {
                     y1={prev.y}
                     x2={n.x}
                     y2={n.y}
-                    stroke={isHovered ? "rgba(255, 255, 255, 0.45)" : "rgba(255, 255, 255, 0.04)"}
+                    stroke={isHovered ? "rgba(255, 255, 255, 0.55)" : "rgba(255, 255, 255, 0.04)"}
                     strokeWidth="1"
                     initial={{ pathLength: 0 }}
                     whileInView={{ pathLength: 1 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 1, delay: 0.4 + i * 0.08 }}
+                    transition={{ duration: reduce ? 0.01 : 1, delay: reduce ? 0 : 0.4 + i * 0.08, ease: EASE.premium }}
                   />
                 );
               }
@@ -256,10 +257,10 @@ export default function Skills({ skills = [] }) {
                 left: `calc(50% + ${n.x}px)`,
                 top: `calc(50% + ${n.y}px)`,
               }}
-              initial={{ opacity: 0, scale: 0.6 }}
+              initial={{ opacity: 0, scale: 0.5 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.06, type: "spring", stiffness: 220, damping: 20 }}
+              transition={{ delay: reduce ? 0 : i * 0.06, type: "spring", stiffness: 220, damping: 20 }}
               onMouseEnter={() => setHoveredNode(n.name)}
               onMouseLeave={() => setHoveredNode(null)}
             >
@@ -277,10 +278,11 @@ export default function Skills({ skills = [] }) {
             <motion.div
               key={tech.name || i}
               className={styles.mobileSkillCard}
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: i * 0.05 }}
+              transition={{ duration: TIMING.component, delay: reduce ? 0 : i * 0.05, ease: EASE.premium }}
+              whileHover={reduce ? {} : { y: -3, transition: { duration: TIMING.micro } }}
             >
               <div className={styles.mobileSkillIcon}>{tech.iconNode}</div>
               <div className={styles.mobileSkillInfo}>
@@ -295,13 +297,18 @@ export default function Skills({ skills = [] }) {
         </div>
 
         {/* Philosophy Quote Card */}
-        <Reveal delay={0.15}>
-          <div className={styles.quoteCard}>
-            <span className={styles.quoteMark}>“</span>
-            <p className={styles.quoteText}>Small systems. Bigger possibilities.</p>
-            <span className={styles.quoteTag}>IoT &amp; Software Philosophy</span>
-          </div>
-        </Reveal>
+        <motion.div
+          className={styles.quoteCard}
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: TIMING.section, delay: 0.2, ease: EASE.premium }}
+          whileHover={reduce ? {} : { y: -4, borderColor: "rgba(255, 255, 255, 0.25)", transition: { duration: TIMING.button } }}
+        >
+          <span className={styles.quoteMark}>“</span>
+          <p className={styles.quoteText}>Small systems. Bigger possibilities.</p>
+          <span className={styles.quoteTag}>IoT &amp; Software Philosophy</span>
+        </motion.div>
       </div>
     </section>
   );
