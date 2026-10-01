@@ -522,7 +522,7 @@ export default function Skills({ skills = [] }) {
             “With great power comes great responsibility.”
           </p>
           <span className={styles.footerTag}>
-            — SPIDER-MAN
+            POWER · RESPONSIBILITY · PURPOSE
           </span>
         </motion.div>
       </div>
