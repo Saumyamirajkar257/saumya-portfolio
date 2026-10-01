@@ -1,111 +1,113 @@
 /* ============================================================
-   Hero.module.css — Unified Editorial Composition (Poster Art-Direction)
+   Hero.module.css — Editorial Poster Composition
+   The hero is ONE ARTWORK: giant condensed typography with
+   the portrait layered IN FRONT, inside a subtle poster frame.
    ============================================================ */
 
+/* ── Section wrapper ── */
 .hero {
   position: relative;
+  width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
-  width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   align-items: center;
+  justify-content: center;
   background: #000000;
   color: #FFFFFF;
   overflow: hidden;
-  padding-top: calc(var(--header-h, 72px) + 16px);
-  padding-bottom: 24px;
+  padding: calc(var(--header-h, 72px) + 20px) clamp(16px, 3vw, 48px) 20px;
   user-select: none;
+  gap: 20px;
 }
 
-/* Studio Lighting Accents */
-.hero__lightBeam {
-  position: absolute;
-  top: 0;
-  right: 10%;
-  width: clamp(400px, 50vw, 800px);
-  height: 100%;
-  background: linear-gradient(
-    220deg, 
-    rgba(255, 255, 255, 0.14) 0%, 
-    rgba(255, 255, 255, 0.04) 35%, 
-    transparent 65%
-  );
-  pointer-events: none;
-  z-index: 1;
-  filter: blur(50px);
-}
 
-.hero__backlight {
-  position: absolute;
-  top: 45%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: clamp(380px, 55vw, 780px);
-  height: clamp(380px, 55vw, 780px);
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at center, 
-    rgba(255, 255, 255, 0.12) 0%, 
-    rgba(255, 255, 255, 0.04) 35%, 
-    transparent 65%
-  );
-  pointer-events: none;
-  z-index: 1;
-  filter: blur(50px);
-}
+/* ═══════════════════════════════════════════════════════════════
+   THE POSTER FRAME
+   A physically bounded editorial artwork occupying most of
+   the viewport — subtle 1px border, like a printed poster
+   ═══════════════════════════════════════════════════════════════ */
 
-.hero__particles {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0.12;
-}
-
-/* Top Subtitle Tagline */
-.hero__subHeader {
-  position: relative;
-  z-index: 5;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-family: var(--font-mono);
-  font-size: clamp(11px, 1vw, 12.5px);
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #D4D4D8;
-  margin-bottom: 8px;
-}
-
-.hero__subHeaderDot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #FFFFFF;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.9);
-}
-
-/* Central Visual Composition (Typography + Intersecting Cutout Portrait) */
-.hero__composition {
+.poster {
   position: relative;
   width: 100%;
-  max-width: 1400px;
+  max-width: 1320px;
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 2;
-  min-height: clamp(360px, 54vh, 600px);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 3px;
+  overflow: hidden;
+  background: #050505;
 }
 
-/* Typography Layer */
-.hero__typographyLayer {
+
+/* ── Corner / Edge Labels (tiny editorial metadata) ── */
+
+.poster__labelTL,
+.poster__labelTR,
+.poster__labelBL,
+.poster__labelBR {
+  position: absolute;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.poster__labelTL {
+  top: clamp(14px, 2.2vh, 24px);
+  left: clamp(16px, 2.5vw, 32px);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.poster__labelSep {
+  opacity: 0.4;
+}
+
+.poster__labelTR {
+  top: clamp(14px, 2.2vh, 24px);
+  right: clamp(16px, 2.5vw, 32px);
+}
+
+.poster__labelBL {
+  bottom: clamp(14px, 2.2vh, 24px);
+  left: clamp(16px, 2.5vw, 32px);
+}
+
+.poster__labelBR {
+  bottom: clamp(14px, 2.2vh, 24px);
+  right: clamp(16px, 2.5vw, 32px);
+}
+
+
+/* ── Artwork Area (Typography + Portrait layering) ── */
+
+.poster__artwork {
   position: relative;
-  z-index: 2;
+  width: 100%;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: clamp(340px, 56vh, 580px);
+}
+
+
+/* ── Typography Layer (BEHIND the portrait) ── */
+
+.poster__typographyLayer {
+  position: relative;
+  z-index: 1;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -113,70 +115,86 @@
   justify-content: center;
   text-align: center;
   pointer-events: none;
+  padding: 0 clamp(8px, 2vw, 32px);
 }
 
-/* Solid Bold Editorial Name (NO vertical gray gradient) */
-.hero__giantName {
-  font-family: var(--font-anton), 'Anton', 'Impact', sans-serif;
-  font-size: clamp(4.8rem, 15.5vw, 13.5rem);
+.poster__firstName {
+  font-family: 'Anton', 'Impact', 'Arial Narrow', sans-serif;
+  font-size: clamp(5rem, 16vw, 15rem);
   font-weight: 400;
-  line-height: 0.82;
-  letter-spacing: 0.01em;
+  line-height: 0.88;
+  letter-spacing: -0.01em;
   text-transform: uppercase;
   color: #FFFFFF;
   margin: 0;
   padding: 0;
-  text-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
 }
 
-.hero__secondarySurname {
-  font-family: var(--font-mono);
-  font-size: clamp(12px, 1.4vw, 18px);
-  font-weight: 700;
-  letter-spacing: 0.45em;
+.poster__lastName {
+  font-family: 'Anton', 'Impact', 'Arial Narrow', sans-serif;
+  font-size: clamp(5rem, 16vw, 15rem);
+  font-weight: 400;
+  line-height: 0.88;
+  letter-spacing: -0.01em;
   text-transform: uppercase;
-  color: #8E8E93;
-  margin-top: 8px;
-  text-indent: 0.45em;
+  color: #FFFFFF;
+  margin-top: -0.04em;
 }
 
-/* Intersecting Portrait (Centered / Overlapping the Typography directly) */
-.hero__portraitWrap {
+
+/* ── Portrait Layer (IN FRONT of the typography) ── */
+
+.poster__portraitWrap {
   position: absolute;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 4;
-  height: clamp(360px, 62vh, 620px);
+  z-index: 3;
+  height: clamp(300px, 60vh, 560px);
   display: flex;
   align-items: flex-end;
   justify-content: center;
   pointer-events: none;
 }
 
-.hero__portraitImg {
+.poster__portraitImg {
   height: 100%;
   width: auto;
-  max-width: 80vw;
+  max-width: 85vw;
   object-fit: contain;
   object-position: bottom center;
-  filter: contrast(1.2) brightness(1.03) drop-shadow(0 15px 45px rgba(0, 0, 0, 0.95));
-  -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
-  mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+  filter: contrast(1.15) brightness(1.05);
+  /* Subtle fade-out at the very bottom so portrait bleeds into the poster edge */
+  -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
   user-select: none;
   -webkit-user-drag: none;
 }
 
-/* Action Controls */
-.hero__actions {
+
+/* ═══════════════════════════════════════════════════════════════
+   BELOW THE POSTER — Footer bar with CTA, Socials, Scroll
+   ═══════════════════════════════════════════════════════════════ */
+
+.hero__footer {
   position: relative;
   z-index: 6;
+  width: 100%;
+  max-width: 1320px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 14px;
-  margin-top: 12px;
-  margin-bottom: 8px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+
+/* ── CTA Buttons ── */
+
+.hero__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .hero__btnPrimary {
@@ -188,14 +206,13 @@
   color: #000000;
   font-family: var(--font-display, sans-serif);
   font-weight: 700;
-  font-size: 13px;
+  font-size: 12.5px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  padding: 11px 22px;
-  min-height: 44px;
-  border-radius: 8px;
+  padding: 10px 20px;
+  min-height: 42px;
+  border-radius: 6px;
   transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
   white-space: nowrap;
 }
 
@@ -207,7 +224,7 @@
 .hero__btnPrimary:hover {
   background: #E4E4E7;
   transform: translateY(-2px);
-  box-shadow: 0 6px 25px rgba(255, 255, 255, 0.35);
+  box-shadow: 0 6px 24px rgba(255, 255, 255, 0.18);
 }
 
 .hero__btnPrimary:hover .hero__btnArrow {
@@ -219,26 +236,24 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: rgba(18, 18, 22, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.18);
   color: #FFFFFF;
   font-family: var(--font-display, sans-serif);
   font-weight: 600;
-  font-size: 13px;
+  font-size: 12.5px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  padding: 11px 22px;
-  min-height: 44px;
-  border-radius: 8px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  padding: 10px 20px;
+  min-height: 42px;
+  border-radius: 6px;
   transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   white-space: nowrap;
 }
 
 .hero__btnSecondary:hover {
-  background: rgba(30, 30, 36, 0.95);
   border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.06);
   transform: translateY(-2px);
 }
 
@@ -246,91 +261,47 @@
   transform: translateY(2px);
 }
 
-/* Bottom Editorial Meta Bar */
-.hero__bottomBar {
-  position: relative;
-  z-index: 6;
-  width: 100%;
-  max-width: 1400px;
-  margin-inline: auto;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  padding-inline: clamp(20px, 4vw, 60px);
-}
 
-.hero__metaLeft {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.hero__metaInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.hero__metaTitle {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #D4D4D8;
-}
-
-.hero__metaSub {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #71717A;
-}
+/* ── Social Icons ── */
 
 .hero__socials {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .hero__socialIcon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #8E8E93;
+  color: rgba(255, 255, 255, 0.4);
   transition: all 0.2s ease;
-  width: 36px;
-  height: 36px;
-  border-radius: 6px;
+  width: 34px;
+  height: 34px;
+  border-radius: 5px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(18, 18, 22, 0.6);
 }
 
 .hero__socialIcon:hover {
   color: #FFFFFF;
-  border-color: rgba(255, 255, 255, 0.35);
-  background: rgba(30, 30, 38, 0.85);
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.06);
   transform: translateY(-2px);
 }
 
-/* Lower Right: Scroll Cue */
-.hero__metaRight {
-  display: flex;
-  align-items: center;
-}
+
+/* ── Scroll Cue ── */
 
 .hero__scrollCue {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #8E8E93;
+  color: rgba(255, 255, 255, 0.35);
   background: none;
   border: none;
   padding: 6px 0;
@@ -338,9 +309,13 @@
   transition: color 0.2s ease;
 }
 
+.hero__scrollText {
+  /* inherit */
+}
+
 .hero__scrollArrow {
   font-size: 13px;
-  color: #FFFFFF;
+  color: rgba(255, 255, 255, 0.6);
   transition: transform 0.2s ease;
 }
 
@@ -350,74 +325,90 @@
 
 .hero__scrollCue:hover .hero__scrollArrow {
   transform: translateY(3px);
+  color: #FFFFFF;
 }
 
-/* ============================================================
-   RESPONSIVE BREAKPOINTS
-   ============================================================ */
 
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ════════════════════════════════════════════════════════════ */
+
+/* Tablet */
 @media (max-width: 1024px) {
-  .hero__giantName {
-    font-size: clamp(4rem, 14vw, 9rem);
+  .poster__firstName,
+  .poster__lastName {
+    font-size: clamp(4.2rem, 14vw, 10rem);
   }
 
-  .hero__portraitWrap {
-    height: clamp(320px, 55vh, 520px);
+  .poster__portraitWrap {
+    height: clamp(280px, 52vh, 480px);
   }
 }
 
+/* Small Tablet / Large Phone */
 @media (max-width: 768px) {
   .hero {
-    padding-top: calc(var(--header-h, 72px) + 12px);
-    padding-bottom: 20px;
+    padding: calc(var(--header-h, 72px) + 12px) 12px 16px;
+    gap: 14px;
   }
 
-  .hero__giantName {
-    font-size: clamp(3.2rem, 14vw, 6rem);
+  .poster__firstName,
+  .poster__lastName {
+    font-size: clamp(3.4rem, 15vw, 7rem);
   }
 
-  .hero__secondarySurname {
-    font-size: 12px;
-    letter-spacing: 0.3em;
+  .poster__portraitWrap {
+    height: clamp(240px, 45vh, 400px);
   }
 
-  .hero__portraitWrap {
-    height: clamp(280px, 48vh, 420px);
-    opacity: 0.9;
+  .hero__footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
   }
 
   .hero__actions {
-    margin-top: 14px;
     gap: 10px;
   }
 
   .hero__btnPrimary,
   .hero__btnSecondary {
-    padding: 9px 18px;
-    font-size: 12px;
+    padding: 9px 16px;
+    font-size: 11.5px;
   }
 
-  .hero__bottomBar {
-    padding-inline: 20px;
+  .poster__labelTR {
+    display: none;
+  }
+
+  .poster__labelBR {
+    display: none;
   }
 }
 
+/* Phone */
 @media (max-width: 540px) {
   .hero {
-    padding-bottom: 16px;
+    padding: calc(var(--header-h, 72px) + 8px) 10px 14px;
+    gap: 12px;
   }
 
-  .hero__giantName {
-    font-size: clamp(2.8rem, 15vw, 4.4rem);
+  .poster {
+    border-radius: 2px;
   }
 
-  .hero__secondarySurname {
-    font-size: 10.5px;
-    letter-spacing: 0.25em;
+  .poster__firstName,
+  .poster__lastName {
+    font-size: clamp(2.8rem, 17vw, 5rem);
+    line-height: 0.92;
   }
 
-  .hero__portraitWrap {
-    height: clamp(240px, 40vh, 340px);
+  .poster__portraitWrap {
+    height: clamp(200px, 38vh, 320px);
+  }
+
+  .poster__artwork {
+    min-height: clamp(260px, 44vh, 400px);
   }
 
   .hero__actions {
@@ -428,16 +419,35 @@
   .hero__btnPrimary,
   .hero__btnSecondary {
     padding: 8px 14px;
-    font-size: 11.5px;
+    font-size: 11px;
   }
 
-  .hero__bottomBar {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 14px;
+  .hero__socials {
+    gap: 5px;
   }
 
-  .hero__metaLeft {
-    gap: 8px;
+  .hero__socialIcon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .poster__labelTL {
+    font-size: 8.5px;
+  }
+
+  .poster__labelBL {
+    font-size: 8.5px;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 380px) {
+  .poster__firstName,
+  .poster__lastName {
+    font-size: clamp(2.4rem, 18vw, 4rem);
+  }
+
+  .poster__portraitWrap {
+    height: clamp(180px, 34vh, 280px);
   }
 }
