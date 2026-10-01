@@ -31,8 +31,7 @@
 
 .poster {
   position: relative;
-  width: 100%;
-  max-width: 1320px;
+  width: min(80vw, 1120px);
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -42,6 +41,7 @@
   border-radius: 3px;
   overflow: hidden;
   background: #050505;
+  padding: clamp(28px, 4vh, 48px) clamp(24px, 3.5vw, 48px);
 }
 
 
@@ -120,7 +120,7 @@
 
 .poster__firstName {
   font-family: 'Anton', 'Impact', 'Arial Narrow', sans-serif;
-  font-size: clamp(5rem, 16vw, 15rem);
+  font-size: clamp(3.8rem, 12vw, 11rem);
   font-weight: 400;
   line-height: 0.88;
   letter-spacing: -0.01em;
@@ -132,13 +132,13 @@
 
 .poster__lastName {
   font-family: 'Anton', 'Impact', 'Arial Narrow', sans-serif;
-  font-size: clamp(5rem, 16vw, 15rem);
+  font-size: clamp(3.8rem, 12vw, 11rem);
   font-weight: 400;
   line-height: 0.88;
   letter-spacing: -0.01em;
   text-transform: uppercase;
   color: #FFFFFF;
-  margin-top: -0.04em;
+  margin-top: -0.02em;
 }
 
 
@@ -150,7 +150,7 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 3;
-  height: clamp(300px, 60vh, 560px);
+  height: clamp(280px, 55vh, 500px);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -179,8 +179,7 @@
 .hero__footer {
   position: relative;
   z-index: 6;
-  width: 100%;
-  max-width: 1320px;
+  width: min(80vw, 1120px);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -335,13 +334,22 @@
 
 /* Tablet */
 @media (max-width: 1024px) {
+  .poster {
+    width: min(88vw, 1040px);
+    padding: clamp(24px, 3.5vh, 40px) clamp(20px, 3vw, 36px);
+  }
+
+  .hero__footer {
+    width: min(88vw, 1040px);
+  }
+
   .poster__firstName,
   .poster__lastName {
-    font-size: clamp(4.2rem, 14vw, 10rem);
+    font-size: clamp(3.4rem, 11vw, 8rem);
   }
 
   .poster__portraitWrap {
-    height: clamp(280px, 52vh, 480px);
+    height: clamp(250px, 48vh, 420px);
   }
 }
 
@@ -352,13 +360,22 @@
     gap: 14px;
   }
 
+  .poster {
+    width: min(94vw, 720px);
+    padding: clamp(20px, 3vh, 32px) clamp(16px, 2.5vw, 28px);
+  }
+
+  .hero__footer {
+    width: min(94vw, 720px);
+  }
+
   .poster__firstName,
   .poster__lastName {
-    font-size: clamp(3.4rem, 15vw, 7rem);
+    font-size: clamp(2.8rem, 12vw, 5.5rem);
   }
 
   .poster__portraitWrap {
-    height: clamp(240px, 45vh, 400px);
+    height: clamp(220px, 40vh, 360px);
   }
 
   .hero__footer {
@@ -394,21 +411,27 @@
   }
 
   .poster {
+    width: calc(100vw - 20px);
     border-radius: 2px;
+    padding: clamp(16px, 2.5vh, 24px) clamp(12px, 2vw, 20px);
+  }
+
+  .hero__footer {
+    width: calc(100vw - 20px);
   }
 
   .poster__firstName,
   .poster__lastName {
-    font-size: clamp(2.8rem, 17vw, 5rem);
+    font-size: clamp(2.4rem, 14vw, 4.2rem);
     line-height: 0.92;
   }
 
   .poster__portraitWrap {
-    height: clamp(200px, 38vh, 320px);
+    height: clamp(180px, 35vh, 290px);
   }
 
   .poster__artwork {
-    min-height: clamp(260px, 44vh, 400px);
+    min-height: clamp(220px, 38vh, 340px);
   }
 
   .hero__actions {
@@ -444,10 +467,10 @@
 @media (max-width: 380px) {
   .poster__firstName,
   .poster__lastName {
-    font-size: clamp(2.4rem, 18vw, 4rem);
+    font-size: clamp(2rem, 15vw, 3.4rem);
   }
 
   .poster__portraitWrap {
-    height: clamp(180px, 34vh, 280px);
+    height: clamp(160px, 30vh, 240px);
   }
 }
