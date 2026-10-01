@@ -56,17 +56,6 @@ export default function Hero({ profile }) {
       {/* ═══ THE POSTER FRAME ═══ */}
       <div className={styles.poster}>
 
-        {/* Poster top-left editorial label */}
-        <motion.div
-          className={styles.poster__labelTL}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.7, delay: 0.6, ease: EASE.premium }}
-        >
-          <span>01</span>
-          <span className={styles.poster__labelSep}>/</span>
-          <span>PORTFOLIO / 2026</span>
-        </motion.div>
 
         {/* Poster top-right discipline badge */}
         <motion.div
@@ -134,15 +123,8 @@ export default function Hero({ profile }) {
           PUNE, INDIA
         </motion.div>
 
-        {/* Poster bottom-right: SELECTED WORK */}
-        <motion.div
-          className={styles.poster__labelBR}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.7, delay: 0.72, ease: EASE.premium }}
-        >
-          SELECTED WORK
-        </motion.div>
+
+
       </div>
 
       {/* ═══ BELOW THE POSTER: Actions + Meta ═══ */}
