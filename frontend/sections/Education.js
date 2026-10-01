@@ -4,6 +4,11 @@ import { motion, useReducedMotion } from "framer-motion";
 import { EASE, TIMING } from "@/components/animations/MotionSystem";
 import styles from "./Education.module.css";
 
+function getSemesterNum(key = "") {
+  const match = key.match(/\d+/);
+  return match ? parseInt(match[0], 10) : 999;
+}
+
 function formatSemesterKey(key = "") {
   const match = key.match(/\d+/);
   if (match) {
@@ -50,7 +55,11 @@ export default function Education({ education = [] }) {
             const isPrimary = i === 0;
             const dateStr = formatDateRange(ed.start_date, ed.end_date, ed.current);
             const degreeTitle = ed.degree?.toUpperCase() || "DIPLOMA";
-            const gradeEntries = ed.grades ? Object.entries(ed.grades) : [];
+            const gradeEntries = ed.grades
+              ? Object.entries(ed.grades).sort(
+                  ([aKey], [bKey]) => getSemesterNum(aKey) - getSemesterNum(bKey)
+                )
+              : [];
 
             return (
               <motion.article
