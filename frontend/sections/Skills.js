@@ -511,14 +511,20 @@ export default function Skills({ skills = [] }) {
         </div>
 
         {/* Minimal Editorial Philosophy Sign-off */}
-        <div className={styles.footerNote}>
+        <motion.div
+          className={styles.footerNote}
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+          transition={{ duration: TIMING.section, ease: EASE.premium }}
+        >
           <p className={styles.footerQuote}>
-            “Small systems. Bigger possibilities.”
+            “With great power comes great responsibility.”
           </p>
           <span className={styles.footerTag}>
-            IoT &amp; SOFTWARE PHILOSOPHY · PUNE, INDIA
+            — SPIDER-MAN
           </span>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
