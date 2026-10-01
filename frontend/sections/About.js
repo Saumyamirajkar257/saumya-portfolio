@@ -1,145 +1,136 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
-import SectionHeading from "@/components/SectionHeading";
-import { ViewportCounter, MagneticButton, EASE, TIMING } from "@/components/animations/MotionSystem";
+import { motion, useReducedMotion } from "framer-motion";
+import { EASE, TIMING } from "@/components/animations/MotionSystem";
 import styles from "./About.module.css";
 
-const ABOUT_STATS = [
-  { num: 3, suffix: "+", label: "Core Languages" },
-  { num: 10, suffix: "+", label: "Certifications" },
-  { num: 100, suffix: "%", label: "Commitment" },
+const CREDENTIAL_ROWS = [
+  {
+    index: "01",
+    main: "Diploma in Computer Engineering & IoT",
+    sub: "Cusrow Wadia Institute of Technology, Pune",
+  },
+  {
+    index: "02",
+    main: "Web Development Internship",
+    sub: "Big Bang Tech Solutions (Full Lifecycle & Web)",
+  },
+  {
+    index: "03",
+    main: "Core Competencies",
+    sub: "Hardware Sensors · Python · JavaScript · Next.js · IoT",
+  },
+  {
+    index: "04",
+    main: "Pune, Maharashtra, India",
+    sub: "Current Academic & Development Base",
+  },
 ];
 
 export default function About({ profile }) {
   const reduce = useReducedMotion();
-  const location = profile?.location || "Pune, Maharashtra, India";
 
-  const sectionRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"]
-  });
+  const certCount = profile?.highlights?.find((h) => h.label.toLowerCase().includes("certification"))?.value || "6+";
+  const languagesCount = "3+";
+  const semestersCount = profile?.highlights?.find((h) => h.label.toLowerCase().includes("semester"))?.value || "4";
 
-  // Subtle cinematic parallax for the credentials card
-  const yMove = useTransform(scrollYProgress, [0, 1], [40, -40]);
+  const stats = [
+    { val: languagesCount, label: "CORE LANGUAGES" },
+    { val: certCount, label: "CERTIFICATIONS" },
+    { val: semestersCount, label: "SEMESTERS COMPLETED" },
+  ];
 
   return (
-    <section id="about" className="block" ref={sectionRef}>
+    <section id="about" className={styles.section}>
       <div className="wrap">
         <div className={styles.aboutGrid}>
-          {/* Left: Engineering Credentials Card */}
+          {/* Left Column: Background & Focus Information Panel */}
           <motion.div
-            style={reduce ? {} : { y: yMove }}
             className={styles.aboutLeft}
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "0px 0px -8% 0px" }}
-            transition={{ duration: TIMING.section, ease: EASE.premium }}
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "0px 0px -6% 0px" }}
+            transition={{ duration: reduce ? 0.01 : TIMING.section, ease: EASE.premium }}
           >
-            <div className={styles.credentialsCard}>
-              <div className={styles.credHeader}>
-                <span className={styles.credTitle}>// Background &amp; Focus</span>
-                <span className={styles.credBadge}>CWIT Pune</span>
+            <div className={styles.credentialsPanel}>
+              <div className={styles.panelHeader}>
+                <span className={styles.panelEyebrow}>BACKGROUND &amp; FOCUS</span>
+                <span className={styles.panelTag}>ACADEMIC &amp; INDUSTRY</span>
               </div>
 
-              <div className={styles.credRow}>
-                <span className={styles.credIcon}>🎓</span>
-                <div className={styles.credText}>
-                  <span className={styles.credMain}>Diploma in Computer Engineering &amp; IoT</span>
-                  <span className={styles.credSub}>Cusrow Wadia Institute of Technology, Pune</span>
-                </div>
-              </div>
-
-              <div className={styles.credRow}>
-                <span className={styles.credIcon}>💼</span>
-                <div className={styles.credText}>
-                  <span className={styles.credMain}>Web Development Internship</span>
-                  <span className={styles.credSub}>Big Bang Tech Solutions (Lifecycle &amp; Frontend)</span>
-                </div>
-              </div>
-
-              <div className={styles.credRow}>
-                <span className={styles.credIcon}>⚡</span>
-                <div className={styles.credText}>
-                  <span className={styles.credMain}>Core Competency</span>
-                  <span className={styles.credSub}>Hardware Sensors • Python • Next.js &amp; FastAPI</span>
-                </div>
-              </div>
-
-              <div className={styles.credRow}>
-                <span className={styles.credIcon}>📍</span>
-                <div className={styles.credText}>
-                  <span className={styles.credMain}>{location}</span>
-                </div>
+              <div className={styles.rowsList}>
+                {CREDENTIAL_ROWS.map((row) => (
+                  <div key={row.index} className={styles.credRow}>
+                    <span className={styles.credIndex}>{row.index}</span>
+                    <div className={styles.credText}>
+                      <span className={styles.credMain}>{row.main}</span>
+                      <span className={styles.credSub}>{row.sub}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </motion.div>
 
-          {/* Right: Content & Highlights */}
+          {/* Right Column: Editorial Profile & Statistics */}
           <div className={styles.aboutRight}>
-            <SectionHeading
-              eyebrow="GET TO KNOW ME"
-              title={<>About <span className="gradient-text">Me</span></>}
-            />
+            <div className={styles.header}>
+              <div className={styles.eyebrow}>
+                <span className={styles.eyebrowDot} />
+                <span>GET TO KNOW ME</span>
+              </div>
+              <h2 className={styles.heading}>ABOUT</h2>
+            </div>
 
             <motion.p
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 18 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: TIMING.component, delay: 0.1, ease: EASE.premium }}
+              transition={{ duration: reduce ? 0.01 : TIMING.component, delay: 0.08, ease: EASE.premium }}
               className={styles.aboutDesc}
             >
-              {profile?.summary || "Computer Engineering and IoT student with hands-on experience in web development, Python, C/C++, JavaScript, Arduino, and embedded systems. I enjoy bridging hardware sensors with clean, resilient software."}
+              Computer Engineering and IoT diploma student with hands-on experience in web development, Python, C/C++, JavaScript, Arduino, and embedded systems.
+              <br /><br />
+              Completed a web development internship involving web/mobile application development, project planning, technical research, and team collaboration. Passionate about bridging hardware sensors with resilient software systems.
             </motion.p>
 
-            {/* 3 Metric Cards */}
-            <div className={styles.statsRow}>
-              {ABOUT_STATS.map((stat, i) => (
+            {/* Factual Editorial Statistics */}
+            <div className={styles.statsGrid}>
+              {stats.map((stat, i) => (
                 <motion.div
                   key={stat.label}
-                  initial={{ opacity: 0, y: 22 }}
+                  initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: TIMING.component, delay: 0.15 + i * 0.08, ease: EASE.premium }}
+                  transition={{ duration: reduce ? 0.01 : TIMING.component, delay: 0.12 + i * 0.06, ease: EASE.premium }}
                   className={styles.statBox}
                 >
-                  <span className={styles.statVal}>
-                    <ViewportCounter end={stat.num} suffix={stat.suffix} duration={1.6} />
-                  </span>
+                  <span className={styles.statVal}>{stat.val}</span>
                   <span className={styles.statLbl}>{stat.label}</span>
                 </motion.div>
               ))}
             </div>
 
-            {/* CTA Button with Magnetic Pull */}
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: TIMING.component, delay: 0.35, ease: EASE.premium }}
-              className={styles.aboutCta}
-            >
-              <MagneticButton strength={0.25}>
-                <a
-                  href="#projects"
-                  className="btn btn--secondary btn--lg"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    const el = document.querySelector("#projects");
-                    if (!el) return;
-                    if (window.__lenis) {
-                      window.__lenis.scrollTo(el, { offset: -60, duration: 1.2 });
-                    } else {
-                      el.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
-                    }
-                  }}
-                >
-                  Explore My Work <span className="btn-arrow" aria-hidden="true">→</span>
-                </a>
-              </MagneticButton>
-            </motion.div>
+            {/* Minimal Editorial CTA */}
+            <div className={styles.ctaWrapper}>
+              <a
+                href="#projects"
+                className={styles.exploreBtn}
+                onClick={(e) => {
+                  e.preventDefault();
+                  const el = document.querySelector("#projects");
+                  if (!el) return;
+                  if (window.__lenis) {
+                    window.__lenis.scrollTo(el, { offset: -60, duration: 1.2 });
+                  } else {
+                    el.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
+                  }
+                }}
+              >
+                <span>EXPLORE MY WORK</span>
+                <span className={styles.exploreArrow}>→</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>

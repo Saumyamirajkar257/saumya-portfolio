@@ -3,104 +3,160 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import SectionHeading from "@/components/SectionHeading";
-import { EASE, TIMING, HoverLift, BorderGlow } from "@/components/animations/MotionSystem";
+import { EASE, TIMING } from "@/components/animations/MotionSystem";
 import styles from "./Projects.module.css";
 
-const FILTERS = ["All", "Hardware + IoT", "Full-Stack & Web", "Python Software"];
+const FILTERS = ["ALL", "HARDWARE + IoT", "FULL-STACK & WEB", "PYTHON SOFTWARE"];
+
+const GITHUB_ICON = (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0 0 22 12.017C22 6.484 17.522 2 12 2z" />
+  </svg>
+);
+
+const ARROW_ICON = (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <line x1="5" y1="12" x2="19" y2="12" />
+    <polyline points="12 5 19 12 12 19" />
+  </svg>
+);
+
+function filterProject(project, activeFilter) {
+  if (activeFilter === "ALL") return true;
+  const cat = (project.category || "").toLowerCase();
+  if (activeFilter === "HARDWARE + IoT") {
+    return cat.includes("hardware") || cat.includes("iot") || cat.includes("embedded");
+  }
+  if (activeFilter === "FULL-STACK & WEB") {
+    return cat.includes("full-stack") || cat.includes("web") || cat.includes("frontend") || cat.includes("app");
+  }
+  if (activeFilter === "PYTHON SOFTWARE") {
+    return cat.includes("python") || cat.includes("software");
+  }
+  return true;
+}
 
 function ProjectCard({ project, index, onOpen }) {
-  const initial = (project.title || "P").trim()[0].toUpperCase();
-  const isFeatured = project.featured;
   const reduce = useReducedMotion();
+  const techList = project.technologies || [];
 
   return (
     <motion.article
       layout="position"
-      initial={{ opacity: 0, y: 32 }}
+      initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "0px 0px -8% 0px" }}
-      transition={{ duration: reduce ? 0.01 : TIMING.component + 0.1, delay: reduce ? 0 : Math.min(index * 0.07, 0.25), ease: EASE.premium }}
-      className={styles.project}
-      onClick={() => onOpen(project)}
-      data-cursor
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          onOpen(project);
-        }
+      viewport={{ once: true, margin: "0px 0px -6% 0px" }}
+      transition={{
+        duration: reduce ? 0.01 : TIMING.component,
+        delay: reduce ? 0 : Math.min(index * 0.08, 0.24),
+        ease: EASE.premium,
       }}
-      aria-label={`Open ${project.title} details`}
-      whileHover={reduce ? {} : { y: -8, transition: { duration: TIMING.button, ease: EASE.premium } }}
-      whileTap={reduce ? {} : { scale: 0.98 }}
+      className={styles.card}
     >
-      {/* 16:9 Cover Image / Visual */}
-      <div className={styles.project__cover}>
+      {/* Project Image Area */}
+      <div
+        className={styles.cardImageWrapper}
+        onClick={() => onOpen(project)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onOpen(project);
+          }
+        }}
+        aria-label={`Open case study for ${project.title}`}
+      >
         {project.image ? (
           <Image
             src={project.image}
             alt={`Screenshot of ${project.title}`}
             fill
             unoptimized
-            sizes="(min-width: 1100px) 33vw, (min-width: 760px) 50vw, 100vw"
-            className={styles.project__shot}
+            sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw"
+            className={styles.cardImage}
           />
         ) : (
-          <div className={styles.project__fallback}>
-            <span className={styles.project__initial}>{initial}</span>
-            <div className={styles.project__ambientRing} />
+          <div className={styles.cardImageFallback}>
+            <span>{project.title}</span>
           </div>
         )}
-        <div className={styles.project__tagline}>
-          <span className={styles.project__tagDot} />
-          <span>{project.category || "PROJECT"}</span>
-        </div>
+        <div className={styles.cardImageOverlay} />
       </div>
 
-      {/* Body */}
-      <div className={styles.project__body}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
-          <span className={styles.project__cat}>{project.category}</span>
-          {isFeatured && (
-            <span style={{ fontSize: "10px", color: "#FFFFFF", fontFamily: "var(--font-mono)", fontWeight: "700", letterSpacing: "0.05em" }}>
-              ★ FEATURED
-            </span>
-          )}
-        </div>
-
-        <h3 className={styles.project__title}>{project.title}</h3>
-        <p className={styles.project__desc}>{project.short_description}</p>
-
-        {/* Tech Tags */}
-        <div className={styles.project__chips}>
-          {(project.technologies || []).slice(0, 4).map((t) => (
-            <span key={t} className={styles.project__chip}>
-              {t}
-            </span>
-          ))}
-        </div>
-
-        {/* Bottom Action */}
-        <div className={styles.project__foot}>
-          <span className={styles.project__linkText}>
-            Explore Case Study <span className={styles.project__arrow}>→</span>
+      {/* Card Content Block */}
+      <div className={styles.cardBody}>
+        {/* Category & Featured Metadata */}
+        <div className={styles.cardMetaRow}>
+          <span className={styles.cardCategory}>
+            {project.category?.toUpperCase() || "ENGINEERING"}
           </span>
-          {project.github_url && (
-            <span
-              className={styles.project__ghIcon}
-              title="GitHub available"
-              onClick={(e) => {
-                e.stopPropagation();
-                window.open(project.github_url, "_blank", "noopener,noreferrer");
-              }}
-            >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-              </svg>
+          {project.featured && (
+            <span className={styles.featuredBadge}>
+              <span className={styles.featuredDot}>●</span>
+              <span>FEATURED</span>
             </span>
           )}
+        </div>
+
+        {/* Project Title */}
+        <h3
+          className={styles.cardTitle}
+          onClick={() => onOpen(project)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onOpen(project);
+            }
+          }}
+        >
+          {project.title}
+        </h3>
+
+        {/* Project Description */}
+        <p className={styles.cardDesc}>
+          {project.short_description || project.description}
+        </p>
+
+        {/* Card Footer: Tech Tags & Bottom Actions */}
+        <div className={styles.cardFooter}>
+          {techList.length > 0 && (
+            <div className={styles.techTagsList}>
+              {techList.slice(0, 5).map((t) => (
+                <span key={t} className={styles.techTag}>
+                  {t}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Action Row: Explore Case Study & GitHub */}
+          <div className={styles.cardActionRow}>
+            <button
+              type="button"
+              className={styles.caseStudyBtn}
+              onClick={() => onOpen(project)}
+              aria-label={`Explore case study for ${project.title}`}
+            >
+              <span>EXPLORE CASE STUDY</span>
+              <span className={styles.caseStudyArrow}>{ARROW_ICON}</span>
+            </button>
+
+            {project.github_url && (
+              <a
+                href={project.github_url}
+                target="_blank"
+                rel="noreferrer noopener"
+                className={styles.githubIconBtn}
+                aria-label={`View ${project.title} source code on GitHub`}
+                title="View GitHub Repository"
+              >
+                {GITHUB_ICON}
+              </a>
+            )}
+          </div>
         </div>
       </div>
     </motion.article>
@@ -108,21 +164,12 @@ function ProjectCard({ project, index, onOpen }) {
 }
 
 export default function Projects({ projects = [] }) {
-  const [filter, setFilter] = useState("All");
+  const [activeFilter, setActiveFilter] = useState("ALL");
   const [activeProject, setActiveProject] = useState(null);
   const reduce = useReducedMotion();
 
-  // Normalize categories for matching filter
-  const filtered = filter === "All"
-    ? projects
-    : projects.filter((p) => {
-        if (filter === "Hardware + IoT") return p.category === "Hardware + IoT" || p.category === "IoT & Embedded";
-        if (filter === "Full-Stack & Web") return p.category === "Full-Stack Web App" || p.category === "Web Development";
-        if (filter === "Python Software") return p.category === "Python Software" || p.category === "Software";
-        return p.category === filter;
-      });
-
-  const sorted = [...filtered].sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+  const filtered = projects.filter((p) => filterProject(p, activeFilter));
+  const sorted = [...filtered].sort((a, b) => Number(a.order ?? 99) - Number(b.order ?? 99));
 
   const closeModal = useCallback(() => setActiveProject(null), []);
 
@@ -138,57 +185,67 @@ export default function Projects({ projects = [] }) {
   }, [activeProject, closeModal]);
 
   return (
-    <section id="projects" className="block">
+    <section id="projects" className={styles.projectsSection}>
       <div className="wrap">
-        <div className={styles.sectionHeaderRow}>
-          <SectionHeading
-            eyebrow="REAL WORLD BUILDS"
-            title={<>Featured <span className="gradient-text">Projects</span></>}
-            lead={
-              <p className="prose">
-                A mix of hardware and software projects that solve real problems.
-              </p>
-            }
-          />
-          <div className={styles.headerAction}>
-            <button
-              className="btn btn--secondary btn--sm"
-              onClick={() => setFilter("All")}
+        {/* Section Header */}
+        <div className={styles.header}>
+          <div className={styles.headerLeft}>
+            <div className={styles.eyebrow}>
+              <span className={styles.eyebrowDot} />
+              <span>REAL WORLD BUILDS</span>
+            </div>
+            <h2 className={styles.heading}>FEATURED PROJECTS</h2>
+            <p className={styles.subheading}>
+              A mix of hardware and software projects that solve real problems.
+            </p>
+          </div>
+
+          <div className={styles.headerRight}>
+            <a
+              href="https://github.com/saumyamirajkar"
+              target="_blank"
+              rel="noreferrer noopener"
+              className={styles.viewAllBtn}
             >
-              View All Projects →
-            </button>
+              <span>VIEW ALL PROJECTS</span>
+              <span className={styles.viewAllArrow}>→</span>
+            </a>
           </div>
         </div>
 
-        {/* Filter Pills */}
-        <div className={styles.projects__filters} role="tablist" aria-label="Filter projects">
+        {/* Category Filters Bar */}
+        <div className={styles.filterBar} role="tablist" aria-label="Filter project categories">
           {FILTERS.map((f) => (
             <button
               key={f}
               role="tab"
-              aria-selected={filter === f}
-              className={`${styles.projects__filter} ${filter === f ? styles.isActive : ""}`}
-              onClick={() => setFilter(f)}
-              style={{ position: "relative" }}
+              aria-selected={activeFilter === f}
+              className={`${styles.filterBtn} ${activeFilter === f ? styles.filterActive : ""}`}
+              onClick={() => setActiveFilter(f)}
             >
-              {filter === f && (
+              {activeFilter === f && (
                 <motion.span
-                  layoutId="projectTabActiveBg"
-                  className={styles.projects__activeBg}
-                  transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                  layoutId="activeFilterHighlight"
+                  className={styles.filterActiveHighlight}
+                  transition={{ type: "spring", stiffness: 450, damping: 35 }}
                 />
               )}
-              <span style={{ position: "relative", zIndex: 1 }}>{f}</span>
+              <span className={styles.filterLabel}>{f}</span>
             </button>
           ))}
         </div>
 
-        {/* 3-column Grid */}
-        <motion.div layout="position" className={styles.projects__grid}>
-          {sorted.map((p, i) => (
-            <ProjectCard key={p.id ?? `${p.title}`} project={p} index={i} onOpen={setActiveProject} />
+        {/* Project Cards Grid Showcase */}
+        <div className={styles.cardsGrid}>
+          {sorted.map((project, i) => (
+            <ProjectCard
+              key={project.id ?? `${project.title}-${i}`}
+              project={project}
+              index={i}
+              onOpen={setActiveProject}
+            />
           ))}
-        </motion.div>
+        </div>
       </div>
 
       {/* Case Study Modal */}
@@ -199,71 +256,89 @@ export default function Projects({ projects = [] }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
+            transition={{ duration: 0.22 }}
             onClick={closeModal}
             role="dialog"
             aria-modal="true"
-            aria-label={`${activeProject.title} details`}
+            aria-label={`${activeProject.title} case study`}
           >
             <motion.div
               className={styles.modal__panel}
-              initial={{ opacity: 0, y: 40, scale: 0.95 }}
+              initial={{ opacity: 0, y: 30, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 24, scale: 0.96 }}
-              transition={{ duration: reduce ? 0.01 : 0.4, ease: EASE.premium }}
+              exit={{ opacity: 0, y: 15, scale: 0.98 }}
+              transition={{ duration: reduce ? 0.01 : 0.3, ease: EASE.premium }}
               onClick={(e) => e.stopPropagation()}
             >
-              <button className={styles.modal__close} onClick={closeModal} aria-label="Close dialog">
+              <button
+                className={styles.modal__close}
+                onClick={closeModal}
+                aria-label="Close modal dialog"
+              >
                 ✕
               </button>
 
-              <div className={styles.modal__cover}>
-                {activeProject.image ? (
+              {activeProject.image && (
+                <div className={styles.modal__cover}>
                   <Image
                     src={activeProject.image}
-                    alt={`Screenshot of ${activeProject.title}`}
+                    alt={`Preview of ${activeProject.title}`}
                     fill
                     unoptimized
-                    sizes="(min-width: 720px) 720px, 100vw"
+                    sizes="(min-width: 760px) 760px, 100vw"
                     className={styles.modal__shot}
                   />
-                ) : (
-                  <div className={styles.modal__fallback}>
-                    <span className={styles.modal__initial}>{(activeProject.title || "P")[0]}</span>
-                  </div>
-                )}
-                <span className={styles.modal__tag}>{activeProject.category}</span>
-              </div>
+                  <span className={styles.modal__coverTag}>
+                    {activeProject.category?.toUpperCase()}
+                  </span>
+                </div>
+              )}
 
               <div className={styles.modal__content}>
-                <span className={styles.modal__cat}>{activeProject.category}</span>
-                <h3 className={styles.modal__title}>{activeProject.title}</h3>
-                <p className={styles.modal__desc}>{activeProject.description}</p>
+                <div className={styles.modal__header}>
+                  <span className={styles.modal__cat}>
+                    {activeProject.category?.toUpperCase()}
+                  </span>
+                  <h3 className={styles.modal__title}>{activeProject.title}</h3>
+                  <p className={styles.modal__desc}>
+                    {activeProject.description || activeProject.short_description}
+                  </p>
+                </div>
 
                 {(activeProject.problem || activeProject.approach || activeProject.result) && (
                   <div className={styles.modal__section}>
-                    <h4 className={styles.modal__h4}>Problem → Idea → Result</h4>
-                    <ul className={styles.modal__nar}>
+                    <h4 className={styles.modal__h4}>PROBLEM → APPROACH → RESULT</h4>
+                    <div className={styles.modal__narrativeGrid}>
                       {activeProject.problem && (
-                        <li><b>The Problem:</b> <span>{activeProject.problem}</span></li>
+                        <div className={styles.modal__narrativeBlock}>
+                          <span className={styles.modal__narrativeLabel}>The Challenge</span>
+                          <p className={styles.modal__narrativeText}>{activeProject.problem}</p>
+                        </div>
                       )}
                       {activeProject.approach && (
-                        <li><b>The Concept &amp; Approach:</b> <span>{activeProject.approach}</span></li>
+                        <div className={styles.modal__narrativeBlock}>
+                          <span className={styles.modal__narrativeLabel}>The Engineering Approach</span>
+                          <p className={styles.modal__narrativeText}>{activeProject.approach}</p>
+                        </div>
                       )}
                       {activeProject.result && (
-                        <li><b>Result &amp; State:</b> <span>{activeProject.result}</span></li>
+                        <div className={styles.modal__narrativeBlock}>
+                          <span className={styles.modal__narrativeLabel}>Outcome &amp; Deliverables</span>
+                          <p className={styles.modal__narrativeText}>{activeProject.result}</p>
+                        </div>
                       )}
-                    </ul>
+                    </div>
                   </div>
                 )}
 
                 {activeProject.features?.length > 0 && (
                   <div className={styles.modal__section}>
-                    <h4 className={styles.modal__h4}>What I Built &amp; Key Features</h4>
-                    <ul className={styles.modal__list}>
+                    <h4 className={styles.modal__h4}>KEY FEATURES &amp; CAPABILITIES</h4>
+                    <ul className={styles.modal__featureList}>
                       {activeProject.features.map((f) => (
-                        <li key={f} className={styles.modal__listItem}>
-                          <span className={styles.modal__check}>✓</span> {f}
+                        <li key={f} className={styles.modal__featureItem}>
+                          <span className={styles.modal__featureBullet}>›</span>
+                          <span>{f}</span>
                         </li>
                       ))}
                     </ul>
@@ -272,36 +347,48 @@ export default function Projects({ projects = [] }) {
 
                 {activeProject.learned && (
                   <div className={styles.modal__section}>
-                    <h4 className={styles.modal__h4}>What I Learned</h4>
+                    <h4 className={styles.modal__h4}>ENGINEERING TAKEAWAYS</h4>
                     <p className={styles.modal__text}>{activeProject.learned}</p>
                   </div>
                 )}
 
                 {activeProject.contribution && (
                   <div className={styles.modal__section}>
-                    <h4 className={styles.modal__h4}>My Role &amp; Contribution</h4>
+                    <h4 className={styles.modal__h4}>MY ROLE &amp; SCOPE</h4>
                     <p className={styles.modal__text}>{activeProject.contribution}</p>
                   </div>
                 )}
 
                 <div className={styles.modal__section}>
-                  <h4 className={styles.modal__h4}>Technologies</h4>
+                  <h4 className={styles.modal__h4}>TECH STACK</h4>
                   <div className={styles.modal__chips}>
                     {(activeProject.technologies || []).map((t) => (
-                      <span key={t} className={styles.project__chip}>{t}</span>
+                      <span key={t} className={styles.modal__chip}>{t}</span>
                     ))}
                   </div>
                 </div>
 
                 <div className={styles.modal__links}>
                   {activeProject.github_url && (
-                    <a href={activeProject.github_url} target="_blank" rel="noreferrer noopener" className="btn btn--secondary btn--sm">
-                      View on GitHub ↗
+                    <a
+                      href={activeProject.github_url}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className={styles.modal__btnSecondary}
+                    >
+                      <span>VIEW ON GITHUB</span>
+                      <span aria-hidden="true">↗</span>
                     </a>
                   )}
                   {activeProject.live_url && (
-                    <a href={activeProject.live_url} target="_blank" rel="noreferrer noopener" className="btn btn--primary btn--sm">
-                      Visit Live Demo →
+                    <a
+                      href={activeProject.live_url}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className={styles.modal__btnPrimary}
+                    >
+                      <span>VISIT LIVE DEMO</span>
+                      <span aria-hidden="true">→</span>
                     </a>
                   )}
                 </div>

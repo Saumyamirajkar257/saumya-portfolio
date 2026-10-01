@@ -1,100 +1,294 @@
-.edu__timeline {
+/* ============================================================
+   Education.module.css — Refined Editorial Timeline
+   ============================================================ */
+
+.section {
+  position: relative;
+  padding-block: clamp(60px, 10vw, 130px);
+  background: #09090B;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Header */
+.header {
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  position: relative;
-  padding-left: 20px;
-  border-left: 1px dashed rgba(255, 255, 255, 0.12);
-  margin-top: 32px;
+  gap: 8px;
+  margin-bottom: clamp(36px, 6vw, 64px);
 }
 
-.edu__timelineItem {
-  position: relative;
-  padding-left: 24px;
-}
-
-.edu__timelineDot {
-  position: absolute;
-  left: -27px;
-  top: 8px;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: #FFFFFF;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-  border: 2px solid #09090B;
-}
-
-.edu__timelineContent {
-  background: #121215;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-m);
-  padding: 24px;
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
-  transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.edu__timelineContent:hover {
-  border-color: rgba(255, 255, 255, 0.35);
-  transform: translateY(-2px);
-  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.8), 0 0 16px rgba(255, 255, 255, 0.05);
-}
-
-.edu__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 8px;
-}
-
-.edu__degree {
-  font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: 700;
-  color: #FFF;
-}
-
-.edu__years {
-  font-size: 13px;
-  color: #A1A1AA;
-}
-
-.edu__institution {
-  font-size: 15px;
-  color: var(--text-mute);
-  margin-bottom: 16px;
-}
-
-.edu__detail {
-  font-size: 14px;
-  color: var(--text-dim);
-  line-height: 1.5;
-  margin-bottom: 16px;
-}
-
-.edu__grades {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.edu__grade {
+.eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 4px 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #A1A1AA;
+}
+
+.eyebrowDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #FFFFFF;
+}
+
+.heading {
+  font-family: var(--font-anton), 'Anton', 'Impact', sans-serif;
+  font-size: clamp(36px, 6.5vw, 76px);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  margin: 4px 0 0;
+}
+
+.subheading {
+  font-family: var(--font-body);
+  font-size: clamp(14px, 1.4vw, 16px);
+  color: #A1A1AA;
+  max-width: 52ch;
+  margin-top: 4px;
+}
+
+/* Timeline Container */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  max-width: 960px;
+}
+
+/* Timeline Item (Node on left + Content on right) */
+.timelineItem {
+  position: relative;
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: clamp(16px, 3vw, 32px);
+  padding-bottom: clamp(36px, 5vw, 56px);
+}
+
+.timelineItem:last-child {
+  padding-bottom: 0;
+}
+
+/* Track & Node */
+.nodeTrack {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 6px;
+}
+
+.nodeDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #71717A;
+  border: 2px solid #09090B;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2);
+  z-index: 2;
+  transition: background-color 0.25s ease, transform 0.25s ease;
+}
+
+.nodeDotPrimary {
+  width: 11px;
+  height: 11px;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.4), 0 0 10px rgba(255, 255, 255, 0.6);
+}
+
+.timelineItem:hover .nodeDot {
+  background: #FFFFFF;
+  transform: scale(1.2);
+}
+
+.nodeLine {
+  position: absolute;
+  top: 18px;
+  bottom: -4px;
+  width: 1px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.08) 100%);
+  z-index: 1;
+}
+
+/* Content Block */
+.contentBlock {
+  display: flex;
+  flex-direction: column;
+  padding: clamp(20px, 3vw, 30px);
+  background: rgba(18, 18, 22, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  transition: border-color 0.25s ease, background-color 0.25s ease;
+}
+
+.timelineItem:hover .contentBlock {
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(24, 24, 30, 0.7);
+}
+
+/* Primary Milestone Visual Weight */
+.isPrimary .contentBlock {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(18, 18, 22, 0.75);
+}
+
+.isPrimary .degreeTitle {
+  font-size: clamp(22px, 3.4vw, 34px);
+  color: #FFFFFF;
+}
+
+/* Secondary Milestone Visual Weight */
+.isSecondary .contentBlock {
+  background: rgba(15, 15, 18, 0.4);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.isSecondary .degreeTitle {
+  font-size: clamp(18px, 2.4vw, 24px);
+  color: #D4D4D8;
+}
+
+/* Date Row */
+.dateRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.dateText {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8E8E93;
+}
+
+.currentBadge {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #000000;
+  background: #FFFFFF;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Degree & Institution */
+.degreeTitle {
+  font-family: var(--font-anton), 'Anton', 'Impact', sans-serif;
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+  margin: 0 0 4px;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.timelineItem:hover .degreeTitle {
+  transform: translateX(4px);
+}
+
+.institution {
+  font-family: var(--font-body);
+  font-size: clamp(13.5px, 1.15vw, 15px);
+  font-weight: 500;
+  color: #A1A1AA;
+  margin: 0 0 12px;
+}
+
+.description {
+  font-family: var(--font-body);
+  font-size: clamp(13px, 1.05vw, 14px);
+  color: #8E8E93;
+  line-height: 1.6;
+  max-width: 68ch;
+  margin: 0 0 16px;
+}
+
+/* Compact Editorial Semester / Grade Metadata Chips */
+.gradesContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.gradesLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #71717A;
+  text-transform: uppercase;
+}
+
+.gradesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.gradeChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 6px;
+  border-radius: 4px;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 11.5px;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
-.edu__gradeKey {
-  color: var(--text-mute);
+.gradeChip:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.06);
 }
 
-.edu__gradeVal {
-  color: #FFF;
-  font-weight: 600;
+.gradeKey {
+  color: #8E8E93;
+  font-weight: 500;
+}
+
+.gradeVal {
+  color: #FFFFFF;
+  font-weight: 700;
+}
+
+/* ============================================================
+   RESPONSIVE (Tablet & Mobile)
+   ============================================================ */
+
+@media (max-width: 640px) {
+  .timelineItem {
+    grid-template-columns: 18px 1fr;
+    gap: 14px;
+    padding-bottom: 28px;
+  }
+
+  .contentBlock {
+    padding: 16px;
+  }
+
+  .gradesList {
+    gap: 6px;
+  }
+
+  .gradeChip {
+    padding: 4px 8px;
+    font-size: 10.5px;
+  }
 }

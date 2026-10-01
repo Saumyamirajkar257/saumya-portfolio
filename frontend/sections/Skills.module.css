@@ -1,10 +1,112 @@
-.constellationContainer {
+/* ============================================================
+   Skills.module.css — Editorial Constellation & Categorized Scanner
+   ============================================================ */
+
+.section {
+  position: relative;
+  padding-block: clamp(60px, 10vw, 130px);
+  background: #09090B;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  scroll-margin-top: 80px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: clamp(36px, 6vw, 64px);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #A1A1AA;
+}
+
+.eyebrowDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #FFFFFF;
+}
+
+.heading {
+  font-family: var(--font-anton), 'Anton', 'Impact', sans-serif;
+  font-size: clamp(36px, 6.5vw, 76px);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  margin: 4px 0 0;
+}
+
+.subheading {
+  font-family: var(--font-body);
+  font-size: clamp(14px, 1.4vw, 16px);
+  color: #A1A1AA;
+  max-width: 54ch;
+  margin-top: 4px;
+}
+
+/* Constellation Card Wrapper (Controlled Width) */
+.constellationCard {
+  position: relative;
+  max-width: 860px;
+  margin: 0 auto clamp(40px, 6vw, 64px);
+  background: rgba(18, 18, 22, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: clamp(20px, 3vw, 32px);
+  overflow: hidden;
+}
+
+.constellationMetaHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 16px;
+}
+
+.constellationTag {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #71717A;
+}
+
+.constellationStatus {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #E4E4E7;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.constellationWrapper {
   position: relative;
   width: 100%;
-  max-width: 760px;
-  height: 560px;
-  margin: 30px auto 20px;
-  display: block;
+  height: 520px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  --node-scale: 1;
 }
 
 .constellationSvg {
@@ -15,88 +117,27 @@
   pointer-events: none;
 }
 
-.skillNode {
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  z-index: 2;
-  transform: translate(-50%, -50%);
-  user-select: none;
-}
-
-.skillIcon {
-  display: grid;
-  place-items: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: #121215;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #E4E4E7;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
-              color 0.3s ease,
-              border-color 0.3s ease,
-              box-shadow 0.3s ease,
-              background 0.3s ease;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .skillIcon.hovered,
-  .skillNode:hover .skillIcon {
-    transform: scale(1.18);
-    color: #FFFFFF;
-    border-color: rgba(255, 255, 255, 0.7);
-    box-shadow: 0 0 24px rgba(255, 255, 255, 0.3);
-    background: #18181C;
-  }
-}
-
-.skillLabel {
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  font-weight: 600;
-  color: #A1A1AA;
-  background: rgba(18, 18, 22, 0.85);
-  padding: 3px 10px;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  white-space: nowrap;
-  pointer-events: none;
-  transition: all 0.3s ease;
-}
-
-.skillNode:hover .skillLabel {
-  color: #FFFFFF;
-  border-color: rgba(255, 255, 255, 0.35);
-  background: rgba(28, 28, 34, 0.95);
-  transform: translateY(2px);
-}
-
+/* Center CORE Node */
 .centerNode {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 64px;
-  height: 64px;
+  width: 58px;
+  height: 58px;
   border-radius: 50%;
   background: #FFFFFF;
   display: grid;
   place-items: center;
-  box-shadow: 0 0 30px rgba(255, 255, 255, 0.35);
-  z-index: 1;
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+  z-index: 3;
 }
 
 .centerText {
-  font-family: var(--font-display);
-  font-weight: 800;
+  font-family: var(--font-anton), 'Anton', 'Impact', sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.04em;
   color: #09090B;
-  font-size: 13.5px;
-  letter-spacing: -0.01em;
 }
 
 .centerPulse {
@@ -110,164 +151,297 @@
 
 @keyframes pulseCore {
   0% { transform: scale(0.95); opacity: 0.8; }
-  50% { transform: scale(1.15); opacity: 0.2; }
+  50% { transform: scale(1.18); opacity: 0.15; }
   100% { transform: scale(0.95); opacity: 0.8; }
 }
 
-/* Mobile Skills Grid */
-.mobileSkillsGrid {
-  display: none;
-  grid-template-columns: 1fr;
-  gap: clamp(12px, 2vw, 16px);
-  margin-block: 24px;
-}
-
-.mobileSkillCard {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 18px;
-  background: #121215;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-m);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-  transition: all 0.25s ease;
-  min-height: 48px;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .mobileSkillCard:hover {
-    border-color: rgba(255, 255, 255, 0.25);
-    transform: translateY(-2px);
-  }
-}
-
-@media (hover: none) and (pointer: coarse) {
-  .mobileSkillCard:active {
-    border-color: rgba(255, 255, 255, 0.25);
-    transform: scale(0.98);
-  }
-}
-
-.mobileSkillIcon {
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  flex-shrink: 0;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  color: #FFFFFF;
-}
-
-.mobileSkillInfo {
+/* Orbiting Skill Nodes */
+.skillNode {
+  position: absolute;
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  z-index: 4;
+  transform: translate(-50%, -50%);
+  user-select: none;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.mobileSkillHeader {
+.nodeButton {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #121215;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #D4D4D8;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.skillNode:hover .nodeButton,
+.nodeButtonActive {
+  background: #FFFFFF;
+  color: #09090B;
+  border-color: #FFFFFF;
+  transform: scale(1.15);
+  box-shadow: 0 0 24px rgba(255, 255, 255, 0.45);
+}
+
+.nodeLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: #A1A1AA;
+  background: rgba(15, 15, 18, 0.9);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  white-space: nowrap;
+  pointer-events: none;
+  transition: all 0.25s ease;
+}
+
+.skillNode:hover .nodeLabel,
+.nodeLabelActive {
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(24, 24, 30, 0.95);
+  transform: translateY(2px);
+}
+
+/* ============================================================
+   Quick-Scan Categorized List (Recruiter Scanner Layout)
+   ============================================================ */
+.scannerSection {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.scannerHeader {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+
+.scannerEyebrowRow {
+  display: inline-flex;
+  align-items: center;
   gap: 8px;
 }
 
-.mobileSkillName {
-  font-family: var(--font-display);
-  font-size: 15px;
+.scannerEyebrowDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #71717A;
+}
+
+.scannerEyebrow {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
   font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #71717A;
+}
+
+.scannerTitle {
+  font-family: var(--font-anton), 'Anton', 'Impact', sans-serif;
+  font-size: clamp(20px, 3vw, 26px);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
   color: #FFFFFF;
 }
 
-.mobileSkillCat {
+.scannerGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.scannerRow {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 24px;
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  align-items: center;
+  transition: background-color 0.2s ease;
+}
+
+.categoryCol {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.categoryIndex {
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #71717A;
+}
+
+.categoryName {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #D4D4D8;
+}
+
+.chipsCol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skillChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
   color: #A1A1AA;
-  letter-spacing: 0.02em;
+  transition: all 0.2s ease;
+  user-select: none;
 }
 
-.mobileSkillDesc {
-  font-size: 12.5px;
-  color: var(--text-dim);
-  line-height: 1.4;
+.skillChip:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #FFFFFF;
+  transform: translateY(-1px);
 }
 
-/* Philosophy Quote Card */
-.quoteCard {
-  position: relative;
+.skillChipIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #E4E4E7;
+  flex-shrink: 0;
+}
+
+.skillChipName {
+  font-weight: 600;
+}
+
+/* Minimal Editorial Philosophy Sign-off */
+.footerNote {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 36px 24px;
-  border-radius: var(--radius-m);
-  background: #121215;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06), 0 20px 40px -15px rgba(0, 0, 0, 0.8);
-  margin-top: 32px;
+  margin-top: clamp(48px, 7vw, 72px);
+  padding-top: 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.quoteMark {
+.footerQuote {
   font-family: var(--font-display);
-  font-size: 42px;
-  line-height: 1;
+  font-size: clamp(16px, 2vw, 20px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
   color: #FFFFFF;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
-.quoteText {
-  font-family: var(--font-display);
-  font-size: clamp(17px, 2.2vw, 24px);
-  font-weight: 700;
-  color: #FFFFFF;
-  letter-spacing: -0.02em;
-  margin-bottom: 10px;
-}
-
-.quoteTag {
+.footerTag {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 10.5px;
   letter-spacing: 0.14em;
-  color: #A1A1AA;
+  color: #71717A;
   text-transform: uppercase;
 }
 
-@media (max-width: 900px) {
-  .constellationContainer {
-    display: none;
-  }
-  .mobileSkillsGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
-  }
-}
+/* ============================================================
+   RESPONSIVE (Tablet & Mobile)
+   ============================================================ */
 
-@media (max-width: 480px) {
-  .mobileSkillsGrid {
+@media (max-width: 860px) {
+  .scannerRow {
     grid-template-columns: 1fr;
-  }
-
-  .mobileSkillCard {
-    padding: 14px;
     gap: 12px;
+    padding: 16px 0;
   }
 
-  .mobileSkillIcon {
-    width: 44px;
-    height: 44px;
+  .constellationWrapper {
+    height: 480px;
+    --node-scale: 0.88;
   }
 }
 
-@media (max-width: 375px) {
-  .quoteCard {
-    padding: 28px 18px;
+@media (max-width: 640px) {
+  .constellationCard {
+    padding: 16px 10px;
+    border-radius: 8px;
   }
 
-  .quoteText {
-    font-size: clamp(15px, 4vw, 18px);
+  .constellationWrapper {
+    height: 400px;
+    --node-scale: 0.64;
+  }
+
+  .centerNode {
+    width: 46px;
+    height: 46px;
+  }
+
+  .centerText {
+    font-size: 11px;
+  }
+
+  .nodeButton {
+    width: 36px;
+    height: 36px;
+  }
+
+  .nodeButton svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .nodeLabel {
+    font-size: 9.5px;
+    padding: 2px 6px;
+  }
+
+  .categoryIndex {
+    font-size: 11px;
+  }
+
+  .categoryName {
+    font-size: 11px;
+  }
+
+  .skillChip {
+    padding: 5px 10px;
+    font-size: 10.5px;
+    gap: 6px;
+  }
+}
+
+@media (max-width: 400px) {
+  .constellationWrapper {
+    height: 360px;
+    --node-scale: 0.52;
+  }
+  
+  .nodeLabel {
+    font-size: 8.5px;
+    padding: 1px 4px;
   }
 }

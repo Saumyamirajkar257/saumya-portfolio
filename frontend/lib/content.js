@@ -46,8 +46,28 @@ export async function getContent(forceRefresh = false) {
 
       collectionsToFetch.forEach((c, idx) => {
         const snap = results[idx];
-        content[c] = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        content[c].sort((a, b) => (a.order || 0) - (b.order || 0));
+        const fetchedItems = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+        // Ensure key projects & certifications are always seamlessly merged if not yet in Firestore
+        if (c === "projects") {
+          const fetchedTitles = new Set(fetchedItems.map((p) => (p.title || "").toLowerCase().trim()));
+          const missingFallbacks = (fallbackContent.projects || []).filter(
+            (fp) => !fetchedTitles.has((fp.title || "").toLowerCase().trim())
+          );
+          content[c] = [...fetchedItems, ...missingFallbacks];
+        } else if (c === "certifications") {
+          const fetchedNames = new Set(fetchedItems.map((item) => (item.name || "").toLowerCase().trim()));
+          const missingFallbacks = (fallbackContent.certifications || []).filter(
+            (fc) => !fetchedNames.has((fc.name || "").toLowerCase().trim())
+          );
+          content[c] = [...fetchedItems, ...missingFallbacks];
+        } else if (fetchedItems.length === 0 && fallbackContent[c]) {
+          content[c] = fallbackContent[c];
+        } else {
+          content[c] = fetchedItems;
+        }
+
+        content[c].sort((a, b) => (Number(a.order ?? 99) - Number(b.order ?? 99)));
       });
 
       return content;

@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { useIsTouch } from "@/lib/hooks";
 
 const LINKS = [
   { label: "Home", href: "#home" },
@@ -12,21 +11,16 @@ const LINKS = [
   { label: "Experience", href: "#experience" },
   { label: "Skills", href: "#skills" },
   { label: "Education", href: "#education" },
+  { label: "Certifications", href: "#certifications" },
   { label: "Contact", href: "#contact" },
 ];
 
-/**
- * Navbar — sticky glass nav with active-section tracking. On mobile, a
- * full-screen overlay menu with staggered, oversized links.
- */
 export default function Navbar({ name }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("#home");
-  const [toggled, setToggled] = useState(true);
   const reduce = useReducedMotion();
-  const touch = useIsTouch();
 
   if (pathname?.startsWith("/ielts") || pathname?.startsWith("/secret") || pathname?.startsWith("/vault")) {
     return null;
@@ -94,7 +88,7 @@ export default function Navbar({ name }) {
             onClick={(e) => { e.preventDefault(); scrollTo("#home"); }}
             aria-label="Back to top"
           >
-            <span style={{ fontFamily: "'Anton', 'Syne', sans-serif", fontSize: "17px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#FFFFFF" }}>
+            <span style={{ fontFamily: "var(--font-anton), 'Anton', sans-serif", fontSize: "18px", letterSpacing: "0.06em", textTransform: "uppercase", color: "#FFFFFF" }}>
               SAUMYA MIRAJKAR
             </span>
           </a>
@@ -106,9 +100,8 @@ export default function Navbar({ name }) {
                 href={l.href}
                 onClick={(e) => { e.preventDefault(); scrollTo(l.href); }}
                 className={`nav__link ${active === l.href ? "is-active" : ""}`}
-                style={{ position: "relative" }}
               >
-                <span style={{ position: "relative", zIndex: 1 }}>{l.label}</span>
+                <span>{l.label}</span>
                 {active === l.href && (
                   <motion.span
                     layoutId="navActiveUnderline"
@@ -120,15 +113,15 @@ export default function Navbar({ name }) {
             ))}
           </nav>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "16px" }} className="nav__actions">
+          <div className="nav__actions">
             <a
               href="/resume/Saumya_Mirajkar_Resume.pdf"
               target="_blank"
               rel="noreferrer"
-              className="nav__link"
-              style={{ fontWeight: 600 }}
+              className="nav__resumeLink"
             >
-              Résumé <span aria-hidden="true">↓</span>
+              <span>Résumé</span>
+              <span aria-hidden="true" style={{ fontSize: "14px" }}>↓</span>
             </a>
           </div>
 
@@ -163,30 +156,30 @@ export default function Navbar({ name }) {
                   onClick={(e) => { e.preventDefault(); scrollTo(l.href); }}
                   initial={{ opacity: 0, y: 24 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.12 + i * 0.06, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ delay: 0.1 + i * 0.05, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
                   className={`nav-overlay__link ${active === l.href ? "is-active" : ""}`}
                 >
-                  {l.label}
+                  <span className="nav-overlay__num">0{i + 1}</span>
+                  <span>{l.label}</span>
                 </motion.a>
               ))}
 
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.7, duration: 0.5 }}
+                transition={{ delay: 0.5, duration: 0.4 }}
                 className="nav-overlay__foot"
-                style={{ display: "flex", flexDirection: "column", gap: "16px" }}
               >
                 <a
                   href="/resume/Saumya_Mirajkar_Resume.pdf"
                   target="_blank"
                   rel="noreferrer"
-                  className="btn btn--primary btn--lg"
-                  style={{ width: "fit-content" }}
+                  className="btn btn--primary"
+                  style={{ width: "fit-content", padding: "10px 22px", borderRadius: "8px" }}
                 >
-                  Download Résumé ↓
+                  DOWNLOAD RÉSUMÉ ↓
                 </a>
-                <span className="text-mono nav-overlay__tag">Pune, Maharashtra</span>
+                <span className="text-mono nav-overlay__tag">PUNE, INDIA</span>
               </motion.div>
             </nav>
           </motion.div>

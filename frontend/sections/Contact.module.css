@@ -1,188 +1,173 @@
 /* ============================================================
-   Contact Section — Clean Minimalist Two-Column Layout
+   Contact.module.css — Editorial Two-Column Contact Section
    ============================================================ */
 
 .section {
   position: relative;
-  width: 100%;
-  padding: clamp(60px, 8vw, 100px) 0;
-  scroll-margin-top: calc(var(--header-h, 72px) + 24px);
-  overflow: hidden;
+  padding-block: clamp(60px, 10vw, 120px);
+  background: #09090B;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  scroll-margin-top: 80px;
 }
 
 .contactWrapper {
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: start;
-  gap: clamp(40px, 6vw, 80px);
-  padding: clamp(24px, 5vw, 64px) clamp(20px, 5vw, 56px);
-  background: #0E0E12;
-  border-radius: var(--radius-l, 24px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 24px 48px -12px rgba(0, 0, 0, 0.85);
-  position: relative;
-  overflow: hidden;
+  gap: clamp(36px, 6vw, 72px);
 }
 
-@media (max-width: 768px) {
-  .contactWrapper {
-    grid-template-columns: 1fr;
-    gap: 32px;
-  }
-}
-
-.contactWrapper::before {
-  content: "";
-  position: absolute;
-  top: -30%;
-  left: -10%;
-  width: 60%;
-  height: 80%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.06) 0%, transparent 65%);
-  filter: blur(50px);
-  pointer-events: none;
-}
-
+/* Left Column: Heading, Subtitle & Direct Links */
 .contactLeft {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  position: relative;
-  z-index: 1;
 }
 
-.contactRight {
-  position: relative;
-  z-index: 1;
-}
-
-.contactBadge {
+.eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 14px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  font-family: var(--font-mono, monospace);
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  color: #FFFFFF;
-  width: fit-content;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #A1A1AA;
+  margin-bottom: 8px;
 }
 
-.statusDot {
-  width: 7px;
-  height: 7px;
+.eyebrowDot {
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: #FFFFFF;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-  animation: statusPulse 2.5s ease-in-out infinite;
 }
 
-@keyframes statusPulse {
-  0%, 100% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.8); }
-  50% { box-shadow: 0 0 20px rgba(255, 255, 255, 1), 0 0 40px rgba(255, 255, 255, 0.3); }
-}
-
-.minimalTitle {
-  font-family: var(--font-display, sans-serif);
-  font-size: clamp(34px, 4.2vw, 52px);
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -0.035em;
+.heading {
+  font-family: var(--font-anton), 'Anton', 'Impact', sans-serif;
+  font-size: clamp(36px, 5.5vw, 68px);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 0.95;
+  text-transform: uppercase;
   color: #FFFFFF;
+  margin: 0 0 16px;
 }
 
-.minimalDesc {
-  font-size: clamp(14.5px, 1.1vw, 16px);
+.headingDim {
+  color: #71717A;
+}
+
+.subheading {
+  font-family: var(--font-body);
+  font-size: clamp(14px, 1.3vw, 16px);
   color: #A1A1AA;
-  max-width: 440px;
   line-height: 1.65;
+  max-width: 46ch;
+  margin-bottom: 28px;
 }
 
-.directLinks {
+.directBlock {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  margin-top: 8px;
+  gap: 16px;
 }
 
-.emailLink {
+.emailRow {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  font-family: var(--font-mono, monospace);
-  font-size: 13.5px;
-  font-weight: 500;
-  color: #A1A1AA;
+  padding: 10px 16px;
+  width: fit-content;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: #E4E4E7;
   transition: all 0.2s ease;
-  min-height: 44px;
-  padding: 8px 0;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .emailLink:hover {
-    color: #FFFFFF;
-    transform: translateX(3px);
-  }
+.emailRow:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #FFFFFF;
+  transform: translateX(2px);
 }
 
-@media (hover: none) and (pointer: coarse) {
-  .emailLink:active {
-    color: #FFFFFF;
-  }
+.emailIcon {
+  display: flex;
+  align-items: center;
+  color: #FFFFFF;
 }
 
-.socialLinks {
+.socialRow {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
 }
 
-.socialChip {
+.socialBtn {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 10px 20px;
-  min-height: 44px;
-  border-radius: 10px;
-  background: rgba(24, 24, 28, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  font-family: var(--font-mono, monospace);
-  font-size: 12.5px;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
   font-weight: 600;
+  letter-spacing: 0.06em;
   color: #A1A1AA;
-  transition: all 0.25s ease;
-  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .socialChip:hover {
-    color: #FFFFFF;
-    border-color: rgba(255, 255, 255, 0.35);
-    background: rgba(40, 40, 48, 0.95);
-    transform: translateY(-2px);
-  }
-}
-
-@media (hover: none) and (pointer: coarse) {
-  .socialChip:active {
-    color: #FFFFFF;
-    border-color: rgba(255, 255, 255, 0.35);
-    background: rgba(40, 40, 48, 0.95);
-    transform: scale(0.97);
-  }
-}
-
-.socialChip:hover {
-  background: rgba(36, 36, 42, 0.95);
-  border-color: rgba(255, 255, 255, 0.35);
+.socialBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
   color: #FFFFFF;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  transform: translateY(-1px);
+}
+
+.resumeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #FFFFFF;
+  transition: all 0.2s ease;
+}
+
+.resumeBtn:hover {
+  background: #FFFFFF;
+  color: #000000;
+  border-color: #FFFFFF;
+  transform: translateY(-1px);
+}
+
+.resumeArrow {
+  font-size: 12px;
+  transition: transform 0.2s ease;
+}
+
+.resumeBtn:hover .resumeArrow {
+  transform: translateY(2px);
+}
+
+/* Right Column: Contact Form */
+.contactRight {
+  position: relative;
+  width: 100%;
 }
 
 /* Responsive */
@@ -190,6 +175,5 @@
   .contactWrapper {
     grid-template-columns: 1fr;
     gap: 36px;
-    padding: 32px 20px;
   }
 }

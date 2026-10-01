@@ -2,78 +2,182 @@
 
 import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import SectionHeading from "@/components/SectionHeading";
-import { EASE, TIMING, HoverLift } from "@/components/animations/MotionSystem";
+import { EASE, TIMING } from "@/components/animations/MotionSystem";
 import styles from "./Certifications.module.css";
+
+// Monochrome Provider Logos (SVGs for guaranteed reliability without broken images)
+const PROVIDER_LOGOS = {
+  google: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z" />
+    </svg>
+  ),
+  ibm: (
+    <svg width="24" height="14" viewBox="0 0 32 16" fill="currentColor" aria-hidden="true">
+      <path d="M0 0h8v2H0zm0 3.5h8v2H0zm0 3.5h8v2H0zm0 3.5h8v2H0zm0 3.5h8v2H0zM10 0h12v2H10zm0 3.5h12v2H10zm0 3.5h12v2H10zm0 3.5h12v2H10zm0 3.5h12v2H10zM24 0h8v2h-8zm0 3.5h8v2h-8zm0 3.5h8v2h-8zm0 3.5h8v2h-8zm0 3.5h8v2h-8z" />
+    </svg>
+  ),
+  atlassian: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M11.458 12.146a1.18 1.18 0 0 0-1.637-.123L2.3 18.847a1.18 1.18 0 0 0 .782 2.067h9.098a1.18 1.18 0 0 0 1.18-1.18v-6.223a1.18 1.18 0 0 0-1.902-1.365zm10.242 6.701L14.18 3.09a1.18 1.18 0 0 0-1.898-.016l-3.8 4.792a1.18 1.18 0 0 0 .193 1.632l9.083 7.643a1.18 1.18 0 0 0 1.697-.247 1.18 1.18 0 0 0 .003-1.688z" />
+    </svg>
+  ),
+  cisco: (
+    <svg width="22" height="16" viewBox="0 0 24 16" fill="currentColor" aria-hidden="true">
+      <rect x="1" y="6" width="2" height="10" rx="1" />
+      <rect x="5.5" y="2" width="2" height="14" rx="1" />
+      <rect x="11" y="0" width="2" height="16" rx="1" />
+      <rect x="16.5" y="2" width="2" height="14" rx="1" />
+      <rect x="21" y="6" width="2" height="10" rx="1" />
+    </svg>
+  ),
+  coursera: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 4.2c4.308 0 7.8 3.492 7.8 7.8s-3.492 7.8-7.8 7.8S4.2 16.308 4.2 12 7.692 4.2 12 4.2zm-2.4 4.5v6.6l5.7-3.3-5.7-3.3z"/>
+    </svg>
+  ),
+};
+
+function resolveProviderLogo(org = "", issuer = "") {
+  const text = `${org} ${issuer}`.toLowerCase();
+  if (text.includes("google")) return PROVIDER_LOGOS.google;
+  if (text.includes("ibm")) return PROVIDER_LOGOS.ibm;
+  if (text.includes("atlassian")) return PROVIDER_LOGOS.atlassian;
+  if (text.includes("cisco")) return PROVIDER_LOGOS.cisco;
+  if (text.includes("coursera")) return PROVIDER_LOGOS.coursera;
+  return null;
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return "2026";
+  const raw = String(dateStr).trim().toUpperCase();
+  // Standardize common formats to uppercase (e.g. "JUL 2026", "SEP 28, 2026")
+  return raw.replace(/SEPTEMBER/gi, "SEP")
+            .replace(/AUGUST/gi, "AUG")
+            .replace(/JULY/gi, "JUL")
+            .replace(/OCTOBER/gi, "OCT")
+            .replace(/NOVEMBER/gi, "NOV")
+            .replace(/DECEMBER/gi, "DEC")
+            .replace(/JANUARY/gi, "JAN")
+            .replace(/FEBRUARY/gi, "FEB")
+            .replace(/MARCH/gi, "MAR")
+            .replace(/APRIL/gi, "APR")
+            .replace(/JUNE/gi, "JUN");
+}
 
 export default function Certifications({ certifications = [] }) {
   const [showAll, setShowAll] = useState(false);
   const reduce = useReducedMotion();
+
   const sorted = [...certifications].sort((a, b) => Number(a.order ?? 999) - Number(b.order ?? 999));
   const visible = showAll ? sorted : sorted.slice(0, 6);
 
   if (!certifications.length) return null;
 
   return (
-    <section id="certifications" className="block">
+    <section id="certifications" className={styles.section}>
       <div className="wrap">
-        <SectionHeading
-          eyebrow="RECOGNIZED LEARNING"
-          title={<>Verified <span className="gradient-text">Certifications</span></>}
-          lead={<p className="prose">Professional credentials earned from Google, IBM, and Cisco.</p>}
-        />
+        {/* Section Header: Large Editorial Heading */}
+        <div className={styles.header}>
+          <div className={styles.headerLeft}>
+            <div className={styles.eyebrow}>
+              <span className={styles.eyebrowDot} />
+              <span>ACCREDITATIONS</span>
+            </div>
+            <h2 className={styles.heading}>
+              CERTIFICATIONS
+            </h2>
+            <p className={styles.subheading}>
+              Professional credentials, courses, and technical learning.
+            </p>
+          </div>
 
-        <div className={styles.certsGrid}>
-          {visible.map((cert, i) => (
-            <motion.div
-              key={cert.id ?? i}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "0px 0px -6% 0px" }}
-              transition={{ duration: TIMING.component, delay: reduce ? 0 : Math.min(i * 0.06, 0.24), ease: EASE.premium }}
-              whileHover={reduce ? {} : { y: -6, transition: { duration: TIMING.button, ease: EASE.premium } }}
-              className={styles.certCard}
-            >
-              <div className={styles.certTop}>
-                <span className={styles.certBadge}>
-                  {cert.logo ? (
-                    <img src={cert.logo} alt={cert.organization} className={styles.certLogoImg} />
-                  ) : (
-                    cert.organization?.[0] || "◈"
-                  )}
-                </span>
-                <span className={styles.certDate}>{cert.date}</span>
-              </div>
-
-              <h3 className={styles.certName}>{cert.name}</h3>
-              <p className={styles.certIssuer}>
-                {cert.organization}
-                {cert.issuer ? ` • ${cert.issuer}` : ""}
-              </p>
-
-              {cert.credential_url ? (
-                <a
-                  href={cert.credential_url}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className={styles.certLink}
-                >
-                  Verify Credential ↗
-                </a>
-              ) : (
-                <span className={styles.verifiedBadge}>✓ Verified</span>
-              )}
-            </motion.div>
-          ))}
+          <div className={styles.headerRight}>
+            <span className={styles.totalBadge}>
+              {certifications.length} CREDENTIALS
+            </span>
+          </div>
         </div>
 
+        {/* Large Editorial Horizontal Rows */}
+        <div className={styles.rowsContainer}>
+          {visible.map((cert, i) => {
+            const indexStr = String(i + 1).padStart(2, "0");
+            const logo = resolveProviderLogo(cert.organization, cert.issuer);
+            const dateDisplay = formatDate(cert.date);
+            const hasCredentialUrl = Boolean(cert.credential_url && cert.credential_url.trim().length > 0);
+
+            return (
+              <motion.article
+                key={cert.id ?? `${cert.name}-${i}`}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "0px 0px -6% 0px" }}
+                transition={{
+                  duration: reduce ? 0.01 : TIMING.component,
+                  delay: reduce ? 0 : Math.min(i * 0.05, 0.25),
+                  ease: EASE.premium,
+                }}
+                className={styles.row}
+              >
+                <div className={styles.row__inner}>
+                  {/* Left: Index Number */}
+                  <div className={styles.row__indexCol}>
+                    <span className={styles.row__index}>{indexStr}</span>
+                  </div>
+
+                  {/* Center: Certification Name & Organization with Logo */}
+                  <div className={styles.row__mainCol}>
+                    <h3 className={styles.row__title}>{cert.name}</h3>
+
+                    <div className={styles.row__providerRow}>
+                      {logo && <span className={styles.row__providerLogo}>{logo}</span>}
+                      <span className={styles.row__providerName}>
+                        {cert.organization || "Independent"}
+                        {cert.issuer ? ` · ${cert.issuer}` : ""}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Right: Standardized Date & Editorial Verification Status */}
+                  <div className={styles.row__metaCol}>
+                    <span className={styles.row__date}>{dateDisplay}</span>
+
+                    {hasCredentialUrl ? (
+                      <a
+                        href={cert.credential_url}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className={styles.row__verifyLink}
+                        aria-label={`Verify credential for ${cert.name}`}
+                      >
+                        <span>VERIFY CREDENTIAL</span>
+                        <span className={styles.row__arrow} aria-hidden="true">↗</span>
+                      </a>
+                    ) : (
+                      <span className={styles.row__verifiedText}>
+                        VERIFIED
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </motion.article>
+            );
+          })}
+        </div>
+
+        {/* Minimal Editorial "VIEW ALL" Action */}
         {certifications.length > 6 && (
           <div className={styles.moreAction}>
             <button
-              className="btn btn--secondary btn--sm"
+              type="button"
+              className={styles.moreBtn}
               onClick={() => setShowAll((v) => !v)}
             >
-              {showAll ? "Show Less" : `View All ${certifications.length} Certifications`}
+              <span className={styles.moreBtnText}>
+                {showAll ? "SHOW LESS ↑" : "VIEW ALL CERTIFICATIONS →"}
+              </span>
+              <span className={styles.moreBtnCount}>{certifications.length} CREDENTIALS</span>
             </button>
           </div>
         )}

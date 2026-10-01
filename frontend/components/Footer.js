@@ -4,13 +4,14 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
 const NAV_LINKS = [
-  { href: "#home", label: "Home" },
-  { href: "#about", label: "About" },
-  { href: "#projects", label: "Projects" },
-  { href: "#experience", label: "Experience" },
+  { label: "Home", href: "#home" },
+  { label: "About", href: "#about" },
+  { label: "Projects", href: "#projects" },
+  { label: "Experience", href: "#experience" },
   { label: "Skills", href: "#skills" },
-  { href: "#certifications", label: "Certifications" },
-  { href: "#contact", label: "Contact" },
+  { label: "Education", href: "#education" },
+  { label: "Certifications", href: "#certifications" },
+  { label: "Contact", href: "#contact" },
 ];
 
 export default function Footer() {
@@ -49,19 +50,15 @@ export default function Footer() {
   useEffect(() => {
     let buffer = "";
     const onKeyDown = (e) => {
-      // Ignore if user is currently typing in an input or textarea
       if (["INPUT", "TEXTAREA"].includes(e.target?.tagName)) return;
-
       buffer += e.key;
       if (buffer.length > 10) {
         buffer = buffer.slice(-10);
       }
-
       if (buffer.endsWith("1981")) {
         window.location.href = "/ielts";
       }
     };
-
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
@@ -69,8 +66,9 @@ export default function Footer() {
   return (
     <footer className="footer">
       <div className="wrap footer__inner">
+        {/* Top: Brand, Navigation & Back to Top */}
         <div className="footer__main">
-          {/* Left: Brand with triple-click secret trigger */}
+          {/* Left: Brand with triple-click easter egg */}
           <div className="footer__brand">
             <span
               className="nav__monogram"
@@ -80,10 +78,10 @@ export default function Footer() {
             >
               SM
             </span>
-            <span className="footer__name">Saumya Mirajkar</span>
+            <span className="footer__name">SAUMYA MIRAJKAR</span>
           </div>
 
-          {/* Center: Navigation Links */}
+          {/* Center: Navigation Links matching Header */}
           <nav className="footer__nav" aria-label="Footer Navigation">
             {NAV_LINKS.map((link) => (
               <a
@@ -112,6 +110,7 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Bottom: Copyright, Privacy/Terms & Portfolio Signature */}
         <div className="footer__bottom">
           <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
             <span>
@@ -132,12 +131,17 @@ export default function Footer() {
               </span>
             </span>
             <span style={{ color: "var(--line-strong)" }}>•</span>
-            <a href="/privacy" className="footer__link" style={{ fontSize: "12px" }}>Privacy Policy</a>
+            <a href="/privacy" className="footer__link" style={{ fontSize: "12px" }}>
+              Privacy Policy
+            </a>
             <span style={{ color: "var(--line-strong)" }}>•</span>
-            <a href="/terms" className="footer__link" style={{ fontSize: "12px" }}>Terms of Service</a>
+            <a href="/terms" className="footer__link" style={{ fontSize: "12px" }}>
+              Terms of Service
+            </a>
           </div>
-          <span className="text-mono" style={{ fontSize: "11.5px", color: "var(--text-faint)" }}>
-            Computer Engineering &amp; IoT Portfolio
+
+          <span className="text-mono" style={{ fontSize: "11px", color: "var(--text-faint)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+            Computer Engineering &amp; IoT Portfolio · Pune, India
           </span>
         </div>
       </div>
