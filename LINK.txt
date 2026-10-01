@@ -1,0 +1,350 @@
+Reference-Based Implementation Instructions
+Reference
+Use the following video as the visual and motion reference:
+REFERENCE VIDEO LINK:
+https://cdn.dribbble.com/userupload/25265151/file/original-aeb9582584598698e740c9522eeb256d.mp4
+The file name/link above is the reference source. You should inspect and study it before implementing the interface.
+Core Requirement
+Recreate the design quality, interaction philosophy, animation behavior, transitions, motion rhythm, spacing logic, and visual polish demonstrated by the reference.
+However:
+DO NOT copy the reference's actual design/content.
+The final result must be my own website/product/interface.
+Think of the reference as a motion/design study, not something to clone.
+
+What You Should Analyze From The Reference
+Before writing code, carefully analyze the reference video and identify:
+1. Overall visual language
+Study:
+    • Layout structure
+    • Composition
+    • Visual hierarchy
+    • Spacing
+    • Alignment
+    • Scale relationships
+    • Typography behavior
+    • Contrast
+    • Background treatment
+    • Depth
+    • Shadows
+    • Borders
+    • Radius
+    • Layering
+    • Visual rhythm
+Do not simply reproduce the pixels.
+Understand why the interface feels the way it does.
+
+2. Animations
+Study every visible animation, including:
+    • Entrance animations
+    • Exit animations
+    • Hover animations
+    • Scroll animations
+    • Element movement
+    • Scaling
+    • Opacity changes
+    • Blur
+    • Parallax
+    • Rotation
+    • Transformations
+    • Morphing
+    • Staggered animations
+    • Text animations
+    • Image animations
+    • Background animations
+    • Cursor interactions
+    • Micro-interactions
+For every animation, determine:
+    • What triggers it?
+    • What element moves?
+    • Where does it start?
+    • Where does it end?
+    • How long does it take?
+    • What easing does it appear to use?
+    • Is there overshoot?
+    • Is there spring physics?
+    • Is there a delay?
+    • Are multiple elements staggered?
+    • Does the animation respond to user interaction?
+Then reproduce the behavioral concept using my own interface.
+
+Motion Should Feel Intentional
+Do not add random animations everywhere.
+Animations should have a purpose.
+For example:
+User interaction
+      ?
+Visual response
+      ?
+Smooth transition
+      ?
+New state
+Avoid:
+    • Generic fade-ins everywhere
+    • Excessive bouncing
+    • Unnecessary spinning
+    • Random delays
+    • Animations that slow down usability
+    • Animations that exist only because the reference has animation
+The goal is premium, intentional motion.
+
+3. Transitions
+Study how the reference moves between states.
+Pay attention to:
+    • Page transitions
+    • Section transitions
+    • Modal transitions
+    • Menu transitions
+    • Image transitions
+    • Text transitions
+    • Navigation transitions
+    • Hover-to-active transitions
+    • Scroll-based transitions
+Recreate the same quality and smoothness, but adapt the transitions to my own UI.
+
+4. Timing
+Do not use arbitrary animation durations.
+Estimate the timing from the reference.
+Create a consistent motion system such as:
+micro interaction
+? fast
+
+button / hover
+? fast-medium
+
+component transition
+? medium
+
+large section transition
+? medium-slow
+
+hero animation
+? cinematic but usable
+Use consistent easing curves throughout the product.
+Prefer natural easing rather than default browser transitions.
+
+5. Scroll Behavior
+If the reference uses scroll-driven animation, analyze:
+    • When animation begins
+    • Scroll distance required
+    • Element movement
+    • Element scaling
+    • Opacity
+    • Pinning/sticky behavior
+    • Parallax
+    • Section transitions
+    • Scroll velocity response
+Then implement equivalent behavior for my own content and layout.
+Do not blindly copy coordinates.
+The animation must remain responsive across:
+    • Desktop
+    • Tablet
+    • Mobile
+
+6. Interaction Details
+Study small details carefully.
+Look for:
+    • Hover states
+    • Button feedback
+    • Cursor interactions
+    • Menu behavior
+    • Cards
+    • Navigation
+    • Tabs
+    • Sliders
+    • Drag interactions
+    • Click feedback
+    • Focus states
+    • Loading states
+    • Active states
+    • Disabled states
+These small interactions are important.
+The implementation should feel alive and responsive, not like a static mockup.
+
+7. My Content Comes First
+Replace EVERYTHING from the reference with my own:
+    • Brand
+    • Logo
+    • Name
+    • Text
+    • Copy
+    • Images
+    • Icons
+    • Colors
+    • Fonts
+    • Products
+    • Data
+    • Navigation
+    • Sections
+    • Components
+    • Illustrations
+    • Assets
+    • Links
+    • CTAs
+Never use placeholder content from the reference unless I explicitly request it.
+
+8. Do Not Clone The Reference
+This is extremely important.
+You are allowed to use the reference to understand:
+Motion + interaction + design principles
+You are NOT being asked to reproduce:
+Exact visual identity + assets + copy + branding + artwork
+The result should look like:
+"My product designed with the same level of motion sophistication as the reference."
+NOT:
+"A copy of the reference website."
+
+9. Build A Motion System
+Do not implement every animation independently.
+Create reusable animation patterns.
+For example:
+fadeUp()
+fadeIn()
+scaleIn()
+slideIn()
+staggerChildren()
+hoverLift()
+magneticButton()
+smoothReveal()
+imageReveal()
+textReveal()
+parallax()
+Use a consistent animation architecture.
+If the project already uses an animation library, use that rather than introducing unnecessary dependencies.
+If appropriate, use technologies such as:
+    • CSS transitions
+    • CSS keyframes
+    • Web Animations API
+    • Framer Motion / Motion
+    • GSAP
+    • Intersection Observer
+    • requestAnimationFrame
+Choose based on the project's existing stack.
+
+10. Performance
+The animations must be smooth.
+Target:
+60 FPS where reasonably achievable
+Prefer GPU-friendly properties such as:
+transform
+opacity
+Avoid unnecessarily animating:
+width
+height
+top
+left
+when a transform-based solution can achieve the same effect.
+Avoid huge JavaScript animation loops when CSS or an animation library can handle the behavior efficiently.
+
+11. Responsive Behavior
+Do NOT simply scale the desktop design down.
+Determine how the reference's motion principles translate to smaller screens.
+For mobile:
+    • Reduce unnecessary motion.
+    • Simplify complex interactions.
+    • Respect touch interaction.
+    • Prevent horizontal overflow.
+    • Maintain readable typography.
+    • Preserve visual hierarchy.
+    • Keep important animations performant.
+    • Respect prefers-reduced-motion.
+The mobile version should feel intentionally designed.
+
+12. Accessibility
+Implement:
+@media (prefers-reduced-motion: reduce) {
+  /* reduce or disable non-essential motion */
+}
+Interactive elements must remain usable without animations.
+Maintain:
+    • Keyboard navigation
+    • Focus states
+    • Semantic HTML
+    • Accessible labels
+    • Adequate contrast
+Motion should enhance the experience, not become a requirement for understanding the interface.
+
+13. Implementation Process
+Before coding:
+Step 1 — Study the reference
+Break the video into:
+Scene
+?
+Component
+?
+Interaction
+?
+Animation
+?
+Timing
+?
+Easing
+Step 2 — Understand my existing project
+Inspect:
+    • Framework
+    • Components
+    • Routes
+    • Styling system
+    • Dependencies
+    • Existing animation libraries
+    • Asset structure
+    • Design tokens
+Do not rewrite the entire project unnecessarily.
+Step 3 — Create an implementation map
+For example:
+Hero
+ ??? Initial state
+ ??? Text reveal
+ ??? Image reveal
+ ??? Background motion
+ ??? CTA interaction
+
+Navigation
+ ??? Initial state
+ ??? Scroll state
+ ??? Hover state
+ ??? Mobile state
+
+Section 1
+ ??? Scroll reveal
+ ??? Image movement
+ ??? Text animation
+Step 4 — Implement
+Build the interface using my content and visual identity.
+Step 5 — Refine
+Compare the implementation against the reference's:
+    • Motion quality
+    • Timing
+    • Rhythm
+    • Smoothness
+    • Interaction feedback
+    • Spatial transitions
+    • Visual hierarchy
+Do not compare exact branding or artwork.
+
+14. Do Not Stop At "It Works"
+The final implementation should be polished.
+After the first implementation, perform a refinement pass.
+Look for:
+    • Awkward animation starts
+    • Abrupt transitions
+    • Incorrect easing
+    • Excessive motion
+    • Inconsistent timing
+    • Poor spacing
+    • Janky scrolling
+    • Layout shifts
+    • Mobile issues
+    • Hover states that feel weak
+    • Components that don't respond naturally
+Fix these before considering the task complete.
+
+Final Goal
+I want the final product to feel like it belongs to the same level of design/motion quality as the reference, while being completely customized to my product.
+Use the reference for:
+Motion ? Interaction ? Timing ? Easing ? Transitions ? Visual rhythm ? UX patterns ? Polish
+Use my project for:
+Brand ? Content ? UI ? Colors ? Typography ? Assets ? Layout ? Components ? Data ? Functionality
+The final implementation must feel original, polished, responsive, performant, and production-ready.
+Do not explain what you could implement.
+Actually inspect the project, inspect the reference, and implement it.
+
