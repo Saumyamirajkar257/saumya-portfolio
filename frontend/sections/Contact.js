@@ -8,7 +8,7 @@ import styles from "./Contact.module.css";
 export default function Contact({ profile }) {
   const reduce = useReducedMotion();
   const socials = profile?.socials || {};
-  const email = profile?.email || "saumyamir25@gmail.com";
+  const email = profile?.email || "Saumyamirajkar25@icloud.com";
 
   return (
     <section id="contact" className={styles.section}>

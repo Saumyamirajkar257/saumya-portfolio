@@ -215,8 +215,8 @@ export default function ContactForm() {
               ? "Connection timed out. "
               : "Something went wrong. "}
             You can email me directly at{" "}
-            <a href="mailto:saumyamir25@gmail.com" style={{ color: "#FFFFFF", textDecoration: "underline" }}>
-              saumyamir25@gmail.com
+            <a href="mailto:Saumyamirajkar25@icloud.com" style={{ color: "#FFFFFF", textDecoration: "underline" }}>
+              Saumyamirajkar25@icloud.com
             </a>
           </p>
         </div>

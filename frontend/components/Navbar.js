@@ -130,17 +130,6 @@ export default function Navbar({ name }) {
             >
               Résumé <span aria-hidden="true">↓</span>
             </a>
-
-            {/* Pill Toggle Switch */}
-            <button
-              type="button"
-              className={`nav__toggleSwitch ${toggled ? "is-toggled" : ""}`}
-              onClick={() => setToggled(!toggled)}
-              aria-label="Toggle studio mode"
-              title={toggled ? "Studio Noir Active" : "Color Pop Active"}
-            >
-              <span className="nav__toggleKnob" />
-            </button>
           </div>
 
           <button

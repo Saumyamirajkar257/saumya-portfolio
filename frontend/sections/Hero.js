@@ -52,7 +52,7 @@ export default function Hero({ profile }) {
   };
 
   const copyEmail = () => {
-    navigator.clipboard.writeText("saumyamir25@gmail.com");
+    navigator.clipboard.writeText("Saumyamirajkar25@icloud.com");
     setCopied(true);
     setTimeout(() => setCopied(false), 2200);
   };
@@ -248,7 +248,7 @@ export default function Hero({ profile }) {
             style={{ color: "inherit", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", background: "none", border: "none", padding: 0 }}
             title="Click to copy email"
           >
-            <span>{copied ? "Copied to clipboard!" : "saumyamir25@gmail.com"}</span>
+            <span>{copied ? "Copied to clipboard!" : "Saumyamirajkar25@icloud.com"}</span>
             <span aria-hidden="true" style={{ fontSize: "12px" }}>{copied ? "✓" : "↗"}</span>
           </button>
         </motion.div>
