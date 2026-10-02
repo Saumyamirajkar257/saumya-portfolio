@@ -4,7 +4,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { EASE, TIMING } from "@/components/animations/MotionSystem";
 import styles from "./About.module.css";
 
-const CREDENTIAL_ROWS = [
+const DEFAULT_CREDENTIAL_ROWS = [
   {
     index: "01",
     main: "Diploma in Computer Engineering & IoT",
@@ -27,18 +27,83 @@ const CREDENTIAL_ROWS = [
   },
 ];
 
-export default function About({ profile }) {
+export default function About({
+  profile = {},
+  certifications = [],
+  skills = [],
+  education = [],
+}) {
   const reduce = useReducedMotion();
 
-  const certCount = profile?.highlights?.find((h) => h.label.toLowerCase().includes("certification"))?.value || "6+";
-  const languagesCount = "3+";
-  const semestersCount = profile?.highlights?.find((h) => h.label.toLowerCase().includes("semester"))?.value || "4";
+  // Dynamic calculations directly from database collections
+  const certCount =
+    certifications && certifications.length > 0
+      ? String(certifications.length)
+      : profile?.highlights?.find((h) =>
+          h.label?.toLowerCase().includes("certification")
+        )?.value || "21";
+
+  const languageSkillsCount = skills.filter((s) => {
+    const cat = (s.category || "").toLowerCase();
+    return cat.includes("lang") || cat.includes("prog");
+  }).length;
+
+  const languagesCount =
+    languageSkillsCount > 0
+      ? String(languageSkillsCount)
+      : profile?.highlights?.find((h) =>
+          h.label?.toLowerCase().includes("language")
+        )?.value || "4";
+
+  const semestersCount =
+    profile?.semesters_completed ||
+    profile?.highlights?.find((h) =>
+      h.label?.toLowerCase().includes("semester")
+    )?.value ||
+    "4";
 
   const stats = [
     { val: languagesCount, label: "CORE LANGUAGES" },
     { val: certCount, label: "CERTIFICATIONS" },
     { val: semestersCount, label: "SEMESTERS COMPLETED" },
   ];
+
+  // Dynamic Background & Focus Rows
+  const primaryEdu = education?.[0];
+  const credentialRows = profile?.aboutRows || [
+    {
+      index: "01",
+      main:
+        primaryEdu?.degree ||
+        profile?.academic_status ||
+        DEFAULT_CREDENTIAL_ROWS[0].main,
+      sub: primaryEdu?.institution || DEFAULT_CREDENTIAL_ROWS[0].sub,
+    },
+    {
+      index: "02",
+      main: "Web Development Internship",
+      sub: "Big Bang Tech Solutions (Full Lifecycle & Web)",
+    },
+    {
+      index: "03",
+      main: "Core Competencies",
+      sub:
+        profile?.core_competencies ||
+        DEFAULT_CREDENTIAL_ROWS[2].sub,
+    },
+    {
+      index: "04",
+      main: profile?.location || DEFAULT_CREDENTIAL_ROWS[3].main,
+      sub: "Current Academic & Development Base",
+    },
+  ];
+
+  const bioParagraphs = profile?.bio
+    ? profile.bio.split("\n\n").filter(Boolean)
+    : [
+        "Computer Engineering and IoT diploma student with hands-on experience in web development, Python, C/C++, JavaScript, Arduino, and embedded systems.",
+        "Completed a web development internship involving web/mobile application development, project planning, technical research, and team collaboration. Passionate about bridging hardware sensors with resilient software systems.",
+      ];
 
   return (
     <section id="about" className={styles.section}>
@@ -59,9 +124,9 @@ export default function About({ profile }) {
               </div>
 
               <div className={styles.rowsList}>
-                {CREDENTIAL_ROWS.map((row) => (
-                  <div key={row.index} className={styles.credRow}>
-                    <span className={styles.credIndex}>{row.index}</span>
+                {credentialRows.map((row, idx) => (
+                  <div key={row.index || idx} className={styles.credRow}>
+                    <span className={styles.credIndex}>{row.index || `0${idx + 1}`}</span>
                     <div className={styles.credText}>
                       <span className={styles.credMain}>{row.main}</span>
                       <span className={styles.credSub}>{row.sub}</span>
@@ -82,17 +147,19 @@ export default function About({ profile }) {
               <h2 className={styles.heading}>ABOUT</h2>
             </div>
 
-            <motion.p
+            <motion.div
               initial={{ opacity: 0, y: 18 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: reduce ? 0.01 : TIMING.component, delay: 0.08, ease: EASE.premium }}
               className={styles.aboutDesc}
             >
-              Computer Engineering and IoT diploma student with hands-on experience in web development, Python, C/C++, JavaScript, Arduino, and embedded systems.
-              <br /><br />
-              Completed a web development internship involving web/mobile application development, project planning, technical research, and team collaboration. Passionate about bridging hardware sensors with resilient software systems.
-            </motion.p>
+              {bioParagraphs.map((para, i) => (
+                <p key={i} style={{ marginBottom: i < bioParagraphs.length - 1 ? "1.25em" : 0 }}>
+                  {para}
+                </p>
+              ))}
+            </motion.div>
 
             {/* Factual Editorial Statistics */}
             <div className={styles.statsGrid}>
@@ -102,7 +169,11 @@ export default function About({ profile }) {
                   initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: reduce ? 0.01 : TIMING.component, delay: 0.12 + i * 0.06, ease: EASE.premium }}
+                  transition={{
+                    duration: reduce ? 0.01 : TIMING.component,
+                    delay: 0.12 + i * 0.06,
+                    ease: EASE.premium,
+                  }}
                   className={styles.statBox}
                 >
                   <span className={styles.statVal}>{stat.val}</span>

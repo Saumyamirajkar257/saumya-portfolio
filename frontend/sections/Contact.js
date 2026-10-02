@@ -67,7 +67,7 @@ export default function Contact({ profile }) {
 
               <div className={styles.socialRow}>
                 <a
-                  href="https://linkedin.com/in/saumyamirajkar"
+                  href={socials.linkedin || profile?.linkedin || "https://linkedin.com/in/saumyamirajkar"}
                   target="_blank"
                   rel="noreferrer noopener"
                   className={styles.socialBtn}
@@ -77,7 +77,7 @@ export default function Contact({ profile }) {
                 </a>
 
                 <a
-                  href={socials.github || "https://github.com/saumyamirajkar"}
+                  href={socials.github || profile?.github || "https://github.com/saumyamirajkar"}
                   target="_blank"
                   rel="noreferrer noopener"
                   className={styles.socialBtn}
@@ -87,7 +87,7 @@ export default function Contact({ profile }) {
                 </a>
 
                 <a
-                  href="/resume/Saumya_Mirajkar_Resume.pdf"
+                  href={profile?.resume_url || "/resume/Saumya_Mirajkar_Resume.pdf"}
                   target="_blank"
                   rel="noreferrer noopener"
                   className={styles.resumeBtn}

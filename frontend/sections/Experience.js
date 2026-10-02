@@ -46,7 +46,7 @@ function cleanBullet(text = "") {
 export default function Experience({ experience = [] }) {
   const reduce = useReducedMotion();
   const rawList = experience.length > 0 ? experience : FALLBACK_EXPERIENCE;
-  const sorted = [...rawList].sort((a, b) => Number(a.order ?? 999) - Number(b.order ?? 999));
+  const sorted = [...rawList].sort((a, b) => Number(a.order ?? a.displayOrder ?? 999) - Number(b.order ?? b.displayOrder ?? 999));
 
   return (
     <section id="experience" className={styles.section}>

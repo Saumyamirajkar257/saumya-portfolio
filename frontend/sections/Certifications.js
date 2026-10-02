@@ -33,7 +33,23 @@ const PROVIDER_LOGOS = {
   ),
   coursera: (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 4.2c4.308 0 7.8 3.492 7.8 7.8s-3.492 7.8-7.8 7.8S4.2 16.308 4.2 12 7.692 4.2 12 4.2zm-2.4 4.5v6.6l5.7-3.3-5.7-3.3z"/>
+      <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 4.2c4.308 0 7.8 3.492 7.8 7.8s-3.492 7.8-7.8 7.8S4.2 16.308 4.2 12 7.692 4.2 12 4.2zm-2.4 4.5v6.6l5.7-3.3-5.7-3.3z" />
+    </svg>
+  ),
+  microsoft: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M1 1h10v10H1zM13 1h10v10H13zM1 13h10v10H1zM13 13h10v10H13z" />
+    </svg>
+  ),
+  credly: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2" />
+      <path d="m8 12 3 3 6-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  aws: (
+    <svg width="22" height="15" viewBox="0 0 24 16" fill="currentColor" aria-hidden="true">
+      <path d="M6.8 9.5c-.8 0-1.4-.2-1.9-.6-.5-.4-.7-1-.7-1.7 0-.8.3-1.4.9-1.8.6-.4 1.4-.6 2.4-.6.9 0 1.6.1 2.2.3v-.4c0-.5-.1-.8-.4-1.1-.3-.3-.7-.4-1.3-.4-.5 0-.9.1-1.3.3-.4.2-.8.5-1.1.9l-.9-.8c.4-.5.9-.9 1.5-1.1.6-.3 1.3-.4 2-.4 1.1 0 1.9.3 2.5.8.6.5.9 1.3.9 2.3v4.4h-1.2v-.9c-.6.7-1.5 1.1-2.6 1.1zm.3-1.1c.6 0 1.2-.2 1.6-.6.4-.4.6-.9.6-1.5-.5-.2-1.1-.3-1.8-.3-.6 0-1.1.1-1.4.4-.3.2-.5.6-.5 1 0 .4.1.7.4.9.3.1.7.1 1.1.1z" />
     </svg>
   ),
 };
@@ -45,31 +61,36 @@ function resolveProviderLogo(org = "", issuer = "") {
   if (text.includes("atlassian")) return PROVIDER_LOGOS.atlassian;
   if (text.includes("cisco")) return PROVIDER_LOGOS.cisco;
   if (text.includes("coursera")) return PROVIDER_LOGOS.coursera;
+  if (text.includes("microsoft")) return PROVIDER_LOGOS.microsoft;
+  if (text.includes("credly") || text.includes("acclaim")) return PROVIDER_LOGOS.credly;
+  if (text.includes("aws") || text.includes("amazon")) return PROVIDER_LOGOS.aws;
   return null;
 }
 
 function formatDate(dateStr) {
   if (!dateStr) return "2026";
   const raw = String(dateStr).trim().toUpperCase();
-  // Standardize common formats to uppercase (e.g. "JUL 2026", "SEP 28, 2026")
-  return raw.replace(/SEPTEMBER/gi, "SEP")
-            .replace(/AUGUST/gi, "AUG")
-            .replace(/JULY/gi, "JUL")
-            .replace(/OCTOBER/gi, "OCT")
-            .replace(/NOVEMBER/gi, "NOV")
-            .replace(/DECEMBER/gi, "DEC")
-            .replace(/JANUARY/gi, "JAN")
-            .replace(/FEBRUARY/gi, "FEB")
-            .replace(/MARCH/gi, "MAR")
-            .replace(/APRIL/gi, "APR")
-            .replace(/JUNE/gi, "JUN");
+  return raw
+    .replace(/SEPTEMBER/gi, "SEP")
+    .replace(/AUGUST/gi, "AUG")
+    .replace(/JULY/gi, "JUL")
+    .replace(/OCTOBER/gi, "OCT")
+    .replace(/NOVEMBER/gi, "NOV")
+    .replace(/DECEMBER/gi, "DEC")
+    .replace(/JANUARY/gi, "JAN")
+    .replace(/FEBRUARY/gi, "FEB")
+    .replace(/MARCH/gi, "MAR")
+    .replace(/APRIL/gi, "APR")
+    .replace(/JUNE/gi, "JUN");
 }
 
 export default function Certifications({ certifications = [] }) {
   const [showAll, setShowAll] = useState(false);
   const reduce = useReducedMotion();
 
-  const sorted = [...certifications].sort((a, b) => Number(a.order ?? 999) - Number(b.order ?? 999));
+  const sorted = [...certifications].sort(
+    (a, b) => Number(a.order ?? 999) - Number(b.order ?? 999)
+  );
   const visible = showAll ? sorted : sorted.slice(0, 6);
 
   if (!certifications.length) return null;
@@ -84,9 +105,7 @@ export default function Certifications({ certifications = [] }) {
               <span className={styles.eyebrowDot} />
               <span>ACCREDITATIONS</span>
             </div>
-            <h2 className={styles.heading}>
-              CERTIFICATIONS
-            </h2>
+            <h2 className={styles.heading}>CERTIFICATIONS</h2>
             <p className={styles.subheading}>
               Professional credentials, courses, and technical learning.
             </p>
@@ -104,8 +123,11 @@ export default function Certifications({ certifications = [] }) {
           {visible.map((cert, i) => {
             const indexStr = String(i + 1).padStart(2, "0");
             const logo = resolveProviderLogo(cert.organization, cert.issuer);
-            const dateDisplay = formatDate(cert.date);
-            const hasCredentialUrl = Boolean(cert.credential_url && cert.credential_url.trim().length > 0);
+            const dateDisplay = formatDate(cert.issueDate || cert.date);
+            const verifyUrl = cert.verificationUrl || cert.credentialUrl || cert.credential_url;
+            const hasCredentialUrl = Boolean(
+              verifyUrl && verifyUrl.trim().length > 0 && verifyUrl.startsWith("http")
+            );
 
             return (
               <motion.article
@@ -134,7 +156,9 @@ export default function Certifications({ certifications = [] }) {
                       {logo && <span className={styles.row__providerLogo}>{logo}</span>}
                       <span className={styles.row__providerName}>
                         {cert.organization || "Independent"}
-                        {cert.issuer ? ` · ${cert.issuer}` : ""}
+                        {cert.issuer && cert.issuer !== cert.organization
+                          ? ` · ${cert.issuer}`
+                          : ""}
                       </span>
                     </div>
                   </div>
@@ -145,19 +169,19 @@ export default function Certifications({ certifications = [] }) {
 
                     {hasCredentialUrl ? (
                       <a
-                        href={cert.credential_url}
+                        href={verifyUrl}
                         target="_blank"
                         rel="noreferrer noopener"
                         className={styles.row__verifyLink}
                         aria-label={`Verify credential for ${cert.name}`}
                       >
                         <span>VERIFY CREDENTIAL</span>
-                        <span className={styles.row__arrow} aria-hidden="true">↗</span>
+                        <span className={styles.row__arrow} aria-hidden="true">
+                          ↗
+                        </span>
                       </a>
                     ) : (
-                      <span className={styles.row__verifiedText}>
-                        VERIFIED
-                      </span>
+                      <span className={styles.row__verifiedText}>VERIFIED</span>
                     )}
                   </div>
                 </div>
@@ -177,7 +201,9 @@ export default function Certifications({ certifications = [] }) {
               <span className={styles.moreBtnText}>
                 {showAll ? "SHOW LESS ↑" : "VIEW ALL CERTIFICATIONS →"}
               </span>
-              <span className={styles.moreBtnCount}>{certifications.length} CREDENTIALS</span>
+              <span className={styles.moreBtnCount}>
+                {certifications.length} CREDENTIALS
+              </span>
             </button>
           </div>
         )}

@@ -281,3 +281,229 @@
   .admin__brandName, .admin__foot { display: none; }
   .admin-edit__grid { grid-template-columns: 1fr; }
 }
+
+/* ============================================================
+   URL-FIRST CERTIFICATE IMPORTER & CMS ENHANCEMENTS
+   ============================================================ */
+
+/* Search bar */
+.admin-search {
+  position: relative;
+  width: min(340px, 100%);
+  margin-bottom: 18px;
+}
+.admin-search input {
+  width: 100%;
+  padding: 9px 14px 9px 34px;
+  border-radius: 10px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13.5px;
+}
+.admin-search input:focus {
+  outline: none;
+  border-color: rgba(0, 229, 160, 0.6);
+}
+.admin-search__icon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-mute);
+  pointer-events: none;
+}
+
+/* Badges for publish/draft status */
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.admin-badge--published {
+  background: rgba(0, 229, 160, 0.12);
+  border: 1px solid rgba(0, 229, 160, 0.3);
+  color: var(--accent);
+}
+.admin-badge--draft {
+  background: rgba(255, 170, 0, 0.12);
+  border: 1px solid rgba(255, 170, 0, 0.35);
+  color: #ffaa00;
+}
+.admin-badge--hidden {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-mute);
+}
+.admin-badge--featured {
+  background: rgba(255, 215, 0, 0.12);
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  color: #ffd700;
+}
+
+/* URL-First Credential Importer Box */
+.admin-importer-box {
+  margin-bottom: 24px;
+  padding: 24px;
+  border-radius: 14px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  display: grid;
+  gap: 16px;
+  animation: admin-in 0.3s var(--ease);
+}
+.admin-importer-box__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.admin-importer-box__head h3 {
+  font-size: 16px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.admin-importer-input-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.admin-importer-input-row input {
+  flex: 1;
+  min-width: 260px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line-strong);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font-size: 14px;
+}
+.admin-importer-input-row input:focus {
+  outline: none;
+  border-color: rgba(0, 229, 160, 0.7);
+}
+
+/* Modals Overlay */
+.admin-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+.admin-modal {
+  width: min(580px, 100%);
+  background: var(--bg-2);
+  border: 1px solid var(--line-strong);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: var(--shadow-2);
+  display: grid;
+  gap: 20px;
+  animation: admin-in 0.25s var(--ease);
+}
+.admin-modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 14px;
+}
+.admin-modal__head h3 {
+  font-size: 18px;
+  color: #ffffff;
+  font-family: var(--font-display);
+}
+.admin-modal__close {
+  background: transparent;
+  border: none;
+  color: var(--text-mute);
+  font-size: 18px;
+  cursor: pointer;
+}
+.admin-modal__close:hover {
+  color: #ffffff;
+}
+
+/* Preview Found Certificate Grid */
+.admin-preview-grid {
+  display: grid;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px;
+}
+.admin-preview-row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 12px;
+  align-items: baseline;
+  font-size: 13.5px;
+}
+.admin-preview-row label {
+  color: var(--text-mute);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  text-transform: uppercase;
+}
+.admin-preview-row input, .admin-preview-row textarea {
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--line-strong);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  font-size: 13.5px;
+}
+.admin-preview-row input:focus {
+  outline: none;
+  border-color: rgba(0, 229, 160, 0.7);
+}
+
+/* Refetch Comparison Table */
+.admin-compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.admin-compare-table th {
+  text-align: left;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-mute);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  border-bottom: 1px solid var(--line);
+}
+.admin-compare-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+.admin-compare-table tr.is-diff {
+  background: rgba(0, 229, 160, 0.06);
+}
+.admin-compare-diff-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  background: rgba(0, 229, 160, 0.2);
+  color: var(--accent);
+  font-family: var(--font-mono);
+}

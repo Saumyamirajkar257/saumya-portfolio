@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getContent } from "@/lib/content";
+import { getContent, subscribeContent } from "@/lib/content";
 import Hero from "@/sections/Hero";
 import About from "@/sections/About";
 import Projects from "@/sections/Projects";
@@ -15,12 +15,25 @@ export default function LivePortfolio({ initialContent }) {
   const [content, setContent] = useState(initialContent);
 
   useEffect(() => {
-    // Fetch latest live content from Firestore on client mount
-    getContent().then((liveData) => {
-      if (liveData && liveData._source === "firebase") {
+    // 1. Initial fresh fetch on client mount
+    getContent(true)
+      .then((liveData) => {
+        if (liveData) {
+          setContent(liveData);
+        }
+      })
+      .catch(console.error);
+
+    // 2. Attach real-time Firestore listener for instant live CMS updates
+    const unsubscribe = subscribeContent((liveData) => {
+      if (liveData) {
         setContent(liveData);
       }
-    }).catch(console.error);
+    });
+
+    return () => {
+      if (typeof unsubscribe === "function") unsubscribe();
+    };
   }, []);
 
   const profile = content?.profile || {};
@@ -33,7 +46,12 @@ export default function LivePortfolio({ initialContent }) {
   return (
     <>
       <Hero profile={profile} />
-      <About profile={profile} />
+      <About
+        profile={profile}
+        certifications={certifications}
+        skills={skills}
+        education={education}
+      />
       <Projects projects={projects} />
       <Experience experience={experience} />
       <Skills skills={skills} />

@@ -1,115 +1,173 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { auth, db } from "@/lib/firebase";
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
-import { collection, getDocs, doc, setDoc, deleteDoc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  doc,
+  setDoc,
+  deleteDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { fallbackContent } from "@/lib/fallback";
+import { clearContentCache, migrateInitialData } from "@/lib/content";
 import "./admin.css";
 
 /* ------------------------------------------------------------------ */
-/* Small helpers                                                       */
+/* Helpers                                                            */
 /* ------------------------------------------------------------------ */
 
-const parseLines = (s) => (s || "").split("\n").map((x) => x.trim()).filter(Boolean);
+const parseLines = (s) =>
+  (s || "")
+    .split("\n")
+    .map((x) => x.trim())
+    .filter(Boolean);
+
 const joinLines = (arr = []) => (Array.isArray(arr) ? arr.join("\n") : "");
 
-/* Field config -> auto-generated forms. type: text|textarea|lines|json|checkbox|number */
+const SKILL_CATEGORIES = [
+  "Programming",
+  "Web Development",
+  "IoT & Hardware",
+  "Tools",
+  "Cloud",
+  "Database",
+  "Professional",
+];
+
+/* ------------------------------------------------------------------ */
+/* Models Configuration                                               */
+/* ------------------------------------------------------------------ */
+
 const MODELS = {
   profile: {
-    label: "About / Profile", singular: "Profile", collection: "profile", isSingleton: true,
+    label: "Profile / About",
+    singular: "Profile",
+    collection: "profile",
+    isSingleton: true,
     fields: [
-      { key: "name", label: "Full name", type: "text" },
-      { key: "role", label: "Role / title", type: "text" },
+      { key: "name", label: "Full Name", type: "text", required: true },
+      { key: "role", label: "Primary Role / Subtitle", type: "text" },
+      { key: "headline", label: "Discipline Badge (e.g. COMPUTER ENGINEERING · IoT · AI)", type: "text" },
       { key: "tagline", label: "Tagline", type: "text" },
-      { key: "location", label: "Location", type: "text" },
-      { key: "email", label: "Email", type: "text" },
-      { key: "phone", label: "Phone", type: "text" },
-      { key: "summary", label: "Summary", type: "textarea" },
-      { key: "bio", label: "Bio", type: "textarea" },
+      { key: "location", label: "Location (e.g. Pune, India)", type: "text" },
+      { key: "email", label: "Contact Email", type: "text", required: true },
+      { key: "phone", label: "Phone Number", type: "text" },
+      { key: "resume_url", label: "Résumé File URL", type: "text" },
+      { key: "academic_status", label: "Academic Status", type: "text" },
+      { key: "summary", label: "Professional Summary", type: "textarea" },
+      { key: "bio", label: "Bio / Narrative (paragraphs separated by blank line)", type: "textarea" },
       { key: "interests", label: "Interests (one per line)", type: "lines" },
-      { key: "career_goals", label: "Career goals (one per line)", type: "lines" },
-      { key: "socials", label: "Socials (JSON e.g. {\"github\":\"https://…\"})", type: "json" },
-      { key: "highlights", label: "Highlights (JSON array e.g. [{\"value\":\"4\",\"label\":\"Semesters\"}])", type: "json" },
-    ],
-  },
-  skills: {
-    label: "Skills", singular: "Skill", collection: "skills",
-    fields: [
-      { key: "name", label: "Skill name", type: "text" },
-      { key: "category", label: "Category", type: "text" },
-      { key: "icon", label: "Icon key", type: "text" },
-      { key: "keywords", label: "Keywords (one per line)", type: "lines" },
-      { key: "order", label: "Display Priority / Sequence (0 = Top / First)", type: "number" },
+      { key: "socials", label: "Social Links (JSON e.g. {\"github\":\"...\", \"linkedin\":\"...\", \"instagram\":\"...\"})", type: "json" },
+      { key: "highlights", label: "Highlights / Stats (JSON array e.g. [{\"value\":\"4\",\"label\":\"Semesters\"}])", type: "json" },
     ],
   },
   projects: {
-    label: "Projects", singular: "Project", collection: "projects",
+    label: "Projects",
+    singular: "Project",
+    collection: "projects",
     fields: [
-      { key: "title", label: "Title", type: "text" },
-      { key: "category", label: "Category", type: "text" },
-      { key: "short_description", label: "Short description", type: "textarea" },
-      { key: "description", label: "Full description", type: "textarea" },
-      { key: "summary", label: "One-line P→A→R summary", type: "textarea" },
-      { key: "problem", label: "Problem", type: "textarea" },
-      { key: "approach", label: "Approach", type: "textarea" },
-      { key: "result", label: "Result", type: "textarea" },
-      { key: "features", label: "Features (one per line)", type: "lines" },
-      { key: "contribution", label: "My contribution", type: "textarea" },
+      { key: "title", label: "Project Title", type: "text", required: true },
+      { key: "category", label: "Category (e.g. Hardware + IoT, Full-Stack & Web, Python Software)", type: "text", required: true },
+      { key: "short_description", label: "Short Description", type: "textarea" },
+      { key: "description", label: "Full Description / Overview", type: "textarea" },
+      { key: "summary", label: "One-Line P→A→R Summary", type: "textarea" },
+      { key: "problem", label: "Problem / Challenge", type: "textarea" },
+      { key: "approach", label: "Approach / Engineering Process", type: "textarea" },
+      { key: "result", label: "Result / Deliverables", type: "textarea" },
+      { key: "features", label: "Key Features (one per line)", type: "lines" },
+      { key: "contribution", label: "Scope & Role", type: "textarea" },
+      { key: "learned", label: "Engineering Takeaways", type: "textarea" },
       { key: "technologies", label: "Technologies (one per line)", type: "lines" },
       { key: "github_url", label: "GitHub URL", type: "text" },
-      { key: "live_url", label: "Live URL", type: "text" },
-      { key: "image", label: "Cover image path (e.g. /projects/portfolio-preview.png)", type: "text" },
-      { key: "featured", label: "Featured (larger card)", type: "checkbox" },
-      { key: "order", label: "Display Priority / Sequence (0 = Top / First)", type: "number" },
+      { key: "live_url", label: "Live Demo URL", type: "text" },
+      { key: "image", label: "Project Image / Cover Path", type: "text" },
+      { key: "status", label: "Status (published / draft / hidden)", type: "select", options: ["published", "draft", "hidden"] },
+      { key: "featured", label: "Featured (Highlight with badge)", type: "checkbox" },
+      { key: "order", label: "Display Order (0 = Top / First)", type: "number" },
+    ],
+  },
+  skills: {
+    label: "Skills",
+    singular: "Skill",
+    collection: "skills",
+    fields: [
+      { key: "name", label: "Skill Name", type: "text", required: true },
+      { key: "category", label: "Category", type: "select-custom", options: SKILL_CATEGORIES, required: true },
+      { key: "icon", label: "Icon Key (e.g. python, cpp, c, javascript, react, html, css, arduino, sensor, git, github, database, cloud, problem, comms, team, time)", type: "text" },
+      { key: "proficiency", label: "Proficiency / Level (optional)", type: "text" },
+      { key: "keywords", label: "Keywords / Tags (one per line)", type: "lines" },
+      { key: "status", label: "Status (published / draft)", type: "select", options: ["published", "draft"] },
+      { key: "featured", label: "Featured in Constellation", type: "checkbox" },
+      { key: "order", label: "Display Order (0 = Top / First)", type: "number" },
     ],
   },
   experience: {
-    label: "Experience", singular: "Job", collection: "experience",
+    label: "Experience",
+    singular: "Experience",
+    collection: "experience",
     fields: [
-      { key: "position", label: "Position", type: "text" },
-      { key: "company", label: "Company", type: "text" },
+      { key: "position", label: "Role / Position", type: "text", required: true },
+      { key: "company", label: "Company / Organization", type: "text", required: true },
       { key: "location", label: "Location", type: "text" },
-      { key: "start_date", label: "Start (e.g. May 2026)", type: "text" },
-      { key: "end_date", label: "End (or Present)", type: "text" },
-      { key: "current", label: "Current role", type: "checkbox" },
+      { key: "start_date", label: "Start Date (e.g. MAY 2026)", type: "text", required: true },
+      { key: "end_date", label: "End Date (or PRESENT)", type: "text" },
+      { key: "current", label: "Currently Active Position", type: "checkbox" },
+      { key: "company_url", label: "Company URL", type: "text" },
       { key: "responsibilities", label: "Responsibilities (one per line)", type: "lines" },
       { key: "technologies", label: "Technologies (one per line)", type: "lines" },
-      { key: "order", label: "Display Priority / Sequence (0 = Top / First)", type: "number" },
+      { key: "status", label: "Status (published / draft)", type: "select", options: ["published", "draft"] },
+      { key: "featured", label: "Featured Role", type: "checkbox" },
+      { key: "order", label: "Display Order (0 = Top / First)", type: "number" },
     ],
   },
   education: {
-    label: "Education", singular: "School", collection: "education",
+    label: "Education",
+    singular: "Education",
+    collection: "education",
     fields: [
-      { key: "institution", label: "Institution", type: "text" },
-      { key: "degree", label: "Degree / course", type: "text" },
+      { key: "degree", label: "Degree / Program", type: "text", required: true },
+      { key: "institution", label: "Institution", type: "text", required: true },
       { key: "location", label: "Location", type: "text" },
-      { key: "start_date", label: "Start", type: "text" },
-      { key: "end_date", label: "End", type: "text" },
-      { key: "current", label: "Currently enrolled", type: "checkbox" },
-      { key: "details", label: "Details (one per line)", type: "lines" },
-      { key: "grades", label: "Grades (JSON e.g. {\"Sem 1\":\"70.82%\"})", type: "json" },
-      { key: "order", label: "Display Priority / Sequence (0 = Top / First)", type: "number" },
+      { key: "start_date", label: "Start Year / Date", type: "text", required: true },
+      { key: "end_date", label: "End Year (or Present)", type: "text" },
+      { key: "current", label: "Currently Enrolled", type: "checkbox" },
+      { key: "details", label: "Program Highlights (one per line)", type: "lines" },
+      { key: "grades", label: "Academic Record (JSON e.g. {\"Sem 1\":\"70.82%\"})", type: "json" },
+      { key: "status", label: "Status (published / draft)", type: "select", options: ["published", "draft"] },
+      { key: "order", label: "Display Order (0 = Top / First)", type: "number" },
     ],
   },
   certifications: {
-    label: "Certifications", singular: "Certification", collection: "certifications",
+    label: "Certifications",
+    singular: "Certification",
+    collection: "certifications",
     fields: [
-      { key: "name", label: "Certification name", type: "text" },
-      { key: "organization", label: "Organization", type: "text" },
-      { key: "issuer", label: "Issuer / platform", type: "text" },
-      { key: "date", label: "Date (e.g. Jul 2026)", type: "text" },
-      { key: "credential_url", label: "Credential URL", type: "text" },
-      { key: "logo", label: "Logo URL / Path (e.g. /logos/ibm.svg)", type: "text" },
-      { key: "order", label: "Display Priority / Sequence (0 = Top / First, 1 = Second...)", type: "number" },
+      { key: "name", label: "Certificate Name", type: "text", required: true },
+      { key: "organization", label: "Issuing Organization", type: "text", required: true },
+      { key: "issuer", label: "Issuer / Platform (e.g. Coursera)", type: "text" },
+      { key: "issueDate", label: "Issue Date (e.g. JUL 2026)", type: "text", required: true },
+      { key: "expiryStatus", label: "Expiry Status (e.g. No expiry / Expires: JUL 2029 / Not provided)", type: "text" },
+      { key: "credentialId", label: "Credential ID (or Not provided)", type: "text" },
+      { key: "verificationUrl", label: "Verification URL", type: "text" },
+      { key: "sourceCredentialUrl", label: "Source Credential URL", type: "text" },
+      { key: "category", label: "Category", type: "text" },
+      { key: "description", label: "Description", type: "textarea" },
+      { key: "imageUrl", label: "Certificate Image / Badge URL", type: "text" },
+      { key: "status", label: "Status (published / draft)", type: "select", options: ["published", "draft"] },
+      { key: "featured", label: "Featured Credential", type: "checkbox" },
+      { key: "order", label: "Display Order (0 = Top / First)", type: "number" },
     ],
   },
 };
 
 /* ------------------------------------------------------------------ */
-/* UI atoms                                                             */
+/* Auth Component                                                     */
 /* ------------------------------------------------------------------ */
+
 function LoginScreen({ onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -124,7 +182,7 @@ function LoginScreen({ onLogin }) {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       onLogin(userCredential.user);
     } catch (err) {
-      setError(err.message || "Login failed.");
+      setError(err.message || "Invalid credentials.");
     }
     setBusy(false);
   };
@@ -132,52 +190,147 @@ function LoginScreen({ onLogin }) {
   return (
     <div className="admin-login">
       <form className="admin-login__card" onSubmit={submit}>
-        <Link href="/" className="admin-login__back">← back to site</Link>
+        <Link href="/" className="admin-login__back">
+          ← Back to portfolio
+        </Link>
         <div className="admin-login__logo">SM</div>
-        <h1>Admin Panel</h1>
-        <p className="admin-login__sub">Sign in to edit your portfolio content.</p>
+        <h1>Portfolio CMS</h1>
+        <p className="admin-login__sub">Sign in to control your portfolio content in real time.</p>
 
         <label className="admin-field">
           <span>Email</span>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+            required
+          />
         </label>
         <label className="admin-field">
           <span>Password</span>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
+            required
+          />
         </label>
 
-        {error ? <p className="admin-error" role="alert">{error}</p> : null}
+        {error ? (
+          <p className="admin-error" role="alert">
+            {error}
+          </p>
+        ) : null}
 
         <button className="admin-btn admin-btn--primary" disabled={busy}>
-          {busy ? "Signing in…" : "Sign in"}
+          {busy ? "Authenticating…" : "Sign In to CMS"}
         </button>
       </form>
     </div>
   );
 }
 
+/* ------------------------------------------------------------------ */
+/* Dynamic Form Field Input                                           */
+/* ------------------------------------------------------------------ */
+
 function FieldInput({ field, value, onChange }) {
   if (field.type === "textarea" || field.type === "lines" || field.type === "json") {
-    return <textarea rows={field.type === "textarea" ? 4 : 3} value={value} onChange={(e) => onChange(e.target.value)} />;
+    return (
+      <textarea
+        rows={field.type === "textarea" ? 4 : 3}
+        value={value || ""}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={field.type === "lines" ? "One entry per line" : ""}
+      />
+    );
   }
   if (field.type === "checkbox") {
-    return <input type="checkbox" checked={Boolean(value)} onChange={(e) => onChange(e.target.checked)} />;
+    return (
+      <input
+        type="checkbox"
+        checked={Boolean(value)}
+        onChange={(e) => onChange(e.target.checked)}
+      />
+    );
   }
   if (field.type === "number") {
     return (
-      <input 
-        type="number" 
+      <input
+        type="number"
         min="0"
-        value={value === undefined || value === null ? "" : value} 
-        onChange={(e) => onChange(e.target.value === "" ? "" : Number(e.target.value))} 
+        value={value === undefined || value === null ? "" : value}
+        onChange={(e) =>
+          onChange(e.target.value === "" ? "" : Number(e.target.value))
+        }
         placeholder="0"
       />
     );
   }
-  return <input type="text" value={value === undefined || value === null ? "" : value} onChange={(e) => onChange(e.target.value)} />;
+  if (field.type === "select") {
+    return (
+      <select
+        value={value || field.options[0]}
+        onChange={(e) => onChange(e.target.value)}
+        style={{
+          width: "100%",
+          padding: "10px 12px",
+          borderRadius: "10px",
+          border: "1px solid var(--line-strong)",
+          background: "var(--surface)",
+          color: "var(--text)",
+        }}
+      >
+        {field.options.map((opt) => (
+          <option key={opt} value={opt}>
+            {opt.toUpperCase()}
+          </option>
+        ))}
+      </select>
+    );
+  }
+  if (field.type === "select-custom") {
+    return (
+      <div style={{ display: "grid", gap: "8px" }}>
+        <input
+          type="text"
+          value={value || ""}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="Select from options or type custom category..."
+        />
+        <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+          {field.options.map((opt) => (
+            <button
+              type="button"
+              key={opt}
+              className="admin-btn admin-btn--sm"
+              style={{
+                fontSize: "11px",
+                padding: "4px 8px",
+                background: value === opt ? "rgba(0, 229, 160, 0.2)" : "rgba(255,255,255,0.05)",
+                borderColor: value === opt ? "var(--accent)" : "var(--line)",
+              }}
+              onClick={() => onChange(opt)}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  return (
+    <input
+      type="text"
+      value={value === undefined || value === null ? "" : value}
+      onChange={(e) => onChange(e.target.value)}
+      required={Boolean(field.required)}
+    />
+  );
 }
 
-/* Convert the field values back to an API payload. */
 function buildPayload(model, values) {
   const payload = {};
   for (const f of model.fields) {
@@ -186,6 +339,8 @@ function buildPayload(model, values) {
       v = parseLines(v);
     } else if (f.type === "number") {
       v = v === "" || v === undefined || v === null ? 0 : Number(v);
+    } else if (f.type === "checkbox") {
+      v = Boolean(v);
     } else if (f.type === "json") {
       const raw = String(v || "").trim();
       if (!raw) {
@@ -200,53 +355,980 @@ function buildPayload(model, values) {
     }
     payload[f.key] = v;
   }
+  payload.updatedAt = new Date().toISOString();
   return payload;
 }
 
-/* Restore form values from an object. */
 function valuesFromItem(fields, item) {
   const out = {};
   for (const f of fields) {
     let v = item?.[f.key];
+    if (f.key === "issueDate" && !v && item?.date) v = item.date;
+    if (f.key === "verificationUrl" && !v && (item?.credential_url || item?.credentialUrl))
+      v = item.credential_url || item.credentialUrl;
+    if (f.key === "status" && !v) {
+      v = item?.published === false ? "draft" : "published";
+    }
+
     if (f.type === "lines") v = joinLines(v);
-    else if (f.type === "json") v = JSON.stringify(v ?? (f.key === "socials" || f.key === "highlights" ? (Array.isArray(v) ? [] : {}) : {}), null, 1);
-    out[f.key] = v === undefined ? (f.type === "checkbox" ? false : f.type === "number" ? 0 : "") : v;
+    else if (f.type === "json")
+      v = JSON.stringify(
+        v ?? (f.key === "highlights" ? [] : {}),
+        null,
+        1
+      );
+    out[f.key] =
+      v === undefined
+        ? f.type === "checkbox"
+          ? false
+          : f.type === "number"
+          ? 0
+          : f.type === "select"
+          ? f.options[0]
+          : ""
+        : v;
   }
   return out;
 }
 
 /* ------------------------------------------------------------------ */
-/* Manager per content model                                            */
+/* Delete Confirmation Modal                                          */
 /* ------------------------------------------------------------------ */
-function ContentManager({ modelKey }) {
-  const model = MODELS[modelKey];
+
+function DeleteConfirmModal({ title, onCancel, onConfirm, busy }) {
+  return (
+    <div className="admin-modal-overlay">
+      <div className="admin-modal" style={{ maxWidth: "440px" }}>
+        <div className="admin-modal__head">
+          <h3>Confirm Delete</h3>
+          <button className="admin-modal__close" onClick={onCancel}>
+            ✕
+          </button>
+        </div>
+        <p style={{ fontSize: "14.5px", color: "var(--text-dim)", lineHeight: "1.6" }}>
+          Delete <strong>"{title}"</strong>? This will permanently remove it from the database and public portfolio.
+        </p>
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "12px" }}>
+          <button className="admin-btn" onClick={onCancel} disabled={busy}>
+            Cancel
+          </button>
+          <button
+            className="admin-btn admin-btn--danger"
+            onClick={onConfirm}
+            disabled={busy}
+          >
+            {busy ? "Deleting…" : "Delete Item"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* URL-First Certificate Importer & Management                        */
+/* ------------------------------------------------------------------ */
+/* Credential Fetch Helper (with Cloudflare Edge fallback)            */
+/* ------------------------------------------------------------------ */
+
+async function fetchCredentialApi(targetUrl) {
+  try {
+    const res = await fetch("/api/certificates/fetch", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: targetUrl }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data) return data;
+    }
+  } catch (err) {
+    // Continue to deployed fallback
+  }
+
+  // Deployed Cloudflare Pages Function fallback
+  try {
+    const remoteRes = await fetch(
+      "https://saumya-portfolio-acv.pages.dev/api/certificates/fetch",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: targetUrl }),
+      }
+    );
+    if (remoteRes.ok) {
+      return await remoteRes.json();
+    }
+  } catch (err) {
+    // Both attempts failed
+  }
+
+  return {
+    success: false,
+    message: "Couldn't automatically retrieve certificate details.",
+    fallbackManual: true,
+  };
+}
+
+function CertificationsManager() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState(null);   // null | "new" | item
-  const [values, setValues] = useState({});
-  const [error, setError] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [notice, setNotice] = useState("");
+  const [error, setError] = useState("");
+
+  // URL-First State
+  const [isUrlBoxOpen, setIsUrlBoxOpen] = useState(false);
+  const [importUrl, setImportUrl] = useState("");
+  const [fetching, setFetching] = useState(false);
+  const [importError, setImportError] = useState("");
+  const [previewCert, setPreviewCert] = useState(null); // Found certificate for review
+
+  // Duplicate Detection
+  const [duplicateMatch, setDuplicateMatch] = useState(null);
+
+  // Refetch Modal State
+  const [refetchModalData, setRefetchModalData] = useState(null); // { current, fetched, busy }
+
+  // Edit / Manual State
+  const [editing, setEditing] = useState(null);
+  const [values, setValues] = useState({});
+
+  // Delete State
+  const [itemToDelete, setItemToDelete] = useState(null);
+  const [deleteBusy, setDeleteBusy] = useState(false);
+
+  const model = MODELS.certifications;
 
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
-      const snap = await getDocs(collection(db, model.collection));
-      const fetched = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      fetched.sort((a, b) => (Number(a.order ?? 999) - Number(b.order ?? 999)));
+      const snap = await getDocs(collection(db, "certifications"));
+      const fetched = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      fetched.sort(
+        (a, b) =>
+          Number(a.order ?? a.displayOrder ?? 999) -
+          Number(b.order ?? b.displayOrder ?? 999)
+      );
       setItems(fetched);
     } catch (err) {
       setError(err.message);
     }
     setLoading(false);
-  }, [model.collection]);
+  }, []);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  // Check Duplicate
+  const checkDuplicate = (certId, url) => {
+    const cleanUrl = (url || "").trim().toLowerCase();
+    const cleanId = (certId || "").trim().toUpperCase();
+
+    return items.find((item) => {
+      const itemUrl = (
+        item.verificationUrl ||
+        item.credentialUrl ||
+        item.sourceCredentialUrl ||
+        item.credential_url ||
+        ""
+      )
+        .trim()
+        .toLowerCase();
+      const itemId = (item.credentialId || "").trim().toUpperCase();
+
+      if (cleanUrl && itemUrl && cleanUrl === itemUrl) return true;
+      if (cleanId && cleanId !== "NOT PROVIDED" && itemId && itemId !== "NOT PROVIDED" && cleanId === itemId) {
+        return true;
+      }
+      return false;
+    });
+  };
+
+  // Fetch Certificate from Backend
+  const handleFetchCertificate = async (e) => {
+    if (e) e.preventDefault();
+    if (!importUrl || !importUrl.trim()) {
+      setImportError("Please enter a valid credential or verification URL.");
+      return;
+    }
+
+    setFetching(true);
+    setImportError("");
+    setDuplicateMatch(null);
+
+    try {
+      const data = await fetchCredentialApi(importUrl.trim());
+
+      if (!data.success || !data.certificate) {
+        setImportError(
+          data.message || "Couldn't automatically retrieve certificate details."
+        );
+        setFetching(false);
+        return;
+      }
+
+      const fetchedCert = data.certificate;
+
+      // Duplicate check
+      const dup = checkDuplicate(fetchedCert.credentialId, fetchedCert.verificationUrl);
+      if (dup) {
+        setDuplicateMatch(dup);
+        setImportError("This credential already exists in your portfolio.");
+        setFetching(false);
+        return;
+      }
+
+      // Found! Show editable preview
+      setPreviewCert({
+        name: fetchedCert.name || "",
+        organization: fetchedCert.organization || "",
+        issuer: fetchedCert.issuer || fetchedCert.organization || "",
+        issueDate: fetchedCert.issueDate || "JUL 2026",
+        expiryDate: fetchedCert.expiryDate || "",
+        expiryStatus: fetchedCert.expiryStatus || "Not provided",
+        noExpiry: Boolean(fetchedCert.noExpiry),
+        credentialId: fetchedCert.credentialId || "Not provided",
+        credentialUrl: fetchedCert.credentialUrl || importUrl,
+        verificationUrl: fetchedCert.verificationUrl || importUrl,
+        sourceCredentialUrl: importUrl,
+        description: fetchedCert.description || "",
+        category: fetchedCert.category || "Professional Certification",
+        imageUrl: fetchedCert.imageUrl || "",
+        status: "published",
+        featured: false,
+        verified: true,
+      });
+    } catch (err) {
+      setImportError("Couldn't automatically retrieve certificate details.");
+    }
+    setFetching(false);
+  };
+
+  // Confirm and Save from Preview
+  const handleConfirmAndAdd = async () => {
+    if (!previewCert || !previewCert.name.trim()) return;
+
+    try {
+      const docRef = doc(collection(db, "certifications"));
+      const finalPayload = {
+        ...previewCert,
+        order: items.length,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      await setDoc(docRef, finalPayload);
+      clearContentCache();
+      setNotice(`"${previewCert.name}" imported and saved ✓`);
+      setPreviewCert(null);
+      setIsUrlBoxOpen(false);
+      setImportUrl("");
+      refresh();
+      setTimeout(() => setNotice(""), 3500);
+    } catch (err) {
+      setImportError("Failed to save certificate: " + err.message);
+    }
+  };
+
+  // Fallback to manual entry
+  const handleOpenManualEntry = () => {
+    const initial = valuesFromItem(model.fields, null);
+    if (importUrl) {
+      initial.sourceCredentialUrl = importUrl;
+      initial.verificationUrl = importUrl;
+    }
+    initial.order = items.length;
+    initial.status = "published";
+    setValues(initial);
+    setEditing("new");
+    setPreviewCert(null);
+    setIsUrlBoxOpen(false);
+    setImportError("");
+  };
+
+  // Re-fetch details comparison
+  const handleStartRefetch = async (item) => {
+    const targetUrl =
+      item.sourceCredentialUrl ||
+      item.verificationUrl ||
+      item.credentialUrl ||
+      item.credential_url;
+
+    if (!targetUrl || !targetUrl.startsWith("http")) {
+      alert("No valid source credential URL found for this certificate.");
+      return;
+    }
+
+    setRefetchModalData({
+      current: item,
+      fetched: null,
+      loading: true,
+      error: "",
+    });
+
+    try {
+      const data = await fetchCredentialApi(targetUrl);
+      if (!data.success || !data.certificate) {
+        setRefetchModalData((prev) => ({
+          ...prev,
+          loading: false,
+          error: data.message || "Could not retrieve updated credential details.",
+        }));
+        return;
+      }
+
+      setRefetchModalData((prev) => ({
+        ...prev,
+        loading: false,
+        fetched: data.certificate,
+      }));
+    } catch (err) {
+      setRefetchModalData((prev) => ({
+        ...prev,
+        loading: false,
+        error: "Failed to connect to the credential provider.",
+      }));
+    }
+  };
+
+  const handleApplyRefetchChanges = async () => {
+    if (!refetchModalData || !refetchModalData.fetched) return;
+    const { current, fetched } = refetchModalData;
+
+    try {
+      const updated = {
+        name: fetched.name || current.name,
+        organization: fetched.organization || current.organization,
+        issuer: fetched.issuer || current.issuer || fetched.organization,
+        issueDate: fetched.issueDate || current.issueDate,
+        expiryStatus: fetched.expiryStatus || current.expiryStatus,
+        credentialId:
+          fetched.credentialId !== "Not provided"
+            ? fetched.credentialId
+            : current.credentialId,
+        verificationUrl: fetched.verificationUrl || current.verificationUrl,
+        updatedAt: new Date().toISOString(),
+      };
+
+      await updateDoc(doc(db, "certifications", String(current.id)), updated);
+      clearContentCache();
+      setNotice("Credential details updated ✓");
+      setRefetchModalData(null);
+      refresh();
+      setTimeout(() => setNotice(""), 3000);
+    } catch (err) {
+      alert("Failed to apply changes: " + err.message);
+    }
+  };
+
+  // Standard Save
+  const handleSaveItem = async () => {
+    setError("");
+    const payload = buildPayload(model, values);
+    if (!payload.name || !payload.organization) {
+      setError("Certificate name and issuing organization are required.");
+      return;
+    }
+
+    try {
+      if (editing === "new") {
+        if (payload.order === undefined || payload.order === null) {
+          payload.order = items.length;
+        }
+        payload.createdAt = new Date().toISOString();
+        const docRef = doc(collection(db, "certifications"));
+        await setDoc(docRef, payload);
+      } else {
+        await setDoc(doc(db, "certifications", String(editing.id)), payload, {
+          merge: true,
+        });
+      }
+
+      clearContentCache();
+      setNotice(`Saved ✓`);
+      setEditing(null);
+      refresh();
+      setTimeout(() => setNotice(""), 3000);
+    } catch (err) {
+      setError("Save failed: " + err.message);
+    }
+  };
+
+  // Move priority order
+  const handleMove = async (index, direction) => {
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= items.length) return;
+
+    const currentItem = items[index];
+    const targetItem = items[targetIndex];
+
+    try {
+      await updateDoc(doc(db, "certifications", String(currentItem.id)), {
+        order: targetIndex,
+      });
+      await updateDoc(doc(db, "certifications", String(targetItem.id)), {
+        order: index,
+      });
+      clearContentCache();
+      refresh();
+    } catch (err) {
+      setError("Reorder failed: " + err.message);
+    }
+  };
+
+  // Delete
+  const handleConfirmDelete = async () => {
+    if (!itemToDelete) return;
+    setDeleteBusy(true);
+    try {
+      await deleteDoc(doc(db, "certifications", String(itemToDelete.id)));
+      clearContentCache();
+      setItems((prev) => prev.filter((i) => String(i.id) !== String(itemToDelete.id)));
+      setNotice("Certificate deleted ✓");
+      setItemToDelete(null);
+      refresh();
+      setTimeout(() => setNotice(""), 3000);
+    } catch (err) {
+      setError("Delete failed: " + err.message);
+    }
+    setDeleteBusy(false);
+  };
+
+  // Filtered Items via Search
+  const filteredItems = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return items;
+    return items.filter((item) => {
+      const name = (item.name || "").toLowerCase();
+      const org = (item.organization || item.issuer || "").toLowerCase();
+      const id = (item.credentialId || "").toLowerCase();
+      return name.includes(q) || org.includes(q) || id.includes(q);
+    });
+  }, [items, searchQuery]);
+
+  return (
+    <div className="admin-panel">
+      {/* Header */}
+      <div className="admin-panel__head">
+        <div>
+          <h2>Certifications</h2>
+          <p className="admin-muted" style={{ marginTop: "4px" }}>
+            {items.length} total credentials live in Firestore
+          </p>
+        </div>
+        <div className="admin-panel__actions">
+          {notice ? <span className="admin-notice">{notice}</span> : null}
+          <button className="admin-btn" onClick={refresh}>
+            ↻ Refresh
+          </button>
+          <button
+            className="admin-btn admin-btn--primary"
+            onClick={() => {
+              setIsUrlBoxOpen((v) => !v);
+              setImportError("");
+              setDuplicateMatch(null);
+            }}
+          >
+            + ADD CERTIFICATE
+          </button>
+        </div>
+      </div>
+
+      {error ? <p className="admin-error">{error}</p> : null}
+
+      {/* ═══ 1. URL-FIRST CERTIFICATE IMPORTER BOX ═══ */}
+      {isUrlBoxOpen && (
+        <div className="admin-importer-box">
+          <div className="admin-importer-box__head">
+            <h3>⚡ Automatic Credential Import</h3>
+            <button
+              className="admin-btn admin-btn--sm"
+              onClick={() => setIsUrlBoxOpen(false)}
+            >
+              Close ✕
+            </button>
+          </div>
+
+          <form onSubmit={handleFetchCertificate}>
+            <label className="admin-field" style={{ marginBottom: "12px" }}>
+              <span>CREDENTIAL / VERIFICATION URL *</span>
+              <div className="admin-importer-input-row">
+                <input
+                  type="url"
+                  placeholder="https://coursera.org/verify/..."
+                  value={importUrl}
+                  onChange={(e) => {
+                    setImportUrl(e.target.value);
+                    setImportError("");
+                    setDuplicateMatch(null);
+                  }}
+                  autoFocus
+                  required
+                />
+                <button
+                  type="submit"
+                  className="admin-btn admin-btn--primary"
+                  disabled={fetching}
+                  style={{ minWidth: "160px", justifyContent: "center" }}
+                >
+                  {fetching ? "FETCHING…" : "FETCH CERTIFICATE"}
+                </button>
+              </div>
+            </label>
+          </form>
+
+          {/* Fallback Message & Manual Action */}
+          {importError && (
+            <div style={{ padding: "12px", background: "rgba(255, 100, 100, 0.08)", border: "1px solid rgba(255, 100, 100, 0.25)", borderRadius: "10px" }}>
+              <p style={{ color: "#ff8086", fontSize: "13.5px", marginBottom: "8px" }}>
+                {importError}
+              </p>
+              {duplicateMatch ? (
+                <button
+                  type="button"
+                  className="admin-btn admin-btn--sm"
+                  onClick={() => {
+                    setSearchQuery(duplicateMatch.name);
+                    setIsUrlBoxOpen(false);
+                  }}
+                >
+                  VIEW EXISTING →
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="admin-btn admin-btn--sm admin-btn--primary"
+                  onClick={handleOpenManualEntry}
+                >
+                  ENTER DETAILS MANUALLY
+                </button>
+              )}
+            </div>
+          )}
+
+          {!importError && !fetching && (
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span className="admin-muted" style={{ fontSize: "12px" }}>
+                Supports Coursera, Credly, Google, IBM, Cisco, Microsoft, AWS, Udemy, and generic accreditation pages.
+              </span>
+              <button
+                type="button"
+                className="admin-btn admin-btn--sm"
+                onClick={handleOpenManualEntry}
+              >
+                Enter Details Manually
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ═══ 4. EDITABLE PREVIEW MODAL BEFORE SAVING ═══ */}
+      {previewCert && (
+        <div className="admin-modal-overlay">
+          <div className="admin-modal">
+            <div className="admin-modal__head">
+              <h3>CERTIFICATE FOUND</h3>
+              <button
+                className="admin-modal__close"
+                onClick={() => setPreviewCert(null)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className="admin-muted" style={{ fontSize: "13px" }}>
+              Review or edit extracted details before confirming and adding to your live portfolio.
+            </p>
+
+            <div className="admin-preview-grid">
+              <div className="admin-preview-row">
+                <label>Name</label>
+                <input
+                  type="text"
+                  value={previewCert.name}
+                  onChange={(e) =>
+                    setPreviewCert((s) => ({ ...s, name: e.target.value }))
+                  }
+                />
+              </div>
+
+              <div className="admin-preview-row">
+                <label>Organization</label>
+                <input
+                  type="text"
+                  value={previewCert.organization}
+                  onChange={(e) =>
+                    setPreviewCert((s) => ({ ...s, organization: e.target.value }))
+                  }
+                />
+              </div>
+
+              <div className="admin-preview-row">
+                <label>Issue Date</label>
+                <input
+                  type="text"
+                  value={previewCert.issueDate}
+                  onChange={(e) =>
+                    setPreviewCert((s) => ({ ...s, issueDate: e.target.value }))
+                  }
+                />
+              </div>
+
+              <div className="admin-preview-row">
+                <label>Credential ID</label>
+                <input
+                  type="text"
+                  value={previewCert.credentialId}
+                  onChange={(e) =>
+                    setPreviewCert((s) => ({ ...s, credentialId: e.target.value }))
+                  }
+                />
+              </div>
+
+              <div className="admin-preview-row">
+                <label>Expiry</label>
+                <input
+                  type="text"
+                  value={previewCert.expiryStatus}
+                  onChange={(e) =>
+                    setPreviewCert((s) => ({ ...s, expiryStatus: e.target.value }))
+                  }
+                />
+              </div>
+
+              <div className="admin-preview-row">
+                <label>Verification URL</label>
+                <input
+                  type="text"
+                  value={previewCert.verificationUrl}
+                  onChange={(e) =>
+                    setPreviewCert((s) => ({ ...s, verificationUrl: e.target.value }))
+                  }
+                />
+              </div>
+
+              {previewCert.imageUrl && (
+                <div className="admin-preview-row">
+                  <label>Image Preview</label>
+                  <img
+                    src={previewCert.imageUrl}
+                    alt="Certificate Badge"
+                    style={{ maxHeight: "60px", objectFit: "contain", borderRadius: "6px" }}
+                  />
+                </div>
+              )}
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+              <button className="admin-btn" onClick={() => setPreviewCert(null)}>
+                CANCEL
+              </button>
+              <button
+                className="admin-btn admin-btn--primary"
+                onClick={handleConfirmAndAdd}
+              >
+                CONFIRM &amp; ADD
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══ 17. REFETCH DETAILS COMPARISON MODAL ═══ */}
+      {refetchModalData && (
+        <div className="admin-modal-overlay">
+          <div className="admin-modal" style={{ maxWidth: "620px" }}>
+            <div className="admin-modal__head">
+              <h3>REFETCH DETAILS</h3>
+              <button
+                className="admin-modal__close"
+                onClick={() => setRefetchModalData(null)}
+              >
+                ✕
+              </button>
+            </div>
+
+            {refetchModalData.loading ? (
+              <p className="admin-muted">Retrieving latest public credential information…</p>
+            ) : refetchModalData.error ? (
+              <p className="admin-error">{refetchModalData.error}</p>
+            ) : refetchModalData.fetched ? (
+              <>
+                <p className="admin-muted" style={{ fontSize: "13px" }}>
+                  Compare your current database record against newly fetched information. Choose whether to apply updates.
+                </p>
+                <table className="admin-compare-table">
+                  <thead>
+                    <tr>
+                      <th>FIELD</th>
+                      <th>CURRENT</th>
+                      <th>FETCHED</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { key: "name", label: "Name" },
+                      { key: "organization", label: "Organization" },
+                      { key: "issueDate", label: "Issue Date" },
+                      { key: "expiryStatus", label: "Expiry" },
+                      { key: "credentialId", label: "Credential ID" },
+                    ].map((f) => {
+                      const curVal =
+                        refetchModalData.current[f.key] ||
+                        (f.key === "issueDate" ? refetchModalData.current.date : "") ||
+                        "—";
+                      const fetchVal = refetchModalData.fetched[f.key] || "—";
+                      const isDiff =
+                        curVal.toLowerCase().trim() !== fetchVal.toLowerCase().trim();
+
+                      return (
+                        <tr key={f.key} className={isDiff ? "is-diff" : ""}>
+                          <td>
+                            <strong>{f.label}</strong>
+                            {isDiff && <span className="admin-compare-diff-badge">Changed</span>}
+                          </td>
+                          <td style={{ color: isDiff ? "var(--text-dim)" : "var(--text)" }}>{curVal}</td>
+                          <td style={{ color: isDiff ? "var(--accent)" : "var(--text)" }}>{fetchVal}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "12px" }}>
+                  <button className="admin-btn" onClick={() => setRefetchModalData(null)}>
+                    KEEP CURRENT
+                  </button>
+                  <button
+                    className="admin-btn admin-btn--primary"
+                    onClick={handleApplyRefetchChanges}
+                  >
+                    APPLY FETCHED CHANGES
+                  </button>
+                </div>
+              </>
+            ) : null}
+          </div>
+        </div>
+      )}
+
+      {/* ═══ 16. MANUAL EDIT / NEW FORM ═══ */}
+      {editing ? (
+        <div className="admin-edit">
+          <h3>
+            {editing === "new"
+              ? "New Certificate"
+              : `Edit ${editing.name || "Certificate"}`}
+          </h3>
+          <div className="admin-edit__grid">
+            {model.fields.map((f) => (
+              <label
+                key={f.key}
+                className={`admin-field ${
+                  f.type === "lines" || f.type === "textarea" || f.type === "json"
+                    ? "admin-field--wide"
+                    : ""
+                }`}
+              >
+                <span>{f.label}</span>
+                <FieldInput
+                  field={f}
+                  value={values[f.key]}
+                  onChange={(v) => setValues((s) => ({ ...s, [f.key]: v }))}
+                />
+              </label>
+            ))}
+          </div>
+          <div className="admin-edit__foot">
+            <button className="admin-btn" onClick={() => setEditing(null)}>
+              Cancel
+            </button>
+            <button className="admin-btn admin-btn--primary" onClick={handleSaveItem}>
+              Save Certificate
+            </button>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Search bar */}
+          <div className="admin-search">
+            <input
+              type="text"
+              placeholder="Search certificate, organization, ID…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          {/* Certificate List */}
+          <ul className="admin-list">
+            {filteredItems.map((item, idx) => {
+              const isDraft = item.status === "draft" || item.published === false;
+              const hasUrl = Boolean(
+                item.sourceCredentialUrl ||
+                item.verificationUrl ||
+                item.credentialUrl ||
+                item.credential_url
+              );
+
+              return (
+                <li key={item.id} className="admin-list__item">
+                  <div className="admin-list__left">
+                    <span
+                      className="admin-list__orderBadge"
+                      title={`Display Order: ${item.order ?? idx}`}
+                    >
+                      #{idx + 1}
+                    </span>
+                    <div className="admin-list__main">
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                        <strong>{item.name}</strong>
+                        {isDraft ? (
+                          <span className="admin-badge admin-badge--draft">DRAFT</span>
+                        ) : (
+                          <span className="admin-badge admin-badge--published">PUBLISHED</span>
+                        )}
+                        {item.featured && (
+                          <span className="admin-badge admin-badge--featured">FEATURED</span>
+                        )}
+                      </div>
+                      <span className="admin-muted">
+                        {item.organization || item.issuer || "Independent"} · {item.issueDate || item.date || "2026"}
+                        {item.credentialId && item.credentialId !== "Not provided" ? ` · ID: ${item.credentialId}` : ""}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="admin-list__tools">
+                    {/* Reorder */}
+                    <div className="admin-reorder-btns">
+                      <button
+                        type="button"
+                        className="admin-reorder-btn"
+                        onClick={() => handleMove(idx, -1)}
+                        disabled={idx === 0}
+                        title="Move Up"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        className="admin-reorder-btn"
+                        onClick={() => handleMove(idx, 1)}
+                        disabled={idx === items.length - 1}
+                        title="Move Down"
+                      >
+                        ↓
+                      </button>
+                    </div>
+
+                    {/* Re-fetch details button */}
+                    {hasUrl && (
+                      <button
+                        className="admin-btn admin-btn--sm"
+                        onClick={() => handleStartRefetch(item)}
+                        title="Re-fetch latest public details"
+                      >
+                        ↻ Re-fetch
+                      </button>
+                    )}
+
+                    <button
+                      className="admin-btn admin-btn--sm"
+                      onClick={() => {
+                        setValues(valuesFromItem(model.fields, item));
+                        setEditing(item);
+                        setError("");
+                      }}
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      className="admin-btn admin-btn--sm admin-btn--danger"
+                      onClick={() => setItemToDelete(item)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </li>
+              );
+            })}
+            {!loading && filteredItems.length === 0 && (
+              <p className="admin-muted">No certificates match your search.</p>
+            )}
+          </ul>
+        </>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {itemToDelete && (
+        <DeleteConfirmModal
+          title={itemToDelete.name}
+          onCancel={() => setItemToDelete(null)}
+          onConfirm={handleConfirmDelete}
+          busy={deleteBusy}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Generic Content Manager (Projects, Skills, Experience, Education)   */
+/* ------------------------------------------------------------------ */
+
+function ContentManager({ modelKey }) {
+  const model = MODELS[modelKey];
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [editing, setEditing] = useState(null);
+  const [values, setValues] = useState({});
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+
+  const [itemToDelete, setItemToDelete] = useState(null);
+  const [deleteBusy, setDeleteBusy] = useState(false);
+
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    try {
+      if (model.isSingleton) {
+        const snap = await getDocs(collection(db, model.collection));
+        if (!snap.empty) {
+          setItems([{ id: snap.docs[0].id, ...snap.docs[0].data() }]);
+        } else {
+          setItems([]);
+        }
+      } else {
+        const snap = await getDocs(collection(db, model.collection));
+        const fetched = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        fetched.sort(
+          (a, b) =>
+            Number(a.order ?? a.displayOrder ?? 999) -
+            Number(b.order ?? b.displayOrder ?? 999)
+        );
+        setItems(fetched);
+      }
+    } catch (err) {
+      setError(err.message);
+    }
+    setLoading(false);
+  }, [model.collection, model.isSingleton]);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   const beginNew = () => {
     const initial = valuesFromItem(model.fields, null);
     if ("order" in initial) {
       initial.order = items.length;
     }
+    initial.status = "published";
     setValues(initial);
     setEditing("new");
     setError("");
@@ -262,20 +1344,32 @@ function ContentManager({ modelKey }) {
     setError("");
     const payload = buildPayload(model, values);
 
+    // Validation
+    for (const f of model.fields) {
+      if (f.required && !payload[f.key]) {
+        setError(`${f.label} is required.`);
+        return;
+      }
+    }
+
     try {
       if (editing === "new") {
         if (payload.order === undefined || payload.order === null) {
           payload.order = items.length;
         }
+        payload.createdAt = new Date().toISOString();
         const docRef = doc(collection(db, model.collection));
         await setDoc(docRef, payload);
       } else if (model.isSingleton) {
-        const targetId = editing.id || "main";
+        const targetId = editing?.id || "main";
         await setDoc(doc(db, model.collection, targetId), payload, { merge: true });
       } else {
-        await setDoc(doc(db, model.collection, String(editing.id)), payload, { merge: true });
+        await setDoc(doc(db, model.collection, String(editing.id)), payload, {
+          merge: true,
+        });
       }
 
+      clearContentCache();
       setNotice(`${model.singular} saved ✓`);
       setEditing(null);
       refresh();
@@ -293,123 +1387,248 @@ function ContentManager({ modelKey }) {
     const targetItem = items[targetIndex];
 
     try {
-      await updateDoc(doc(db, model.collection, String(currentItem.id)), { order: targetIndex });
-      await updateDoc(doc(db, model.collection, String(targetItem.id)), { order: index });
-      setNotice(`Reordered sequence ✓`);
+      await updateDoc(doc(db, model.collection, String(currentItem.id)), {
+        order: targetIndex,
+      });
+      await updateDoc(doc(db, model.collection, String(targetItem.id)), {
+        order: index,
+      });
+      clearContentCache();
       refresh();
-      setTimeout(() => setNotice(""), 2500);
     } catch (err) {
       setError("Reorder failed: " + err.message);
     }
   };
 
-  const remove = async (item) => {
-    if (model.isSingleton) return;
-    const confirmName = item.name || item.title || item.position || item.institution || "this item";
-    if (!window.confirm(`Are you sure you want to delete "${confirmName}"?`)) return;
-    
+  const handleConfirmDelete = async () => {
+    if (!itemToDelete || model.isSingleton) return;
+    setDeleteBusy(true);
     try {
-      setError("");
-      await deleteDoc(doc(db, model.collection, String(item.id)));
-      setItems((prev) => prev.filter((i) => String(i.id) !== String(item.id)));
+      await deleteDoc(doc(db, model.collection, String(itemToDelete.id)));
+      clearContentCache();
+      setItems((prev) => prev.filter((i) => String(i.id) !== String(itemToDelete.id)));
       setNotice(`Deleted ${model.singular} ✓`);
-      setTimeout(() => setNotice(""), 3000);
+      setItemToDelete(null);
       refresh();
+      setTimeout(() => setNotice(""), 3000);
     } catch (err) {
-      console.error("Delete error:", err);
       setError("Delete failed: " + err.message);
     }
+    setDeleteBusy(false);
   };
 
   const headline = (item) =>
-    item.name || item.title || item.position || item.degree || item.institution || item.company || item.organization || item.issuer || `#${item.id}`;
+    item.name ||
+    item.title ||
+    item.position ||
+    item.degree ||
+    item.institution ||
+    item.company ||
+    `#${item.id}`;
+
+  const subtitle = (item) =>
+    item.category || item.company || item.institution || item.location || "";
+
+  // Search filter
+  const filteredItems = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    if (!q || model.isSingleton) return items;
+    return items.filter((item) => {
+      const h = headline(item).toLowerCase();
+      const s = subtitle(item).toLowerCase();
+      const tech = Array.isArray(item.technologies)
+        ? item.technologies.join(" ").toLowerCase()
+        : "";
+      return h.includes(q) || s.includes(q) || tech.includes(q);
+    });
+  }, [items, searchQuery, model.isSingleton]);
 
   return (
     <div className="admin-panel">
       <div className="admin-panel__head">
-        <h2>{model.label}</h2>
+        <div>
+          <h2>{model.label}</h2>
+          {!model.isSingleton && (
+            <p className="admin-muted" style={{ marginTop: "4px" }}>
+              {items.length} items live in Firestore
+            </p>
+          )}
+        </div>
         <div className="admin-panel__actions">
           {notice ? <span className="admin-notice">{notice}</span> : null}
-          <button className="admin-btn" onClick={refresh}>↻ Refresh</button>
-          {!model.isSingleton && <button className="admin-btn admin-btn--primary" onClick={beginNew}>+ New {model.singular}</button>}
+          <button className="admin-btn" onClick={refresh}>
+            ↻ Refresh
+          </button>
+          {!model.isSingleton && (
+            <button className="admin-btn admin-btn--primary" onClick={beginNew}>
+              + New {model.singular}
+            </button>
+          )}
         </div>
       </div>
 
-      {error ? <p className="admin-error" role="alert">{error}</p> : null}
-      {loading && <p className="admin-muted">Loading…</p>}
+      {error ? <p className="admin-error">{error}</p> : null}
 
       {editing ? (
         <div className="admin-edit">
-          <h3>{editing === "new" ? `New ${model.singular}` : `Edit ${headline(editing)}`}</h3>
+          <h3>
+            {editing === "new" ? `New ${model.singular}` : `Edit ${headline(editing)}`}
+          </h3>
           <div className="admin-edit__grid">
             {model.fields.map((f) => (
-              <label key={f.key} className={`admin-field ${f.type === "lines" || f.type === "textarea" || f.type === "json" ? "admin-field--wide" : ""}`}>
+              <label
+                key={f.key}
+                className={`admin-field ${
+                  f.type === "lines" || f.type === "textarea" || f.type === "json"
+                    ? "admin-field--wide"
+                    : ""
+                }`}
+              >
                 <span>{f.label}</span>
-                <FieldInput field={f} value={values[f.key]} onChange={(v) => setValues((s) => ({ ...s, [f.key]: v }))} />
+                <FieldInput
+                  field={f}
+                  value={values[f.key]}
+                  onChange={(v) => setValues((s) => ({ ...s, [f.key]: v }))}
+                />
               </label>
             ))}
           </div>
           <div className="admin-edit__foot">
-            <button className="admin-btn" onClick={() => setEditing(null)}>Cancel</button>
-            <button className="admin-btn admin-btn--primary" onClick={save}>Save</button>
+            <button className="admin-btn" onClick={() => setEditing(null)}>
+              Cancel
+            </button>
+            <button className="admin-btn admin-btn--primary" onClick={save}>
+              Save
+            </button>
           </div>
         </div>
-      ) : (
-        <ul className="admin-list">
-          {items.map((item, idx) => (
-            <li key={item.id} className="admin-list__item">
-              <div className="admin-list__left">
-                {!model.isSingleton && (
-                  <span className="admin-list__orderBadge" title={`Priority / Order: ${item.order ?? idx}`}>
-                    #{idx + 1}
-                  </span>
-                )}
-                <div className="admin-list__main">
-                  <strong>{headline(item)}</strong>
-                  <span className="admin-muted">{item.organization || item.issuer || item.category || item.company || item.institution || ""}</span>
-                </div>
+      ) : model.isSingleton ? (
+        <div style={{ marginTop: "16px" }}>
+          {items.length > 0 ? (
+            <div className="admin-list__item" style={{ padding: "20px" }}>
+              <div className="admin-list__main">
+                <strong style={{ fontSize: "18px" }}>{items[0].name}</strong>
+                <p className="admin-muted" style={{ marginTop: "6px" }}>
+                  {items[0].role} · {items[0].location}
+                </p>
+                <p style={{ marginTop: "10px", color: "var(--text-dim)", fontSize: "14px", lineHeight: "1.6" }}>
+                  {items[0].summary}
+                </p>
               </div>
+              <button
+                className="admin-btn admin-btn--primary"
+                onClick={() => beginEdit(items[0])}
+              >
+                Edit Profile Content
+              </button>
+            </div>
+          ) : (
+            <p className="admin-muted">
+              Profile not found in Firestore. Sync from Overview tab.
+            </p>
+          )}
+        </div>
+      ) : (
+        <>
+          <div className="admin-search">
+            <input
+              type="text"
+              placeholder={`Search ${model.label.toLowerCase()}…`}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
 
-              <div className="admin-list__tools">
-                {!model.isSingleton && (
-                  <div className="admin-reorder-btns">
-                    <button 
-                      type="button" 
-                      className="admin-reorder-btn" 
-                      onClick={() => moveItem(idx, -1)}
-                      disabled={idx === 0}
-                      title="Move up (Show higher on website)"
+          <ul className="admin-list">
+            {filteredItems.map((item, idx) => {
+              const isDraft = item.status === "draft" || item.published === false;
+
+              return (
+                <li key={item.id} className="admin-list__item">
+                  <div className="admin-list__left">
+                    <span
+                      className="admin-list__orderBadge"
+                      title={`Order: ${item.order ?? idx}`}
                     >
-                      ↑
+                      #{idx + 1}
+                    </span>
+                    <div className="admin-list__main">
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                        <strong>{headline(item)}</strong>
+                        {isDraft ? (
+                          <span className="admin-badge admin-badge--draft">DRAFT</span>
+                        ) : (
+                          <span className="admin-badge admin-badge--published">PUBLISHED</span>
+                        )}
+                        {item.featured && (
+                          <span className="admin-badge admin-badge--featured">FEATURED</span>
+                        )}
+                      </div>
+                      <span className="admin-muted">{subtitle(item)}</span>
+                    </div>
+                  </div>
+
+                  <div className="admin-list__tools">
+                    <div className="admin-reorder-btns">
+                      <button
+                        type="button"
+                        className="admin-reorder-btn"
+                        onClick={() => moveItem(idx, -1)}
+                        disabled={idx === 0}
+                        title="Move Up"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        className="admin-reorder-btn"
+                        onClick={() => moveItem(idx, 1)}
+                        disabled={idx === items.length - 1}
+                        title="Move Down"
+                      >
+                        ↓
+                      </button>
+                    </div>
+                    <button
+                      className="admin-btn admin-btn--sm"
+                      onClick={() => beginEdit(item)}
+                    >
+                      Edit
                     </button>
-                    <button 
-                      type="button" 
-                      className="admin-reorder-btn" 
-                      onClick={() => moveItem(idx, 1)}
-                      disabled={idx === items.length - 1}
-                      title="Move down (Show lower on website)"
+                    <button
+                      className="admin-btn admin-btn--sm admin-btn--danger"
+                      onClick={() => setItemToDelete(item)}
                     >
-                      ↓
+                      Delete
                     </button>
                   </div>
-                )}
-                <button className="admin-btn admin-btn--sm" onClick={() => beginEdit(item)}>Edit</button>
-                {!model.isSingleton && (
-                  <button className="admin-btn admin-btn--sm admin-btn--danger" onClick={() => remove(item)}>Delete</button>
-                )}
-              </div>
-            </li>
-          ))}
-          {!loading && items.length === 0 && <p className="admin-muted">Nothing in Firestore yet. Click "+ New" to add, or sync default data from the Overview tab.</p>}
-        </ul>
+                </li>
+              );
+            })}
+            {!loading && filteredItems.length === 0 && (
+              <p className="admin-muted">No items match your search.</p>
+            )}
+          </ul>
+        </>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {itemToDelete && (
+        <DeleteConfirmModal
+          title={headline(itemToDelete)}
+          onCancel={() => setItemToDelete(null)}
+          onConfirm={handleConfirmDelete}
+          busy={deleteBusy}
+        />
       )}
     </div>
   );
 }
 
 /* ------------------------------------------------------------------ */
-/* Messages + overview                                                  */
+/* Messages Inbox                                                     */
 /* ------------------------------------------------------------------ */
+
 function MessagesManager() {
   const [msgs, setMsgs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -418,7 +1637,7 @@ function MessagesManager() {
     setLoading(true);
     try {
       const snap = await getDocs(collection(db, "messages"));
-      const fetched = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const fetched = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
       fetched.sort((a, b) => {
         const ta = a.created_at?.toMillis?.() || 0;
         const tb = b.created_at?.toMillis?.() || 0;
@@ -431,7 +1650,9 @@ function MessagesManager() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   const toggleHandled = async (msg) => {
     try {
@@ -445,116 +1666,192 @@ function MessagesManager() {
   return (
     <div className="admin-panel">
       <div className="admin-panel__head">
-        <h2>Contact messages</h2>
-        <button className="admin-btn" onClick={refresh}>↻ Refresh</button>
+        <h2>Contact Messages</h2>
+        <button className="admin-btn" onClick={refresh}>
+          ↻ Refresh
+        </button>
       </div>
-      {loading ? <p className="admin-muted">Loading…</p> : (
+      {loading ? (
+        <p className="admin-muted">Loading messages…</p>
+      ) : (
         <ul className="admin-msgs">
           {msgs.map((m) => (
             <li key={m.id} className={`admin-msg ${m.handled ? "is-handled" : ""}`}>
               <div className="admin-msg__head">
                 <strong>{m.name}</strong>
-                <a href={`mailto:${m.email}`} className="admin-msg__mail">{m.email}</a>
+                <a href={`mailto:${m.email}`} className="admin-msg__mail">
+                  {m.email}
+                </a>
                 <span className="admin-msg__date">
-                  {m.created_at?.toDate ? m.created_at.toDate().toLocaleString() : ""}
+                  {m.created_at?.toDate
+                    ? m.created_at.toDate().toLocaleString()
+                    : ""}
                 </span>
-                <button className="admin-btn admin-btn--sm" onClick={() => toggleHandled(m)}>
-                  {m.handled ? "Reopen" : "Mark done"}
+                <button
+                  className="admin-btn admin-btn--sm"
+                  onClick={() => toggleHandled(m)}
+                >
+                  {m.handled ? "Reopen" : "Mark Done"}
                 </button>
               </div>
-              <p className="admin-msg__subject">{m.subject}</p>
               <p className="admin-msg__body">{m.message}</p>
             </li>
           ))}
-          {!loading && msgs.length === 0 && <p className="admin-muted">No messages yet.</p>}
+          {!loading && msgs.length === 0 && (
+            <p className="admin-muted">No messages in inbox yet.</p>
+          )}
         </ul>
       )}
     </div>
   );
 }
 
-function Overview({ onLogout }) {
-  const [seeding, setSeeding] = useState(false);
-  const [seedMsg, setSeedMsg] = useState("");
+/* ------------------------------------------------------------------ */
+/* Overview Dashboard Tab                                             */
+/* ------------------------------------------------------------------ */
 
-  const seedDatabase = async () => {
-    if (!window.confirm("This will write/sync default profile, skills, projects, experience, education, and certifications into Firestore. Continue?")) return;
-    setSeeding(true);
-    setSeedMsg("");
+function Overview({ onLogout, onSelectTab }) {
+  const [counts, setCounts] = useState({
+    certifications: 0,
+    projects: 0,
+    skills: 0,
+    experience: 0,
+    education: 0,
+  });
+  const [syncing, setSyncing] = useState(false);
+  const [syncMsg, setSyncMsg] = useState("");
+
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        const collections = ["certifications", "projects", "skills", "experience", "education"];
+        const res = await Promise.all(collections.map((c) => getDocs(collection(db, c))));
+        setCounts({
+          certifications: res[0].size,
+          projects: res[1].size,
+          skills: res[2].size,
+          experience: res[3].size,
+          education: res[4].size,
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchCounts();
+  }, []);
+
+  const handleSyncInitialData = async () => {
+    if (!window.confirm("Safely sync initial portfolio content to Firestore? Existing items will not be overwritten.")) return;
+    setSyncing(true);
+    setSyncMsg("");
     try {
-      // 1. Profile
-      await setDoc(doc(db, "profile", "main"), fallbackContent.profile, { merge: true });
-
-      // 2. Skills
-      for (let i = 0; i < fallbackContent.skills.length; i++) {
-        const skill = fallbackContent.skills[i];
-        const id = String(skill.id || `skill-${i}`);
-        await setDoc(doc(db, "skills", id), { ...skill, order: i }, { merge: true });
-      }
-
-      // 3. Projects
-      for (let i = 0; i < fallbackContent.projects.length; i++) {
-        const proj = fallbackContent.projects[i];
-        const id = String(proj.id || `proj-${i}`);
-        await setDoc(doc(db, "projects", id), { ...proj, order: i }, { merge: true });
-      }
-
-      // 4. Experience
-      for (let i = 0; i < fallbackContent.experience.length; i++) {
-        const exp = fallbackContent.experience[i];
-        const id = String(exp.id || `exp-${i}`);
-        await setDoc(doc(db, "experience", id), { ...exp, order: i }, { merge: true });
-      }
-
-      // 5. Education
-      for (let i = 0; i < fallbackContent.education.length; i++) {
-        const edu = fallbackContent.education[i];
-        const id = String(edu.id || `edu-${i}`);
-        await setDoc(doc(db, "education", id), { ...edu, order: i }, { merge: true });
-      }
-
-      // 6. Certifications
-      for (let i = 0; i < fallbackContent.certifications.length; i++) {
-        const cert = fallbackContent.certifications[i];
-        const id = String(cert.id || `cert-${i}`);
-        await setDoc(doc(db, "certifications", id), { ...cert, order: i }, { merge: true });
-      }
-
-      setSeedMsg("Successfully synced all default content to Firestore! You can now edit, reorder, or delete any item ✓");
+      const res = await migrateInitialData(false);
+      setSyncMsg("Sync completed successfully! All items live in Firestore ✓");
+      clearContentCache();
     } catch (err) {
-      setSeedMsg("Sync failed: " + err.message);
+      setSyncMsg("Sync failed: " + err.message);
     }
-    setSeeding(false);
+    setSyncing(false);
   };
 
   return (
     <div className="admin-panel">
       <div className="admin-overview">
         <div className="admin-panel__head">
-          <h2>Overview</h2>
-          <button className="admin-btn" onClick={onLogout}>Sign out</button>
-        </div>
-        <p className="admin-muted admin-tip">
-          Welcome to your Firebase Serverless Admin Panel!
-          Content changes here are instantly saved to Firestore and live on the public site in real time.
-        </p>
-
-        <div style={{ marginTop: "32px", padding: "24px", background: "var(--surface)", border: "1px solid var(--line)", borderRadius: "14px" }}>
-          <h3 style={{ fontSize: "17px", marginBottom: "8px", color: "#FFFFFF" }}>Initialize / Sync Firestore Database</h3>
-          <p className="admin-muted" style={{ marginBottom: "16px", fontSize: "13.5px" }}>
-            If your Firestore collections are empty or you want all initial skills, projects, and certifications available in Firestore for editing and deleting, click below:
-          </p>
-          <button 
-            type="button" 
-            className="admin-btn admin-btn--primary" 
-            onClick={seedDatabase}
-            disabled={seeding}
-          >
-            {seeding ? "Syncing..." : "⚡ Sync Default Content to Firestore"}
+          <div>
+            <h2>CMS Overview</h2>
+            <p className="admin-muted" style={{ marginTop: "4px" }}>
+              Firestore is your Single Source of Truth. Changes reflect publicly in real time.
+            </p>
+          </div>
+          <button className="admin-btn" onClick={onLogout}>
+            Sign Out
           </button>
-          {seedMsg && (
-            <p style={{ marginTop: "14px", fontSize: "13.5px", color: seedMsg.includes("failed") ? "#ff8086" : "var(--cyan)" }}>
-              {seedMsg}
+        </div>
+
+        {/* Live Counters */}
+        <div className="admin-stats" style={{ marginTop: "24px" }}>
+          <div
+            className="admin-stat"
+            style={{ cursor: "pointer" }}
+            onClick={() => onSelectTab("certifications")}
+          >
+            <div className="admin-stat__value" style={{ color: "var(--accent)" }}>
+              {counts.certifications}
+            </div>
+            <div className="admin-stat__label">CERTIFICATIONS →</div>
+          </div>
+
+          <div
+            className="admin-stat"
+            style={{ cursor: "pointer" }}
+            onClick={() => onSelectTab("projects")}
+          >
+            <div className="admin-stat__value">{counts.projects}</div>
+            <div className="admin-stat__label">PROJECTS →</div>
+          </div>
+
+          <div
+            className="admin-stat"
+            style={{ cursor: "pointer" }}
+            onClick={() => onSelectTab("skills")}
+          >
+            <div className="admin-stat__value">{counts.skills}</div>
+            <div className="admin-stat__label">SKILLS →</div>
+          </div>
+
+          <div
+            className="admin-stat"
+            style={{ cursor: "pointer" }}
+            onClick={() => onSelectTab("experience")}
+          >
+            <div className="admin-stat__value">{counts.experience}</div>
+            <div className="admin-stat__label">EXPERIENCE →</div>
+          </div>
+
+          <div
+            className="admin-stat"
+            style={{ cursor: "pointer" }}
+            onClick={() => onSelectTab("education")}
+          >
+            <div className="admin-stat__value">{counts.education}</div>
+            <div className="admin-stat__label">EDUCATION →</div>
+          </div>
+        </div>
+
+        {/* Sync / Migrate Box */}
+        <div
+          style={{
+            marginTop: "32px",
+            padding: "24px",
+            background: "var(--surface)",
+            border: "1px solid var(--line)",
+            borderRadius: "14px",
+          }}
+        >
+          <h3 style={{ fontSize: "16px", marginBottom: "6px", color: "#FFFFFF" }}>
+            Database Integrity &amp; Fallback Migration
+          </h3>
+          <p className="admin-muted" style={{ marginBottom: "14px", fontSize: "13px" }}>
+            Ensure all foundational projects, skills, education, and credentials are initialized as independent Firestore documents without duplicating existing records.
+          </p>
+          <button
+            type="button"
+            className="admin-btn admin-btn--primary"
+            onClick={handleSyncInitialData}
+            disabled={syncing}
+          >
+            {syncing ? "Syncing…" : "⚡ Verify & Sync Initial Records"}
+          </button>
+          {syncMsg && (
+            <p
+              style={{
+                marginTop: "12px",
+                fontSize: "13px",
+                color: syncMsg.includes("failed") ? "#ff8086" : "var(--cyan)",
+              }}
+            >
+              {syncMsg}
             </p>
           )}
         </div>
@@ -564,12 +1861,13 @@ function Overview({ onLogout }) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Page                                                                 */
+/* Main Admin Page Export                                             */
 /* ------------------------------------------------------------------ */
+
 export default function AdminPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState("overview");
+  const [tab, setTab] = useState("certifications");
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => {
@@ -579,7 +1877,12 @@ export default function AdminPage() {
     return () => unsubscribe();
   }, []);
 
-  if (loading) return <div style={{ padding: "40px", color: "white" }}>Loading...</div>;
+  if (loading)
+    return (
+      <div style={{ padding: "40px", color: "white", fontFamily: "var(--font-mono)" }}>
+        Loading CMS…
+      </div>
+    );
 
   if (!user) return <LoginScreen onLogin={setUser} />;
 
@@ -588,24 +1891,76 @@ export default function AdminPage() {
       <aside className="admin__side">
         <div className="admin__brand">
           <span className="admin__logo">SM</span>
-          <span className="admin__brandName">Portfolio Admin</span>
+          <span className="admin__brandName">Portfolio CMS</span>
         </div>
         <nav className="admin__nav">
-          <button className={`admin__navBtn ${tab === "overview" ? "is-active" : ""}`} onClick={() => setTab("overview")}>Overview</button>
-          {Object.keys(MODELS).map((k) => (
-            <button key={k} className={`admin__navBtn ${tab === k ? "is-active" : ""}`} onClick={() => setTab(k)}>
-              {MODELS[k].label}
-            </button>
-          ))}
-          <button className={`admin__navBtn ${tab === "messages" ? "is-active" : ""}`} onClick={() => setTab("messages")}>Messages</button>
+          <button
+            className={`admin__navBtn ${tab === "overview" ? "is-active" : ""}`}
+            onClick={() => setTab("overview")}
+          >
+            Overview
+          </button>
+          <button
+            className={`admin__navBtn ${tab === "certifications" ? "is-active" : ""}`}
+            onClick={() => setTab("certifications")}
+          >
+            Certifications ⚡
+          </button>
+          <button
+            className={`admin__navBtn ${tab === "projects" ? "is-active" : ""}`}
+            onClick={() => setTab("projects")}
+          >
+            Projects
+          </button>
+          <button
+            className={`admin__navBtn ${tab === "skills" ? "is-active" : ""}`}
+            onClick={() => setTab("skills")}
+          >
+            Skills
+          </button>
+          <button
+            className={`admin__navBtn ${tab === "experience" ? "is-active" : ""}`}
+            onClick={() => setTab("experience")}
+          >
+            Experience
+          </button>
+          <button
+            className={`admin__navBtn ${tab === "education" ? "is-active" : ""}`}
+            onClick={() => setTab("education")}
+          >
+            Education
+          </button>
+          <button
+            className={`admin__navBtn ${tab === "profile" ? "is-active" : ""}`}
+            onClick={() => setTab("profile")}
+          >
+            Profile &amp; About
+          </button>
+          <button
+            className={`admin__navBtn ${tab === "messages" ? "is-active" : ""}`}
+            onClick={() => setTab("messages")}
+          >
+            Messages
+          </button>
         </nav>
         <div className="admin__foot">
-          <Link href="/" className="admin-btn" style={{ width: "100%", justifyContent: "center" }}>View site ↗</Link>
+          <Link
+            href="/"
+            className="admin-btn"
+            style={{ width: "100%", justifyContent: "center" }}
+          >
+            View Live Site ↗
+          </Link>
         </div>
       </aside>
       <main className="admin__main">
-        {tab === "overview" && <Overview onLogout={() => signOut(auth)} />}
-        {tab in MODELS && <ContentManager modelKey={tab} />}
+        {tab === "overview" && (
+          <Overview onLogout={() => signOut(auth)} onSelectTab={setTab} />
+        )}
+        {tab === "certifications" && <CertificationsManager />}
+        {tab in MODELS && tab !== "certifications" && (
+          <ContentManager modelKey={tab} />
+        )}
         {tab === "messages" && <MessagesManager />}
       </main>
     </div>

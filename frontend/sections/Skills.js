@@ -33,6 +33,14 @@ const SKILL_ICONS = {
       <path d="M8 15a2 2 0 0 0 3 0v-7" />
     </svg>
   ),
+  react: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(0 12 12)" />
+      <ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(60 12 12)" />
+      <ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(120 12 12)" />
+      <circle cx="12" cy="12" r="1.8" fill="currentColor" />
+    </svg>
+  ),
   html: (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <polyline points="16 18 22 12 16 6" />
@@ -95,6 +103,18 @@ const SKILL_ICONS = {
       <path d="M7 8h4a2 2 0 0 1 0 4H7z" />
     </svg>
   ),
+  database: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <ellipse cx="12" cy="5" rx="9" ry="3" />
+      <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+      <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+    </svg>
+  ),
+  cloud: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
+    </svg>
+  ),
   problem: (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
       <circle cx="12" cy="12" r="3" />
@@ -128,7 +148,6 @@ const SKILL_ICONS = {
   ),
 };
 
-// Clean icon resolver
 function resolveIcon(item) {
   const name = (item.name || "").toLowerCase();
   const icon = (item.icon || "").toLowerCase();
@@ -136,13 +155,19 @@ function resolveIcon(item) {
   if (name.includes("python")) return SKILL_ICONS.python;
   if (name.includes("c++") || name.includes("cpp")) return SKILL_ICONS.cpp;
   if (name.startsWith("c ") || name === "c") return SKILL_ICONS.c;
+  if (name.includes("react") || name.includes("next")) return SKILL_ICONS.react;
   if (name.includes("arduino")) return SKILL_ICONS.arduino;
   if (name.includes("sensor")) return SKILL_ICONS.sensor;
-  if (name.includes("javascript") || name.includes("js")) return SKILL_ICONS.javascript;
+  if (name.includes("javascript") || name.includes("js") || name.includes("typescript") || name.includes("ts"))
+    return SKILL_ICONS.javascript;
   if (name.includes("html")) return SKILL_ICONS.html;
   if (name.includes("css")) return SKILL_ICONS.css;
   if (name.includes("github")) return SKILL_ICONS.github;
   if (name.includes("git")) return SKILL_ICONS.git;
+  if (name.includes("sql") || name.includes("data") || name.includes("mongo") || name.includes("fire"))
+    return SKILL_ICONS.database;
+  if (name.includes("cloud") || name.includes("aws") || name.includes("azure"))
+    return SKILL_ICONS.cloud;
   if (name.includes("excel")) return SKILL_ICONS.excel;
   if (name.includes("powerpoint")) return SKILL_ICONS.powerpoint;
   if (name.includes("problem")) return SKILL_ICONS.problem;
@@ -152,158 +177,94 @@ function resolveIcon(item) {
   return SKILL_ICONS.code;
 }
 
-// Intentional 8-Node Constellation Geometry
-const CONSTELLATION_NODES = [
-  {
-    id: "python",
-    name: "Python",
-    category: "Languages & Logic",
-    group: "technical",
-    orbit: "outer",
-    x: 110,
-    y: -190,
-    iconKey: "python",
-  },
-  {
-    id: "c_cpp",
-    name: "C / C++",
-    category: "Systems & Memory",
-    group: "technical",
-    orbit: "inner",
-    x: 130,
-    y: -35,
-    iconKey: "cpp",
-  },
-  {
-    id: "javascript",
-    name: "JavaScript",
-    category: "Web & Runtime",
-    group: "technical",
-    orbit: "outer",
-    x: 190,
-    y: 110,
-    iconKey: "javascript",
-  },
-  {
-    id: "html_css",
-    name: "HTML5 & CSS3",
-    category: "Web Frontend",
-    group: "technical",
-    orbit: "inner",
-    x: 35,
-    y: 130,
-    iconKey: "html",
-  },
-  {
-    id: "git_github",
-    name: "Git & GitHub",
-    category: "Version Control",
-    group: "technical",
-    orbit: "outer",
-    x: -110,
-    y: 190,
-    iconKey: "github",
-  },
-  {
-    id: "arduino",
-    name: "Arduino & IoT",
-    category: "Microcontrollers",
-    group: "technical",
-    orbit: "inner",
-    x: -130,
-    y: 35,
-    iconKey: "arduino",
-  },
-  {
-    id: "sensor",
-    name: "Sensor Integration",
-    category: "Hardware Signals",
-    group: "technical",
-    orbit: "outer",
-    x: -190,
-    y: -110,
-    iconKey: "sensor",
-  },
-  {
-    id: "problem_solving",
-    name: "Problem-Solving",
-    category: "Engineering Analysis",
-    group: "core",
-    orbit: "inner",
-    x: -35,
-    y: -130,
-    iconKey: "problem",
-  },
-];
-
-// Constellation Cluster Perimeter / Ring Edges
-const CONSTELLATION_EDGES = [
-  // Inner diamond loop
-  ["c_cpp", "html_css"],
-  ["html_css", "arduino"],
-  ["arduino", "problem_solving"],
-  ["problem_solving", "c_cpp"],
-  // Outer square loop
-  ["python", "javascript"],
-  ["javascript", "git_github"],
-  ["git_github", "sensor"],
-  ["sensor", "python"],
-  // Radiating cross-ties between inner and outer
-  ["python", "c_cpp"],
-  ["javascript", "html_css"],
-  ["git_github", "arduino"],
-  ["sensor", "problem_solving"],
-];
-
-// Structured Quick-Scan Categorized List (Recruiter Fast Scan)
-const SCANNER_CATEGORIES = [
-  {
-    id: "technical",
-    title: "TECHNICAL & PROGRAMMING",
-    skills: [
-      { name: "Python", icon: SKILL_ICONS.python },
-      { name: "C", icon: SKILL_ICONS.c },
-      { name: "C++", icon: SKILL_ICONS.cpp },
-      { name: "JavaScript", icon: SKILL_ICONS.javascript },
-      { name: "HTML5", icon: SKILL_ICONS.html },
-      { name: "CSS3", icon: SKILL_ICONS.css },
-    ],
-  },
-  {
-    id: "hardware",
-    title: "HARDWARE, IOT & TOOLS",
-    skills: [
-      { name: "Arduino", icon: SKILL_ICONS.arduino },
-      { name: "Sensor Integration", icon: SKILL_ICONS.sensor },
-      { name: "Git", icon: SKILL_ICONS.git },
-      { name: "GitHub", icon: SKILL_ICONS.github },
-      { name: "Microsoft Excel", icon: SKILL_ICONS.excel },
-      { name: "Microsoft PowerPoint", icon: SKILL_ICONS.powerpoint },
-    ],
-  },
-  {
-    id: "core",
-    title: "CORE & PROFESSIONAL",
-    skills: [
-      { name: "Problem-Solving", icon: SKILL_ICONS.problem },
-      { name: "Communication", icon: SKILL_ICONS.comms },
-      { name: "Teamwork & Coordination", icon: SKILL_ICONS.team },
-      { name: "Time Management", icon: SKILL_ICONS.time },
-    ],
-  },
+// 8 Orbital slots for the visual constellation geometry
+const ORBIT_SLOTS = [
+  { x: 110, y: -190, orbit: "outer", id: "slot-0" },
+  { x: 130, y: -35, orbit: "inner", id: "slot-1" },
+  { x: 190, y: 110, orbit: "outer", id: "slot-2" },
+  { x: 35, y: 130, orbit: "inner", id: "slot-3" },
+  { x: -110, y: 190, orbit: "outer", id: "slot-4" },
+  { x: -130, y: 35, orbit: "inner", id: "slot-5" },
+  { x: -190, y: -110, orbit: "outer", id: "slot-6" },
+  { x: -35, y: -130, orbit: "inner", id: "slot-7" },
 ];
 
 export default function Skills({ skills = [] }) {
   const [hoveredNode, setHoveredNode] = useState(null);
   const reduce = useReducedMotion();
 
-  // Find node lookup map
-  const nodeMap = CONSTELLATION_NODES.reduce((acc, n) => {
+  const sortedSkills = [...skills].sort(
+    (a, b) => Number(a.order ?? 999) - Number(b.order ?? 999)
+  );
+
+  // Group dynamic skills into categories for the recruiter fast scanner
+  const categoryMap = new Map();
+
+  sortedSkills.forEach((s) => {
+    let catName = (s.category || "TECHNICAL & PROGRAMMING").trim().toUpperCase();
+    if (catName === "LANGUAGES" || catName === "PROGRAMMING") catName = "TECHNICAL & PROGRAMMING";
+    if (catName === "WEB" || catName === "WEB DEVELOPMENT") catName = "WEB DEVELOPMENT & FRAMEWORKS";
+    if (catName === "IOT & EMBEDDED" || catName === "IOT & HARDWARE" || catName === "HARDWARE")
+      catName = "HARDWARE, IOT & TOOLS";
+    if (catName === "TOOLS & PLATFORMS" || catName === "TOOLS") catName = "TOOLS & PLATFORMS";
+    if (catName === "PROFESSIONAL" || catName === "CORE") catName = "CORE & PROFESSIONAL";
+
+    if (!categoryMap.has(catName)) {
+      categoryMap.set(catName, []);
+    }
+    categoryMap.get(catName).push({
+      id: s.id,
+      name: s.name,
+      icon: resolveIcon(s),
+    });
+  });
+
+  const categories = Array.from(categoryMap.entries()).map(([title, list], idx) => ({
+    id: `cat-${idx}`,
+    title,
+    skills: list,
+  }));
+
+  // Build dynamic constellation nodes from the top skills
+  const constellationNodes = ORBIT_SLOTS.map((slot, idx) => {
+    const skill = sortedSkills[idx] || {
+      id: `fallback-${idx}`,
+      name: `Core Competency 0${idx + 1}`,
+      category: "Engineering",
+    };
+    return {
+      id: String(skill.id || `node-${idx}`),
+      name: skill.name,
+      category: skill.category || "Competency",
+      iconNode: resolveIcon(skill),
+      x: slot.x,
+      y: slot.y,
+      orbit: slot.orbit,
+    };
+  });
+
+  const nodeMap = constellationNodes.reduce((acc, n) => {
     acc[n.id] = n;
     return acc;
   }, {});
 
   const activeNodeData = hoveredNode ? nodeMap[hoveredNode] : null;
+
+  // Connecting edges between constellation nodes
+  const constellationEdges = [
+    [constellationNodes[1]?.id, constellationNodes[3]?.id],
+    [constellationNodes[3]?.id, constellationNodes[5]?.id],
+    [constellationNodes[5]?.id, constellationNodes[7]?.id],
+    [constellationNodes[7]?.id, constellationNodes[1]?.id],
+    [constellationNodes[0]?.id, constellationNodes[2]?.id],
+    [constellationNodes[2]?.id, constellationNodes[4]?.id],
+    [constellationNodes[4]?.id, constellationNodes[6]?.id],
+    [constellationNodes[6]?.id, constellationNodes[0]?.id],
+    [constellationNodes[0]?.id, constellationNodes[1]?.id],
+    [constellationNodes[2]?.id, constellationNodes[3]?.id],
+    [constellationNodes[4]?.id, constellationNodes[5]?.id],
+    [constellationNodes[6]?.id, constellationNodes[7]?.id],
+  ].filter(([a, b]) => a && b);
 
   return (
     <section id="skills" className={styles.section}>
@@ -367,7 +328,7 @@ export default function Skills({ skills = [] }) {
               />
 
               {/* Central Rays to each node */}
-              {CONSTELLATION_NODES.map((n, i) => {
+              {constellationNodes.map((n, i) => {
                 const isHovered = hoveredNode === n.id;
                 return (
                   <motion.line
@@ -390,8 +351,8 @@ export default function Skills({ skills = [] }) {
                 );
               })}
 
-              {/* Cluster / Inter-node Connective Edges */}
-              {CONSTELLATION_EDGES.map(([srcId, dstId], i) => {
+              {/* Connective Edges */}
+              {constellationEdges.map(([srcId, dstId], i) => {
                 const src = nodeMap[srcId];
                 const dst = nodeMap[dstId];
                 if (!src || !dst) return null;
@@ -427,9 +388,8 @@ export default function Skills({ skills = [] }) {
             </div>
 
             {/* Interactive Orbiting Skill Nodes */}
-            {CONSTELLATION_NODES.map((n, i) => {
+            {constellationNodes.map((n, i) => {
               const isHovered = hoveredNode === n.id;
-              const iconNode = SKILL_ICONS[n.iconKey] || SKILL_ICONS.code;
 
               return (
                 <motion.div
@@ -455,7 +415,7 @@ export default function Skills({ skills = [] }) {
                   aria-label={`${n.name} (${n.category})`}
                 >
                   <div className={`${styles.nodeButton} ${isHovered ? styles.nodeButtonActive : ""}`}>
-                    {iconNode}
+                    {n.iconNode}
                   </div>
                   <div className={`${styles.nodeLabel} ${isHovered ? styles.nodeLabelActive : ""}`}>
                     {n.name}
@@ -477,7 +437,7 @@ export default function Skills({ skills = [] }) {
           </div>
 
           <div className={styles.scannerGrid}>
-            {SCANNER_CATEGORIES.map((cat, idx) => (
+            {categories.map((cat, idx) => (
               <motion.div
                 key={cat.id}
                 initial={{ opacity: 0, y: 18 }}
@@ -499,7 +459,7 @@ export default function Skills({ skills = [] }) {
                 {/* Skill Chips List */}
                 <div className={styles.chipsCol}>
                   {cat.skills.map((skill) => (
-                    <div key={skill.name} className={styles.skillChip}>
+                    <div key={skill.id || skill.name} className={styles.skillChip}>
                       <span className={styles.skillChipIcon}>{skill.icon}</span>
                       <span className={styles.skillChipName}>{skill.name}</span>
                     </div>

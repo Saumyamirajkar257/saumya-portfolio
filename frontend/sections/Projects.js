@@ -169,7 +169,7 @@ export default function Projects({ projects = [] }) {
   const reduce = useReducedMotion();
 
   const filtered = projects.filter((p) => filterProject(p, activeFilter));
-  const sorted = [...filtered].sort((a, b) => Number(a.order ?? 99) - Number(b.order ?? 99));
+  const sorted = [...filtered].sort((a, b) => Number(a.order ?? a.displayOrder ?? 99) - Number(b.order ?? b.displayOrder ?? 99));
 
   const closeModal = useCallback(() => setActiveProject(null), []);
 

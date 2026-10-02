@@ -45,6 +45,13 @@ export default function Hero({ profile }) {
   const linkedinUrl = profile?.socials?.linkedin || profile?.linkedin || "https://linkedin.com/in/saumyamirajkar";
   const instagramUrl = profile?.socials?.instagram || profile?.instagram || "https://instagram.com/saumyamirajkar";
 
+  const fullName = (profile?.name || "Saumya Mirajkar").trim();
+  const nameParts = fullName.split(" ");
+  const firstName = nameParts[0]?.toUpperCase() || "SAUMYA";
+  const lastName = nameParts.slice(1).join(" ")?.toUpperCase() || "MIRAJKAR";
+  const discipline = profile?.headline || profile?.discipline || "COMPUTER ENGINEERING · IoT · AI";
+  const locationText = profile?.location?.toUpperCase() || "PUNE, INDIA";
+
   return (
     <section
       id="home"
@@ -64,7 +71,7 @@ export default function Hero({ profile }) {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.7, delay: 0.65, ease: EASE.premium }}
         >
-          COMPUTER ENGINEERING · IoT · AI
+          {discipline}
         </motion.div>
 
         {/* ── Artwork Area: Typography + Portrait ── */}
@@ -80,9 +87,9 @@ export default function Hero({ profile }) {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.12, ease: EASE.premium }}
-              aria-label="Saumya Mirajkar"
+              aria-label={fullName}
             >
-              SAUMYA
+              {firstName}
             </motion.h1>
             <motion.div
               className={styles.poster__lastName}
@@ -91,7 +98,7 @@ export default function Hero({ profile }) {
               transition={{ duration: 0.9, delay: 0.22, ease: EASE.premium }}
               aria-hidden="true"
             >
-              MIRAJKAR
+              {lastName}
             </motion.div>
           </motion.div>
 
@@ -120,7 +127,7 @@ export default function Hero({ profile }) {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.7, delay: 0.7, ease: EASE.premium }}
         >
-          PUNE, INDIA
+          {locationText}
         </motion.div>
 
 

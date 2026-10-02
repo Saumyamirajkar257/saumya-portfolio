@@ -30,7 +30,7 @@ function formatDateRange(startDate, endDate, isCurrent) {
 
 export default function Education({ education = [] }) {
   const reduce = useReducedMotion();
-  const sorted = [...education].sort((a, b) => Number(a.order ?? 999) - Number(b.order ?? 999));
+  const sorted = [...education].sort((a, b) => Number(a.order ?? a.displayOrder ?? 999) - Number(b.order ?? b.displayOrder ?? 999));
 
   if (!sorted.length) return null;
 
