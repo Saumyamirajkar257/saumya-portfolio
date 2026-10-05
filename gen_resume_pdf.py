@@ -1,192 +1,169 @@
 #!/usr/bin/env python3
-"""Generate a clean, single-page PDF résumé from the portfolio data."""
+"""Generate a clean, single-page, ATS-compliant PDF résumé matching the official resume layout."""
 from pathlib import Path
 from reportlab.lib.pagesizes import letter
-from reportlab.lib.units import inch, mm
+from reportlab.lib.units import inch
 from reportlab.lib.colors import HexColor
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import (
-    SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable,
-    KeepTogether
+    SimpleDocTemplate, Paragraph, Spacer, HRFlowable
 )
 
 PDF_PATH = Path(__file__).parent / "frontend" / "public" / "resume" / "Saumya_Mirajkar_Resume.pdf"
+PDF_PATH.parent.mkdir(parents=True, exist_ok=True)
 
-# Colour palette — matches the site "Signal" theme
-DARK = HexColor("#0b0e12")
-ACCENT = HexColor("#00e5a0")
-ACCENT_DARK = HexColor("#00b87f")
-MINT = HexColor("#4fdcb4")
-WHITE = HexColor("#f4f3f0")
-MUTED = HexColor("#9ca3af")
+# Classic ATS clean palette (pure black / dark gray on white background)
+TEXT_COLOR = HexColor("#0f172a") # Dark slate / black
+MUTED_COLOR = HexColor("#334155") # Dark neutral
 
 styles = getSampleStyleSheet()
-styles.add(ParagraphStyle(name="Name", fontName="Helvetica-Bold", fontSize=26, leading=30, textColor=WHITE, spaceAfter=2))
-styles.add(ParagraphStyle(name="Role", fontName="Helvetica", fontSize=13, leading=16, textColor=MINT, spaceAfter=8))
-styles.add(ParagraphStyle(name="Section", fontName="Helvetica-Bold", fontSize=11, leading=14, textColor=ACCENT, spaceBefore=14, spaceAfter=4, textTransform="uppercase", tracking=1.2))
-styles.add(ParagraphStyle(name="Body", fontName="Helvetica", fontSize=9.5, leading=13, textColor=WHITE, spaceAfter=2))
-styles.add(ParagraphStyle(name="Muted", fontName="Helvetica-Oblique", fontSize=9.5, leading=13, textColor=MUTED, spaceAfter=2))
-styles.add(ParagraphStyle(name="BulletStyle", fontName="Helvetica", fontSize=9.5, leading=13, textColor=WHITE, leftIndent=18, bulletIndent=6, spaceAfter=1, bulletFontName="Helvetica", bulletFontSize=9.5))
-styles.add(ParagraphStyle(name="Meta", fontName="Helvetica", fontSize=9, leading=12, textColor=MUTED, spaceAfter=0))
 
-# --- Résumé content (mirrors portfolio seed) ---
-profile = {
-    "name": "Saumya Mirajkar",
-    "role": "Computer Engineering & IoT Student",
-    "location": "Pune, Maharashtra",
-    "email": "saumyamir25@gmail.com",
-    "phone": "+91 98928 14242",
-    "github": "github.com/saumyamirajkar",
-    "summary": "Computer Engineering and IoT diploma student with hands-on experience in web development, Python, C/C++, JavaScript, Arduino, and embedded systems. Completed a web development internship involving web/mobile application development, project planning and execution, technical research, and collaboration with development and design teams. Built academic projects involving sensor integration, automated control systems, and Python-based CRUD operations.",
-}
+styles.add(ParagraphStyle(
+    name="ResumeName",
+    fontName="Helvetica-Bold",
+    fontSize=22,
+    leading=26,
+    alignment=1, # Center
+    textColor=TEXT_COLOR,
+    spaceAfter=4
+))
 
-skills = {
-    "Languages": ["C", "C++", "Python", "JavaScript"],
-    "Web": ["HTML", "CSS"],
-    "IoT & Embedded": ["Arduino", "Sensor Integration"],
-    "Tools & Platforms": ["Git", "GitHub", "Microsoft Excel", "Microsoft PowerPoint"],
-    "Professional": ["Communication", "Problem-Solving", "Teamwork & Coordination", "Time Management"],
-}
+styles.add(ParagraphStyle(
+    name="ResumeContact",
+    fontName="Helvetica",
+    fontSize=9.5,
+    leading=14,
+    alignment=1, # Center
+    textColor=TEXT_COLOR,
+    spaceAfter=1
+))
 
-projects = [
-    {
-        "title": "Automatic Car Wiper System",
-        "category": "IoT & Embedded",
-        "short": "Arduino-based wiper system that detects rainfall and activates the wiper automatically.",
-        "problem": "Manual wipers demand constant attention the moment rain starts.",
-        "approach": "Detected rain with moisture and rain sensors wired to an Arduino, then automated the wiper activation logic.",
-        "result": "The wiper engages on its own the instant rain is sensed, so the driver never scrambles for the stalk.",
-        "technologies": ["Arduino", "C", "C++", "Sensor Integration"],
-    },
-    {
-        "title": "Library Management System",
-        "category": "Software",
-        "short": "Python-based system for managing book records, members, and issue/return tracking.",
-        "problem": "Paper-based records made books, members, and issue/return tracking unreliable.",
-        "approach": "Designed a clean data model and a Python CRUD flow for books, members, and transactions.",
-        "result": "Records stay accurate and searchable, with a clear audit trail for every issue and return.",
-        "technologies": ["Python", "CRUD", "Data Handling"],
-    },
-]
+styles.add(ParagraphStyle(
+    name="ResumeSection",
+    fontName="Helvetica-Bold",
+    fontSize=11,
+    leading=14,
+    textColor=TEXT_COLOR,
+    spaceBefore=11,
+    spaceAfter=4,
+    textTransform="uppercase"
+))
 
-experience = [
-    {
-        "company": "Big Bang Tech Solutions Pvt. Ltd.",
-        "position": "Web Development Intern",
-        "location": "Pune, Maharashtra",
-        "dates": "May 2026 – Sep 2026",
-        "responsibilities": [
-            "Assisted with web and mobile application development activities.",
-            "Supported project planning and execution while meeting project deadlines.",
-            "Conducted technical research and supported implementation of technical solutions.",
-            "Collaborated with development and design teams on project activities.",
-        ],
-        "technologies": ["Web Development", "JavaScript", "Python", "Git"],
-    },
-]
+styles.add(ParagraphStyle(
+    name="ItemTitle",
+    fontName="Helvetica-Bold",
+    fontSize=9.5,
+    leading=13.5,
+    textColor=TEXT_COLOR,
+    spaceAfter=1
+))
 
-education = [
-    {
-        "institution": "Cusrow Wadia Institute of Technology",
-        "degree": "Diploma in Computer Engineering & IoT",
-        "location": "Pune, Maharashtra",
-        "dates": "2023 – Present",
-        "details": "Computer Engineering & IoT diploma track with coursework spanning programming, web development, embedded systems and networking.",
-        "grades": {"Sem 1": "70.82%", "Sem 2": "71.65%", "Sem 3": "65.89%", "Sem 4": "64.98%"},
-    },
-    {
-        "institution": "S S Ajmera High School",
-        "degree": "SSC (10th Grade)",
-        "location": "Pimpri Chinchwad",
-        "dates": "2023",
-        "grades": {"SSC": "79.80%"},
-    },
-]
+styles.add(ParagraphStyle(
+    name="ItemSub",
+    fontName="Helvetica",
+    fontSize=9,
+    leading=13,
+    textColor=MUTED_COLOR,
+    spaceAfter=2
+))
 
-certifications = [
-    {"name": "Google AI Professional Certificate", "org": "Google", "date": "Jul 2026"},
-    {"name": "Introduction to Cloud Computing", "org": "IBM", "date": "Aug 2026"},
-    {"name": "Python Essentials 1", "org": "Cisco Networking Academy", "date": "Jul 2026"},
-    {"name": "AI Fundamentals", "org": "Google", "date": "Jul 2026"},
-    {"name": "AI for Brainstorming and Planning", "org": "Google", "date": "Jul 2026"},
-    {"name": "AI for Research and Insights", "org": "Google", "date": "Jul 2026"},
-    {"name": "AI for Writing and Communicating", "org": "Google", "date": "Jul 2026"},
-    {"name": "AI for Content Creation", "org": "Google", "date": "Jul 2026"},
-    {"name": "AI for Data Analysis", "org": "Google", "date": "Jul 2026"},
-    {"name": "AI for App Building", "org": "Google", "date": "Jul 2026"},
-]
+styles.add(ParagraphStyle(
+    name="ResumeBullet",
+    fontName="Helvetica",
+    fontSize=9,
+    leading=13,
+    textColor=TEXT_COLOR,
+    leftIndent=14,
+    bulletIndent=4,
+    spaceAfter=1.5
+))
 
-# Build the PDF
-doc = SimpleDocTemplate(
-    str(PDF_PATH),
-    pagesize=letter,
-    leftMargin=0.9*inch, rightMargin=0.9*inch,
-    topMargin=0.7*inch, bottomMargin=0.7*inch,
-)
+styles.add(ParagraphStyle(
+    name="SkillsLine",
+    fontName="Helvetica",
+    fontSize=9.5,
+    leading=14,
+    textColor=TEXT_COLOR,
+    spaceAfter=2
+))
 
-story = []
+def build_pdf():
+    doc = SimpleDocTemplate(
+        str(PDF_PATH),
+        pagesize=letter,
+        leftMargin=0.65 * inch,
+        rightMargin=0.65 * inch,
+        topMargin=0.55 * inch,
+        bottomMargin=0.55 * inch,
+    )
 
-# Header bar
-header_data = [[
-    Paragraph(profile["name"], styles["Name"]),
-    Paragraph(f'{profile["location"]}  •  {profile["email"]}  •  {profile["phone"]}', styles["Meta"]),
-]]
-header = Table(header_data, colWidths=[4.5*inch, 2.7*inch])
-header.setStyle(TableStyle([
-    ("VALIGN", (0,0), (-1,-1), "TOP"),
-    ("ALIGN", (1,0), (1,0), "RIGHT"),
-    ("TOPPADDING", (0,0), (-1,-1), 0),
-    ("BOTTOMPADDING", (0,0), (-1,-1), 0),
-]))
-story.append(header)
-story.append(Paragraph(profile["role"], styles["Role"]))
-story.append(HRFlowable(width="100%", thickness=1, color=ACCENT, spaceAfter=6, spaceBefore=0))
+    story = []
 
-# Summary
-story.append(Paragraph("Summary", styles["Section"]))
-story.append(Paragraph(profile["summary"], styles["Body"]))
+    # Header
+    story.append(Paragraph("<b>Saumya Mirajkar</b>", styles["ResumeName"]))
+    story.append(Paragraph("Pune, Maharashtra &nbsp;&bull;&nbsp; +91 98928 14242 &nbsp;&bull;&nbsp; saumyamir25@gmail.com", styles["ResumeContact"]))
+    story.append(Paragraph("Portfolio: saumya-mirajkar-portfolio.pages.dev &nbsp;&bull;&nbsp; GitHub: github.com/saumyamirajkar", styles["ResumeContact"]))
+    story.append(Spacer(1, 4))
 
-# Skills
-story.append(Paragraph("Skills", styles["Section"]))
-for cat, items in skills.items():
-    story.append(Paragraph(f"<b>{cat}:</b> {', '.join(items)}", styles["Body"]))
+    # EDUCATION
+    story.append(Paragraph("EDUCATION", styles["ResumeSection"]))
+    story.append(Paragraph("<b>Diploma in Computer Engineering &amp; IoT</b> &mdash; Cusrow Wadia Institute of Technology", styles["ItemTitle"]))
+    story.append(Paragraph("Pune, Maharashtra &nbsp;&bull;&nbsp; 2023 &ndash; Present", styles["ItemSub"]))
+    story.append(Paragraph("Sem 1: 70.82% &nbsp;|&nbsp; Sem 2: 71.65% &nbsp;|&nbsp; Sem 3: 65.89% &nbsp;|&nbsp; Sem 4: 64.98%", styles["ItemSub"]))
+    story.append(Spacer(1, 2))
+    story.append(Paragraph("<b>SSC</b> &mdash; S S Ajmera High School &nbsp;&bull;&nbsp; 2023 &nbsp;&bull;&nbsp; 79.80%", styles["ItemTitle"]))
 
-# Projects
-story.append(Paragraph("Projects", styles["Section"]))
-for p in projects:
-    story.append(Paragraph(f"<b>{p['title']}</b>  <font color='#4fdcb4'>{p['category']}</font>", styles["Body"]))
-    story.append(Paragraph(f"Problem → Approach → Result: {p['problem']} | {p['approach']} | {p['result']}", styles["Muted"]))
-    story.append(Paragraph(f"Tech: {', '.join(p['technologies'])}", styles["Muted"]))
+    # TECHNICAL SKILLS
+    story.append(Paragraph("TECHNICAL SKILLS", styles["ResumeSection"]))
+    story.append(Paragraph("<b>Programming:</b> C, C++, Python, JavaScript", styles["SkillsLine"]))
+    story.append(Paragraph("<b>Web:</b> HTML, CSS, React", styles["SkillsLine"]))
 
-# Experience
-story.append(Paragraph("Experience", styles["Section"]))
-for e in experience:
-    story.append(Paragraph(f"<b>{e['position']}</b>  —  {e['company']}", styles["Body"]))
-    story.append(Paragraph(f"{e['location']}  •  {e['dates']}", styles["Muted"]))
-    for r in e["responsibilities"]:
-        story.append(Paragraph(r, styles["BulletStyle"], bulletText="•"))
-    story.append(Paragraph(f"Technologies: {', '.join(e['technologies'])}", styles["Muted"]))
+    # EXPERIENCE
+    story.append(Paragraph("EXPERIENCE", styles["ResumeSection"]))
+    story.append(Paragraph("<b>Web Development Intern</b> &mdash; <b>Big Bang Tech Solutions Pvt. Ltd.</b>", styles["ItemTitle"]))
+    story.append(Paragraph("Pune, Maharashtra &nbsp;&bull;&nbsp; May 2026 &ndash; Sep 2026", styles["ItemSub"]))
+    exp_bullets = [
+        "Assisted with web and mobile application development.",
+        "Supported project planning, implementation and testing.",
+        "Conducted technical research and helped with technical solutions.",
+        "Worked with development and design teams on project tasks.",
+    ]
+    for b in exp_bullets:
+        story.append(Paragraph(f"&bull; &nbsp; {b}", styles["ResumeBullet"]))
 
-# Education
-story.append(Paragraph("Education", styles["Section"]))
-for ed in education:
-    story.append(Paragraph(f"<b>{ed['degree']}</b>  —  {ed['institution']}", styles["Body"]))
-    story.append(Paragraph(f"{ed['location']}  •  {ed['dates']}", styles["Muted"]))
-    if ed.get("details"):
-        story.append(Paragraph(ed["details"][0], styles["Body"]))
-    if ed.get("grades"):
-        for k, v in ed["grades"].items():
-            story.append(Paragraph(f"{k}: {v}", styles["BulletStyle"], bulletText="•"))
+    # PROJECTS
+    story.append(Paragraph("PROJECTS", styles["ResumeSection"]))
+    
+    # AutoInvoice
+    story.append(Paragraph("<b>AutoInvoice</b> &mdash; Invoice &amp; Client Management Web App &mdash; React, Vite, JavaScript, jsPDF", styles["ItemTitle"]))
+    story.append(Paragraph("&bull; &nbsp; Built a web app for managing clients, invoices and payment information.", styles["ResumeBullet"]))
+    story.append(Paragraph("&bull; &nbsp; Added invoice PDF generation, email invoice workflow and UPI payment functionality.", styles["ResumeBullet"]))
+    story.append(Spacer(1, 2))
 
-# Certifications
-story.append(Paragraph("Certifications", styles["Section"]))
-for c in certifications:
-    story.append(Paragraph(f"<b>{c['name']}</b>  —  {c['org']}  ({c['date']})", styles["Body"]))
+    # LifeTrackr
+    story.append(Paragraph("<b>LifeTrackr</b> &mdash; Personal Productivity Web App &mdash; HTML, CSS, JavaScript, Firebase", styles["ItemTitle"]))
+    story.append(Paragraph("&bull; &nbsp; Developed a personal dashboard for tracking tasks, habits, finance, journal entries and productivity.", styles["ResumeBullet"]))
+    story.append(Paragraph("&bull; &nbsp; Implemented authentication, cloud data storage and a responsive interface.", styles["ResumeBullet"]))
+    story.append(Spacer(1, 2))
 
-# Footer
-story.append(Spacer(1, 12))
-story.append(HRFlowable(width="100%", thickness=0.5, color=MUTED, spaceAfter=4, spaceBefore=0))
-story.append(Paragraph("Open to software, web, Python and IoT internships.  github.com/saumyamirajkar", styles["Meta"]))
+    # Automatic Car Wiper System
+    story.append(Paragraph("<b>Automatic Car Wiper System</b> &mdash; Arduino, C/C++, Sensors", styles["ItemTitle"]))
+    story.append(Paragraph("&bull; &nbsp; Built an automatic wiper system using moisture and rain sensors.", styles["ResumeBullet"]))
+    story.append(Paragraph("&bull; &nbsp; Used Arduino to control the wiper according to detected rain.", styles["ResumeBullet"]))
 
-doc.build(story)
-print(f"PDF generated at {PDF_PATH} ({PDF_PATH.stat().st_size/1024:.1f} KB)")
+    # CERTIFICATIONS
+    story.append(Paragraph("CERTIFICATIONS", styles["ResumeSection"]))
+    certs = [
+        "<b>IBM AI Developer Professional Certificate</b> &mdash; IBM / Coursera (Oct 2026)",
+        "<b>Google AI Professional Certificate</b> &mdash; Google (Jul 2026)",
+        "<b>Introduction to Cloud Computing</b> &mdash; IBM (Aug 2026)",
+        "<b>Python Essentials 1</b> &mdash; Cisco Networking Academy (Jul 2026)",
+    ]
+    for c in certs:
+        story.append(Paragraph(f"&bull; &nbsp; {c}", styles["ResumeBullet"]))
+
+    doc.build(story)
+    print(f"PDF generated successfully at {PDF_PATH} ({PDF_PATH.stat().st_size} bytes)")
+
+if __name__ == "__main__":
+    build_pdf()
