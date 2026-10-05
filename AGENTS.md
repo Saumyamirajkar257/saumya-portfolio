@@ -2,9 +2,10 @@
 
 ## Automatic Deployment & Sync
 - **GitHub & Cloudflare Pages Sync**: Whenever modifications or updates are made to the project (e.g. `gen_resume_pdf.py`, resume PDF, portfolio code, fallback content, styling, etc.):
-  1. Ensure the production build succeeds (`npm run build` in `frontend`).
-  2. Commit the changes to git.
-  3. Push to GitHub (`git push origin main`), which triggers automatic build and deployment on Cloudflare Pages (`https://saumya-mirajkar-portfolio.pages.dev`).
+  1. Build and deploy directly to Cloudflare Pages: run `npx wrangler pages deploy out --project-name saumya-mirajkar-portfolio` (or `npm run deploy` inside `frontend/`).
+  2. Stage and commit the changes to git.
+  3. Push to GitHub (`git push origin main`) to keep the repository in sync.
+  4. Note: Cloudflare Pages projects (`saumya-mirajkar-portfolio` and `saumya-portfolio`) are configured with Direct Upload (`Git Provider: No`), which is why `wrangler pages deploy` is required to update the live edge assets.
 
 ## Resume Source of Truth
 - Whenever a user asks for Saumya's resume, always provide the details from the official single-page resume:
