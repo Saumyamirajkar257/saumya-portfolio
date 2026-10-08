@@ -29,13 +29,11 @@ export default function Navbar({ name }) {
   // Keep résumé URL in sync with CMS in real time
   useEffect(() => {
     getContent(false).then((data) => {
-      if (data?.profile?.resume_url) setResumeUrl(data.profile.resume_url);
+      setResumeUrl(getActiveResumeUrl(data?.profile));
     }).catch(() => {});
 
     const unsub = subscribeContent((liveData) => {
-      if (liveData?.profile?.resume_url) {
-        setResumeUrl(liveData.profile.resume_url);
-      }
+      setResumeUrl(getActiveResumeUrl(liveData?.profile));
     });
     return () => {
       if (typeof unsub === "function") unsub();
@@ -134,54 +132,56 @@ export default function Navbar({ name }) {
           </nav>
 
           <div className="nav__actions">
-            <div
-              className="nav__resumeWrapper"
-              onMouseEnter={() => setResumeMenuOpen(true)}
-              onMouseLeave={() => setResumeMenuOpen(false)}
-            >
-              <a
-                href={resumeUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="nav__resumeLink"
-                title="View or download Saumya's Résumé"
+            {resumeUrl && (
+              <div
+                className="nav__resumeWrapper"
+                onMouseEnter={() => setResumeMenuOpen(true)}
+                onMouseLeave={() => setResumeMenuOpen(false)}
               >
-                <span>Résumé</span>
-                <span aria-hidden="true" style={{ fontSize: "14px" }}>↓</span>
-              </a>
+                <a
+                  href={resumeUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="nav__resumeLink"
+                  title="View or download Saumya's Résumé"
+                >
+                  <span>Résumé</span>
+                  <span aria-hidden="true" style={{ fontSize: "14px" }}>↓</span>
+                </a>
 
-              <AnimatePresence>
-                {resumeMenuOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 4, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 4, scale: 0.98 }}
-                    transition={{ duration: 0.15 }}
-                    className="nav__resumeDropdown"
-                  >
-                    <a
-                      href={resumeUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="nav__resumeDropdownItem"
-                      onClick={() => setResumeMenuOpen(false)}
+                <AnimatePresence>
+                  {resumeMenuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 4, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 4, scale: 0.98 }}
+                      transition={{ duration: 0.15 }}
+                      className="nav__resumeDropdown"
                     >
-                      <span>View in Browser</span>
-                      <span>↗</span>
-                    </a>
-                    <a
-                      href={resumeUrl}
-                      download="Saumya_Mirajkar_Resume.pdf"
-                      className="nav__resumeDropdownItem"
-                      onClick={() => setResumeMenuOpen(false)}
-                    >
-                      <span>Download PDF</span>
-                      <span>↓</span>
-                    </a>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+                      <a
+                        href={resumeUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="nav__resumeDropdownItem"
+                        onClick={() => setResumeMenuOpen(false)}
+                      >
+                        <span>View in Browser</span>
+                        <span>↗</span>
+                      </a>
+                      <a
+                        href={resumeUrl}
+                        download={getResumeFilename(resumeUrl)}
+                        className="nav__resumeDropdownItem"
+                        onClick={() => setResumeMenuOpen(false)}
+                      >
+                        <span>Download PDF</span>
+                        <span>↓</span>
+                      </a>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
           </div>
 
           <button
@@ -229,25 +229,27 @@ export default function Navbar({ name }) {
                 transition={{ delay: 0.5, duration: 0.4 }}
                 className="nav-overlay__foot"
               >
-                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
-                  <a
-                    href={resumeUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn btn--primary"
-                    style={{ width: "fit-content", padding: "10px 18px", borderRadius: "8px" }}
-                  >
-                    VIEW RÉSUMÉ ↗
-                  </a>
-                  <a
-                    href={resumeUrl}
-                    download="Saumya_Mirajkar_Resume.pdf"
-                    className="btn btn--secondary"
-                    style={{ width: "fit-content", padding: "10px 18px", borderRadius: "8px" }}
-                  >
-                    DOWNLOAD RÉSUMÉ ↓
-                  </a>
-                </div>
+                {resumeUrl && (
+                  <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
+                    <a
+                      href={resumeUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn btn--primary"
+                      style={{ width: "fit-content", padding: "10px 18px", borderRadius: "8px" }}
+                    >
+                      VIEW RÉSUMÉ ↗
+                    </a>
+                    <a
+                      href={resumeUrl}
+                      download={getResumeFilename(resumeUrl)}
+                      className="btn btn--secondary"
+                      style={{ width: "fit-content", padding: "10px 18px", borderRadius: "8px" }}
+                    >
+                      DOWNLOAD RÉSUMÉ ↓
+                    </a>
+                  </div>
+                )}
                 <span className="text-mono nav-overlay__tag">PUNE, INDIA</span>
               </motion.div>
             </nav>

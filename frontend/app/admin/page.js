@@ -19,8 +19,11 @@ import { clearContentCache, migrateInitialData } from "@/lib/content";
 import {
   CANONICAL_RESUME_PATH,
   CANONICAL_RESUME_FILENAME,
+  DEFAULT_RESUME_RECORD,
+  getActiveResumeRecord,
   getActiveResumeUrl,
   getResumeFilename,
+  isResumePublished,
 } from "@/lib/resume";
 import "./admin.css";
 
@@ -1884,8 +1887,9 @@ function MessagesManager() {
 
 function ResumeManager() {
   const [loading, setLoading] = useState(true);
-  const [activeUrl, setActiveUrl] = useState(CANONICAL_RESUME_PATH);
+  const [record, setRecord] = useState(DEFAULT_RESUME_RECORD);
   const [customUrl, setCustomUrl] = useState("");
+  const [versionInput, setVersionInput] = useState("1.0");
   const [uploading, setUploading] = useState(false);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
@@ -1896,17 +1900,20 @@ function ResumeManager() {
       const snap = await getDoc(doc(db, "profile", "main"));
       if (snap.exists()) {
         const data = snap.data();
-        const resolved = getActiveResumeUrl(data);
-        setActiveUrl(resolved);
-        setCustomUrl(resolved);
+        const resolvedRecord = getActiveResumeRecord(data);
+        setRecord(resolvedRecord);
+        setCustomUrl(resolvedRecord.fileUrl);
+        setVersionInput(resolvedRecord.version || "1.0");
       } else {
-        setActiveUrl(CANONICAL_RESUME_PATH);
-        setCustomUrl(CANONICAL_RESUME_PATH);
+        setRecord(DEFAULT_RESUME_RECORD);
+        setCustomUrl(DEFAULT_RESUME_RECORD.fileUrl);
+        setVersionInput(DEFAULT_RESUME_RECORD.version);
       }
     } catch (err) {
       console.warn("Resume fetch warning:", err.message);
-      setActiveUrl(CANONICAL_RESUME_PATH);
-      setCustomUrl(CANONICAL_RESUME_PATH);
+      setRecord(DEFAULT_RESUME_RECORD);
+      setCustomUrl(DEFAULT_RESUME_RECORD.fileUrl);
+      setVersionInput(DEFAULT_RESUME_RECORD.version);
     }
     setLoading(false);
   }, []);
@@ -1915,19 +1922,41 @@ function ResumeManager() {
     refresh();
   }, [refresh]);
 
-  const updateActiveResume = async (newUrl) => {
+  const saveResumeRecord = async (partialUpdates) => {
     setError("");
     setNotice("");
     try {
-      await setDoc(doc(db, "profile", "main"), { resume_url: newUrl }, { merge: true });
+      const updated = {
+        ...record,
+        ...partialUpdates,
+        updatedAt: new Date().toISOString(),
+      };
+      await setDoc(
+        doc(db, "profile", "main"),
+        {
+          resume: updated,
+          resume_url: updated.fileUrl,
+          resume_published: updated.published !== false,
+        },
+        { merge: true }
+      );
       clearContentCache();
-      setActiveUrl(newUrl);
-      setCustomUrl(newUrl);
-      setNotice("Active résumé updated successfully! Reflecting live on portfolio ✓");
+      setRecord(updated);
+      setCustomUrl(updated.fileUrl);
+      setNotice(
+        updated.published
+          ? "Active résumé updated & published live ✓"
+          : "Active résumé saved (unpublished / hidden from public site) ✓"
+      );
       setTimeout(() => setNotice(""), 3500);
     } catch (err) {
       setError("Failed to update résumé: " + err.message);
     }
+  };
+
+  const handleTogglePublished = async () => {
+    const nextPublished = !record.published;
+    await saveResumeRecord({ published: nextPublished });
   };
 
   const handleFileUpload = async (e) => {
@@ -1952,12 +1981,30 @@ function ResumeManager() {
       const fileRef = ref(storage, `resumes/${Date.now()}_${file.name}`);
       await uploadBytes(fileRef, file);
       const downloadUrl = await getDownloadURL(fileRef);
-      await updateActiveResume(downloadUrl);
-      setNotice(`Uploaded "${file.name}" and set as active résumé ✓`);
+      await saveResumeRecord({
+        fileName: file.name,
+        fileUrl: downloadUrl,
+        storagePath: fileRef.fullPath,
+        uploadedAt: new Date().toISOString(),
+        published: true,
+      });
+      setNotice(`Uploaded "${file.name}" and published as active résumé ✓`);
     } catch (err) {
       setError("Upload failed: " + err.message);
     }
     setUploading(false);
+  };
+
+  const handleCustomUrlSave = async () => {
+    if (!customUrl.trim()) return;
+    const filename = getResumeFilename(customUrl);
+    await saveResumeRecord({
+      fileName: filename,
+      fileUrl: customUrl.trim(),
+      storagePath: customUrl.startsWith("http") ? "external" : "local",
+      version: versionInput.trim() || record.version || "1.0",
+      published: true,
+    });
   };
 
   const handleResetCanonical = async () => {
@@ -1967,11 +2014,25 @@ function ResumeManager() {
       )
     )
       return;
-    await updateActiveResume(CANONICAL_RESUME_PATH);
+    await saveResumeRecord({
+      fileName: CANONICAL_RESUME_FILENAME,
+      fileUrl: CANONICAL_RESUME_PATH,
+      storagePath: "canonical",
+      published: true,
+      version: "1.0",
+    });
   };
 
-  const filename = getResumeFilename(activeUrl);
-  const isCanonical = activeUrl === CANONICAL_RESUME_PATH;
+  const isCanonical = record.fileUrl === CANONICAL_RESUME_PATH;
+
+  const formatDate = (isoStr) => {
+    if (!isoStr) return "—";
+    try {
+      return new Date(isoStr).toLocaleString();
+    } catch {
+      return isoStr;
+    }
+  };
 
   return (
     <div className="admin-panel">
@@ -1979,7 +2040,7 @@ function ResumeManager() {
         <div>
           <h2>Active Résumé Management</h2>
           <p className="admin-muted" style={{ marginTop: "4px" }}>
-            Single managed resource consumed by Navigation, Hero CTA, and Contact section.
+            Single managed resource consumed dynamically by Navigation, Hero, About, and Contact.
           </p>
         </div>
         <div className="admin-panel__actions">
@@ -1995,37 +2056,91 @@ function ResumeManager() {
       <div className="admin-resume-grid">
         {/* Left Column: Active Resume Status & Management */}
         <div className="admin-resume-card">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span className="admin-resume-badge">
-              ● {isCanonical ? "ACTIVE (CANONICAL)" : "ACTIVE (STORAGE / CUSTOM)"}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
+            <span
+              className={`admin-resume-badge ${
+                record.published
+                  ? "admin-resume-badge--published"
+                  : "admin-resume-badge--unpublished"
+              }`}
+            >
+              {record.published
+                ? "● PUBLISHED (LIVE ON SITE)"
+                : "○ UNPUBLISHED (HIDDEN)"}
             </span>
-            <span className="admin-muted" style={{ fontSize: "12px", fontFamily: "var(--font-mono)" }}>
-              SOURCE: FIRESTORE
+            <span className="admin-muted" style={{ fontSize: "11px", fontFamily: "var(--font-mono)" }}>
+              {isCanonical ? "STORAGE: LOCAL CANONICAL" : `STORAGE: ${record.storagePath || "CUSTOM"}`}
             </span>
           </div>
 
-          <div>
-            <label style={{ fontSize: "11px", fontFamily: "var(--font-mono)", color: "var(--text-mute)", textTransform: "uppercase" }}>
-              Active Filename
-            </label>
-            <div style={{ fontSize: "16px", fontWeight: "700", marginTop: "4px", wordBreak: "break-all" }}>
-              {filename}
+          {!record.published && (
+            <div
+              style={{
+                fontSize: "12px",
+                color: "#fbbf24",
+                background: "rgba(245, 158, 11, 0.1)",
+                border: "1px solid rgba(245, 158, 11, 0.25)",
+                padding: "8px 12px",
+                borderRadius: "6px",
+              }}
+            >
+              ⚠️ Résumé is currently unpublished. All public “View Résumé” and “Download Résumé” buttons across the portfolio are hidden cleanly.
+            </div>
+          )}
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+            <div>
+              <label style={{ fontSize: "11px", fontFamily: "var(--font-mono)", color: "var(--text-mute)", textTransform: "uppercase" }}>
+                Active Filename
+              </label>
+              <div style={{ fontSize: "14.5px", fontWeight: "700", marginTop: "4px", wordBreak: "break-all" }}>
+                {record.fileName || CANONICAL_RESUME_FILENAME}
+              </div>
+            </div>
+
+            <div>
+              <label style={{ fontSize: "11px", fontFamily: "var(--font-mono)", color: "var(--text-mute)", textTransform: "uppercase" }}>
+                Version
+              </label>
+              <div style={{ fontSize: "14.5px", fontWeight: "700", marginTop: "4px", fontFamily: "var(--font-mono)" }}>
+                {record.version || "1.0"}
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+            <div>
+              <label style={{ fontSize: "11px", fontFamily: "var(--font-mono)", color: "var(--text-mute)", textTransform: "uppercase" }}>
+                Uploaded Date
+              </label>
+              <div style={{ fontSize: "12px", color: "var(--text-dim)", marginTop: "4px" }}>
+                {formatDate(record.uploadedAt)}
+              </div>
+            </div>
+
+            <div>
+              <label style={{ fontSize: "11px", fontFamily: "var(--font-mono)", color: "var(--text-mute)", textTransform: "uppercase" }}>
+                Last Updated
+              </label>
+              <div style={{ fontSize: "12px", color: "var(--text-dim)", marginTop: "4px" }}>
+                {formatDate(record.updatedAt)}
+              </div>
             </div>
           </div>
 
           <div>
             <label style={{ fontSize: "11px", fontFamily: "var(--font-mono)", color: "var(--text-mute)", textTransform: "uppercase" }}>
-              Current Active URL / Path
+              Active URL / Path
             </label>
-            <div style={{ fontSize: "12.5px", fontFamily: "var(--font-mono)", color: "var(--text-dim)", marginTop: "4px", wordBreak: "break-all", background: "rgba(255,255,255,0.03)", padding: "8px 10px", borderRadius: "6px" }}>
-              {activeUrl}
+            <div style={{ fontSize: "12px", fontFamily: "var(--font-mono)", color: "var(--text-dim)", marginTop: "4px", wordBreak: "break-all", background: "rgba(255,255,255,0.03)", padding: "8px 10px", borderRadius: "6px" }}>
+              {record.fileUrl}
             </div>
           </div>
 
           {/* Action Buttons */}
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "4px" }}>
             <a
-              href={activeUrl}
+              href={record.fileUrl}
               target="_blank"
               rel="noreferrer"
               className="admin-btn admin-btn--sm"
@@ -2033,17 +2148,28 @@ function ResumeManager() {
               Open in New Tab ↗
             </a>
             <a
-              href={activeUrl}
-              download={filename}
+              href={record.fileUrl}
+              download={record.fileName || CANONICAL_RESUME_FILENAME}
               className="admin-btn admin-btn--sm"
             >
-              Test Download ↓
+              Download Résumé ↓
             </a>
             <button
               type="button"
               className="admin-btn admin-btn--sm"
+              onClick={handleTogglePublished}
+              style={{
+                borderColor: record.published ? "rgba(245, 158, 11, 0.4)" : "rgba(0, 229, 160, 0.4)",
+                color: record.published ? "#fbbf24" : "var(--accent)",
+              }}
+            >
+              {record.published ? "Unpublish Résumé" : "Publish Résumé"}
+            </button>
+            <button
+              type="button"
+              className="admin-btn admin-btn--sm"
               onClick={handleResetCanonical}
-              disabled={isCanonical}
+              disabled={isCanonical && record.published}
             >
               Reset to Canonical
             </button>
@@ -2060,7 +2186,7 @@ function ResumeManager() {
                 {uploading ? "Uploading to Cloud Storage..." : "Choose or drag new PDF résumé"}
               </span>
               <span className="admin-muted" style={{ fontSize: "11.5px" }}>
-                Accepts .pdf (Updates all portfolio links instantly)
+                Accepts .pdf (Replaces the single active résumé and publishes instantly)
               </span>
               <input
                 type="file"
@@ -2072,22 +2198,30 @@ function ResumeManager() {
             </label>
           </div>
 
-          {/* Direct URL Update */}
+          {/* Direct URL & Version Update */}
           <div style={{ marginTop: "4px" }}>
-            <h4 style={{ fontSize: "13.5px", marginBottom: "8px", fontWeight: "600" }}>Or Set Custom Résumé URL / Path</h4>
-            <div style={{ display: "flex", gap: "8px" }}>
+            <h4 style={{ fontSize: "13.5px", marginBottom: "8px", fontWeight: "600" }}>Or Set Custom Résumé URL &amp; Version</h4>
+            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
               <input
                 type="text"
                 value={customUrl}
                 onChange={(e) => setCustomUrl(e.target.value)}
                 placeholder="/resume/Saumya_Mirajkar_Resume.pdf or https://..."
                 className="admin-input"
-                style={{ flex: 1, padding: "8px 12px", borderRadius: "6px", border: "1px solid var(--line-strong)", background: "rgba(255,255,255,0.05)", color: "#fff", fontSize: "13px" }}
+                style={{ flex: "2 1 200px", padding: "8px 12px", borderRadius: "6px", border: "1px solid var(--line-strong)", background: "rgba(255,255,255,0.05)", color: "#fff", fontSize: "13px" }}
+              />
+              <input
+                type="text"
+                value={versionInput}
+                onChange={(e) => setVersionInput(e.target.value)}
+                placeholder="v1.0"
+                className="admin-input"
+                style={{ width: "80px", padding: "8px 12px", borderRadius: "6px", border: "1px solid var(--line-strong)", background: "rgba(255,255,255,0.05)", color: "#fff", fontSize: "13px", fontFamily: "var(--font-mono)" }}
               />
               <button
                 type="button"
                 className="admin-btn admin-btn--primary admin-btn--sm"
-                onClick={() => updateActiveResume(customUrl)}
+                onClick={handleCustomUrlSave}
               >
                 Set Active
               </button>
@@ -2100,11 +2234,11 @@ function ResumeManager() {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <h4 style={{ fontSize: "14px", margin: 0, fontWeight: "600" }}>Live Document Preview</h4>
             <span className="admin-muted" style={{ fontSize: "11.5px", fontFamily: "var(--font-mono)" }}>
-              {filename}
+              {record.fileName || CANONICAL_RESUME_FILENAME}
             </span>
           </div>
           <iframe
-            src={`${activeUrl}#toolbar=0`}
+            src={`${record.fileUrl}#toolbar=0`}
             title="Active Résumé Preview"
             className="admin-resume-preview-frame"
           />

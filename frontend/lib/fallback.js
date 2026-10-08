@@ -7,11 +7,21 @@ export const fallbackContent = {
     email: "saumyamir25@gmail.com",
     phone: "+91 98928 14242",
     resume_url: "/resume/Saumya_Mirajkar_Resume.pdf",
+    resume: {
+      id: "active",
+      fileName: "Saumya_Mirajkar_Resume.pdf",
+      fileUrl: "/resume/Saumya_Mirajkar_Resume.pdf",
+      storagePath: "canonical",
+      uploadedAt: "2026-10-08T00:00:00.000Z",
+      updatedAt: "2026-10-08T00:00:00.000Z",
+      published: true,
+      version: "1.0",
+    },
     avatar: "/profile.jpg",
     portfolio_url: "https://saumya-mirajkar-portfolio.pages.dev",
     summary:
       "Computer Engineering and IoT diploma student with hands-on experience in web development, Python, C/C++, JavaScript, React, and embedded systems. Completed a web development internship at Big Bang Tech Solutions involving web/mobile application development, project planning and testing, and cross-functional team collaboration.",
-    bio: "I'm a diploma student in Computer Engineering & IoT at Cusrow Wadia Institute of Technology, Pune. I build responsive web applications with React, Vite, and JavaScript, as well as hardware and embedded systems using Arduino and sensors.",
+    bio: "I'm Saumya Mirajkar, a Computer Engineering & IoT student who enjoys turning ideas into practical digital products. I work across web development, software, automation, and IoT, with a focus on building clean, useful, and real-world solutions.",
     interests: [
       "Web Development",
       "React & Frontend Engineering",

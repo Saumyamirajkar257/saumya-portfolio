@@ -3,11 +3,12 @@
 import { useRef } from "react";
 import { motion, useMotionValue, useSpring, useTransform, useReducedMotion } from "framer-motion";
 import { MagneticButton, EASE, TIMING } from "@/components/animations/MotionSystem";
-import { getActiveResumeUrl } from "@/lib/resume";
+import { getActiveResumeUrl, getResumeFilename } from "@/lib/resume";
 import styles from "./Hero.module.css";
 
 export default function Hero({ profile }) {
   const resumeUrl = getActiveResumeUrl(profile);
+  const resumeFilename = getResumeFilename(resumeUrl);
   const reduce = useReducedMotion();
   const heroRef = useRef(null);
 
@@ -156,17 +157,19 @@ export default function Hero({ profile }) {
             </a>
           </MagneticButton>
 
-          <MagneticButton strength={0.25} duration={0.25}>
-            <a
-              href={resumeUrl}
-              download="Saumya_Mirajkar_Resume.pdf"
-              className={styles.hero__btnSecondary}
-              title="Download Saumya Mirajkar's Résumé PDF"
-            >
-              <span>DOWNLOAD RÉSUMÉ</span>
-              <span aria-hidden="true" className={styles.hero__btnArrow}>↓</span>
-            </a>
-          </MagneticButton>
+          {resumeUrl && (
+            <MagneticButton strength={0.25} duration={0.25}>
+              <a
+                href={resumeUrl}
+                download={resumeFilename}
+                className={styles.hero__btnSecondary}
+                title="Download Saumya Mirajkar's Résumé PDF"
+              >
+                <span>DOWNLOAD RÉSUMÉ</span>
+                <span aria-hidden="true" className={styles.hero__btnArrow}>↓</span>
+              </a>
+            </MagneticButton>
+          )}
         </div>
 
         {/* Center: Social Icons */}

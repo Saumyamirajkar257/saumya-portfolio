@@ -2,6 +2,11 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { EASE, TIMING } from "@/components/animations/MotionSystem";
+import {
+  getActiveResumeUrl,
+  getResumeFilename,
+  isResumePublished,
+} from "@/lib/resume";
 import styles from "./About.module.css";
 
 const DEFAULT_CREDENTIAL_ROWS = [
@@ -17,8 +22,8 @@ const DEFAULT_CREDENTIAL_ROWS = [
   },
   {
     index: "03",
-    main: "Core Competencies",
-    sub: "Hardware Sensors · Python · JavaScript · Next.js · IoT",
+    main: "Core Focus & Technologies",
+    sub: "Web Development · Python · JavaScript · Next.js · IoT",
   },
   {
     index: "04",
@@ -26,6 +31,9 @@ const DEFAULT_CREDENTIAL_ROWS = [
     sub: "Current Academic & Development Base",
   },
 ];
+
+const TARGET_BIO =
+  "I'm Saumya Mirajkar, a Computer Engineering & IoT student who enjoys turning ideas into practical digital products. I work across web development, software, automation, and IoT, with a focus on building clean, useful, and real-world solutions.";
 
 export default function About({
   profile = {},
@@ -49,11 +57,7 @@ export default function About({
   }).length;
 
   const languagesCount =
-    languageSkillsCount > 0
-      ? String(languageSkillsCount)
-      : profile?.highlights?.find((h) =>
-          h.label?.toLowerCase().includes("language")
-        )?.value || "4";
+    languageSkillsCount > 0 ? `${languageSkillsCount}+` : "3+";
 
   const semestersCount =
     profile?.semesters_completed ||
@@ -86,7 +90,7 @@ export default function About({
     },
     {
       index: "03",
-      main: "Core Competencies",
+      main: "Core Focus & Technologies",
       sub:
         profile?.core_competencies ||
         DEFAULT_CREDENTIAL_ROWS[2].sub,
@@ -98,12 +102,20 @@ export default function About({
     },
   ];
 
-  const bioParagraphs = profile?.bio
-    ? profile.bio.split("\n\n").filter(Boolean)
-    : [
-        "Computer Engineering and IoT diploma student with hands-on experience in web development, Python, C/C++, JavaScript, Arduino, and embedded systems.",
-        "Completed a web development internship involving web/mobile application development, project planning, technical research, and team collaboration. Passionate about bridging hardware sensors with resilient software systems.",
-      ];
+  // Refined professional bio
+  const bioText =
+    profile?.bio &&
+    !profile.bio.includes("final-year diploma student in Computer Engineering") &&
+    !profile.bio.includes("diploma student in Computer Engineering & IoT at Cusrow")
+      ? profile.bio
+      : TARGET_BIO;
+
+  const bioParagraphs = bioText.split("\n\n").filter(Boolean);
+
+  // Resume status and URLs
+  const resumeUrl = getActiveResumeUrl(profile);
+  const isResumeAvailable = isResumePublished(profile);
+  const resumeFilename = getResumeFilename(resumeUrl);
 
   return (
     <section id="about" className={styles.section}>
@@ -182,7 +194,7 @@ export default function About({
               ))}
             </div>
 
-            {/* Minimal Editorial CTA */}
+            {/* Minimal Editorial CTAs */}
             <div className={styles.ctaWrapper}>
               <a
                 href="#projects"
@@ -201,6 +213,31 @@ export default function About({
                 <span>EXPLORE MY WORK</span>
                 <span className={styles.exploreArrow}>→</span>
               </a>
+
+              {isResumeAvailable && resumeUrl && (
+                <>
+                  <a
+                    href={resumeUrl}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className={styles.resumeViewBtn}
+                    aria-label="View Saumya Mirajkar's official resume in new tab"
+                  >
+                    <span>VIEW RÉSUMÉ</span>
+                    <span className={styles.exploreArrow}>→</span>
+                  </a>
+
+                  <a
+                    href={resumeUrl}
+                    download={resumeFilename}
+                    className={styles.resumeDownloadBtn}
+                    aria-label="Download Saumya Mirajkar's resume PDF"
+                  >
+                    <span>DOWNLOAD RÉSUMÉ</span>
+                    <span className={styles.exploreArrow}>↓</span>
+                  </a>
+                </>
+              )}
             </div>
           </div>
         </div>

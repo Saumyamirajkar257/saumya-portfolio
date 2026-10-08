@@ -551,6 +551,18 @@
   width: fit-content;
 }
 
+.admin-resume-badge--published {
+  background: rgba(0, 229, 160, 0.12);
+  color: var(--accent);
+  border-color: rgba(0, 229, 160, 0.35);
+}
+
+.admin-resume-badge--unpublished {
+  background: rgba(245, 158, 11, 0.12);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
 .admin-resume-preview-frame {
   width: 100%;
   height: 520px;
