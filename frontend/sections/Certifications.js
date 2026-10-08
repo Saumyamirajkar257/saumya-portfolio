@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { EASE, TIMING } from "@/components/animations/MotionSystem";
 import styles from "./Certifications.module.css";
@@ -60,7 +60,7 @@ function resolveProviderLogo(org = "", issuer = "") {
   if (text.includes("ibm")) return PROVIDER_LOGOS.ibm;
   if (text.includes("atlassian")) return PROVIDER_LOGOS.atlassian;
   if (text.includes("cisco")) return PROVIDER_LOGOS.cisco;
-  if (text.includes("coursera")) return PROVIDER_LOGOS.coursera;
+  if (text.includes("coursera") || text.includes("courera")) return PROVIDER_LOGOS.coursera;
   if (text.includes("microsoft")) return PROVIDER_LOGOS.microsoft;
   if (text.includes("credly") || text.includes("acclaim")) return PROVIDER_LOGOS.credly;
   if (text.includes("aws") || text.includes("amazon")) return PROVIDER_LOGOS.aws;
@@ -84,16 +84,258 @@ function formatDate(dateStr) {
     .replace(/JUNE/gi, "JUN");
 }
 
+function formatCredentialId(cert) {
+  const id = cert.credentialId || cert.credential_id;
+  if (!id || id === "Not provided" || id === "NOT PROVIDED") return null;
+  return String(id).trim();
+}
+
+function formatExpiry(cert) {
+  if (cert.expiryDate && String(cert.expiryDate).trim()) {
+    return `Expires: ${String(cert.expiryDate).trim()}`;
+  }
+  if (
+    cert.expiryStatus &&
+    String(cert.expiryStatus).trim() &&
+    cert.expiryStatus !== "Not provided"
+  ) {
+    return String(cert.expiryStatus).trim();
+  }
+  if (cert.noExpiry === true) {
+    return "No Expiry explicitly stated";
+  }
+  return null;
+}
+
+export const CANONICAL_CATEGORIES = [
+  "AI",
+  "Cloud",
+  "Software",
+  "Programming",
+  "Other",
+];
+
+export function resolveCertificateCategory(cert) {
+  if (cert.category && typeof cert.category === "string" && cert.category.trim()) {
+    const raw = cert.category.trim();
+    const match = CANONICAL_CATEGORIES.find(
+      (c) => c.toLowerCase() === raw.toLowerCase()
+    );
+    if (match) return match;
+    return raw;
+  }
+
+  const text = `${cert.name || ""} ${cert.description || ""}`.toLowerCase();
+  if (
+    text.includes("ai") ||
+    text.includes("artificial intelligence") ||
+    text.includes("generative")
+  ) {
+    return "AI";
+  }
+  if (text.includes("cloud") || text.includes("aws") || text.includes("azure")) {
+    return "Cloud";
+  }
+  if (text.includes("software") || text.includes("jira") || text.includes("agile")) {
+    return "Software";
+  }
+  if (
+    text.includes("python") ||
+    text.includes("javascript") ||
+    text.includes("html") ||
+    text.includes("css") ||
+    text.includes("programming") ||
+    text.includes("developer")
+  ) {
+    return "Programming";
+  }
+  return "Other";
+}
+
 export default function Certifications({ certifications = [] }) {
-  const [showAll, setShowAll] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState("All");
   const reduce = useReducedMotion();
 
-  const sorted = [...certifications].sort(
-    (a, b) => Number(a.order ?? 999) - Number(b.order ?? 999)
-  );
-  const visible = showAll ? sorted : sorted.slice(0, 6);
+  // Filter out any hidden or draft records for public view
+  const publicCerts = useMemo(() => {
+    return certifications.filter(
+      (c) => c.visible !== false && c.status !== "draft" && c.status !== "hidden"
+    );
+  }, [certifications]);
+
+  // Sort strictly by display order
+  const sorted = useMemo(() => {
+    return [...publicCerts].sort(
+      (a, b) =>
+        Number(a.sortOrder ?? a.order ?? a.displayOrder ?? 999) -
+        Number(b.sortOrder ?? b.order ?? b.displayOrder ?? 999)
+    );
+  }, [publicCerts]);
+
+  // Dynamic count from the actual collection
+  const totalCount = sorted.length;
+
+  // 1. Featured Certifications: Curated selection (~5-6)
+  // Controlled by Admin via `featured: true`, fallback to top 6 if unconfigured
+  const featuredList = useMemo(() => {
+    const explicitlyFeatured = sorted.filter((c) => c.featured === true);
+    if (explicitlyFeatured.length > 0) {
+      return explicitlyFeatured;
+    }
+    return sorted.slice(0, 6);
+  }, [sorted]);
+
+  // 2. Dynamic Category Counting & Available Categories (no invented categories)
+  const categoryCounts = useMemo(() => {
+    const counts = { All: totalCount };
+    sorted.forEach((cert) => {
+      const cat = resolveCertificateCategory(cert);
+      counts[cat] = (counts[cat] || 0) + 1;
+    });
+    return counts;
+  }, [sorted, totalCount]);
+
+  const availableCategories = useMemo(() => {
+    const present = Object.keys(categoryCounts).filter(
+      (k) => k !== "All" && categoryCounts[k] > 0
+    );
+    present.sort((a, b) => {
+      const idxA = CANONICAL_CATEGORIES.indexOf(a);
+      const idxB = CANONICAL_CATEGORIES.indexOf(b);
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+      if (idxA !== -1) return -1;
+      if (idxB !== -1) return 1;
+      return a.localeCompare(b);
+    });
+    return ["All", ...present];
+  }, [categoryCounts]);
+
+  // 3. Search and Category Filter across the Full Collection
+  const filteredList = useMemo(() => {
+    return sorted.filter((cert) => {
+      // Category filter
+      if (activeCategory !== "All") {
+        const cat = resolveCertificateCategory(cert);
+        if (cat.toLowerCase() !== activeCategory.toLowerCase()) {
+          return false;
+        }
+      }
+
+      // Search query filter
+      const q = searchQuery.toLowerCase().trim();
+      if (!q) return true;
+
+      const name = (cert.name || "").toLowerCase();
+      const org = (cert.organization || "").toLowerCase();
+      const issuer = (cert.issuer || cert.provider || "").toLowerCase();
+      const credId = (cert.credentialId || cert.credential_id || "").toLowerCase();
+      const cat = resolveCertificateCategory(cert).toLowerCase();
+      const skills = (cert.skills || "").toLowerCase();
+      const desc = (cert.description || "").toLowerCase();
+
+      return (
+        name.includes(q) ||
+        org.includes(q) ||
+        issuer.includes(q) ||
+        credId.includes(q) ||
+        cat.includes(q) ||
+        skills.includes(q) ||
+        desc.includes(q)
+      );
+    });
+  }, [sorted, activeCategory, searchQuery]);
 
   if (!certifications.length) return null;
+
+  // Shared Editorial Row Renderer
+  const renderRow = (cert, i, prefix = "f") => {
+    const indexStr = String(i + 1).padStart(2, "0");
+    const logo = resolveProviderLogo(cert.organization, cert.issuer || cert.provider);
+    const dateDisplay = formatDate(cert.issueDate || cert.date);
+    const verifyUrl = cert.verificationUrl || cert.credentialUrl || cert.credential_url;
+    const hasCredentialUrl = Boolean(
+      verifyUrl && typeof verifyUrl === "string" && verifyUrl.trim().startsWith("http")
+    );
+    const credId = formatCredentialId(cert);
+    const expiry = formatExpiry(cert);
+    const categoryName = resolveCertificateCategory(cert);
+
+    return (
+      <motion.article
+        key={cert.id ?? `${cert.name}-${i}-${prefix}`}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "0px 0px -4% 0px" }}
+        transition={{
+          duration: reduce ? 0.01 : TIMING.component,
+          delay: reduce ? 0 : Math.min(i * 0.04, 0.2),
+          ease: EASE.premium,
+        }}
+        className={styles.row}
+      >
+        <div className={styles.row__inner}>
+          {/* Left: Index Number */}
+          <div className={styles.row__indexCol}>
+            <span className={styles.row__index}>{indexStr}</span>
+          </div>
+
+          {/* Center: Certification Name & Organization with Logo */}
+          <div className={styles.row__mainCol}>
+            <h3 className={styles.row__title}>{cert.name}</h3>
+
+            <div className={styles.row__providerRow}>
+              {logo && <span className={styles.row__providerLogo}>{logo}</span>}
+              <span className={styles.row__providerName}>
+                {cert.organization || "Independent"}
+                {cert.issuer && cert.issuer !== cert.organization
+                  ? ` · ${cert.issuer}`
+                  : cert.provider && cert.provider !== cert.organization
+                  ? ` · ${cert.provider}`
+                  : ""}
+              </span>
+              {categoryName && categoryName !== "Other" && (
+                <span className={styles.row__categoryTag}>
+                  {categoryName.toUpperCase()}
+                </span>
+              )}
+              {credId && (
+                <span className={styles.row__credId}>
+                  ID: {credId}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Right: Date, Expiry & Verification Status */}
+          <div className={styles.row__metaCol}>
+            <div className={styles.row__dateStack}>
+              <span className={styles.row__date}>{dateDisplay}</span>
+              {expiry && <span className={styles.row__expiry}>{expiry}</span>}
+            </div>
+
+            {hasCredentialUrl ? (
+              <a
+                href={verifyUrl}
+                target="_blank"
+                rel="noreferrer noopener"
+                className={styles.row__verifyLink}
+                aria-label={`Verify credential for ${cert.name}`}
+              >
+                <span>VERIFY CREDENTIAL</span>
+                <span className={styles.row__arrow} aria-hidden="true">
+                  ↗
+                </span>
+              </a>
+            ) : (
+              <span className={styles.row__verifiedText}>VERIFIED</span>
+            )}
+          </div>
+        </div>
+      </motion.article>
+    );
+  };
 
   return (
     <section id="certifications" className={styles.section}>
@@ -105,106 +347,200 @@ export default function Certifications({ certifications = [] }) {
               <span className={styles.eyebrowDot} />
               <span>ACCREDITATIONS</span>
             </div>
-            <h2 className={styles.heading}>CERTIFICATIONS</h2>
+            <h2 className={styles.heading}>FEATURED CERTIFICATIONS</h2>
             <p className={styles.subheading}>
-              Professional credentials, courses, and technical learning.
+              Selected professional credentials and technical learning.
             </p>
           </div>
 
           <div className={styles.headerRight}>
             <span className={styles.totalBadge}>
-              {certifications.length} CREDENTIALS
+              {totalCount} CREDENTIALS
             </span>
           </div>
         </div>
 
-        {/* Large Editorial Horizontal Rows */}
+        {/* 1. FEATURED CERTIFICATIONS LIST */}
         <div className={styles.rowsContainer}>
-          {visible.map((cert, i) => {
-            const indexStr = String(i + 1).padStart(2, "0");
-            const logo = resolveProviderLogo(cert.organization, cert.issuer);
-            const dateDisplay = formatDate(cert.issueDate || cert.date);
-            const verifyUrl = cert.verificationUrl || cert.credentialUrl || cert.credential_url;
-            const hasCredentialUrl = Boolean(
-              verifyUrl && verifyUrl.trim().length > 0 && verifyUrl.startsWith("http")
-            );
-
-            return (
-              <motion.article
-                key={cert.id ?? `${cert.name}-${i}`}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "0px 0px -6% 0px" }}
-                transition={{
-                  duration: reduce ? 0.01 : TIMING.component,
-                  delay: reduce ? 0 : Math.min(i * 0.05, 0.25),
-                  ease: EASE.premium,
-                }}
-                className={styles.row}
-              >
-                <div className={styles.row__inner}>
-                  {/* Left: Index Number */}
-                  <div className={styles.row__indexCol}>
-                    <span className={styles.row__index}>{indexStr}</span>
-                  </div>
-
-                  {/* Center: Certification Name & Organization with Logo */}
-                  <div className={styles.row__mainCol}>
-                    <h3 className={styles.row__title}>{cert.name}</h3>
-
-                    <div className={styles.row__providerRow}>
-                      {logo && <span className={styles.row__providerLogo}>{logo}</span>}
-                      <span className={styles.row__providerName}>
-                        {cert.organization || "Independent"}
-                        {cert.issuer && cert.issuer !== cert.organization
-                          ? ` · ${cert.issuer}`
-                          : ""}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Right: Standardized Date & Editorial Verification Status */}
-                  <div className={styles.row__metaCol}>
-                    <span className={styles.row__date}>{dateDisplay}</span>
-
-                    {hasCredentialUrl ? (
-                      <a
-                        href={verifyUrl}
-                        target="_blank"
-                        rel="noreferrer noopener"
-                        className={styles.row__verifyLink}
-                        aria-label={`Verify credential for ${cert.name}`}
-                      >
-                        <span>VERIFY CREDENTIAL</span>
-                        <span className={styles.row__arrow} aria-hidden="true">
-                          ↗
-                        </span>
-                      </a>
-                    ) : (
-                      <span className={styles.row__verifiedText}>VERIFIED</span>
-                    )}
-                  </div>
-                </div>
-              </motion.article>
-            );
-          })}
+          {featuredList.map((cert, i) => renderRow(cert, i, "featured"))}
         </div>
 
-        {/* Minimal Editorial "VIEW ALL" Action */}
-        {certifications.length > 6 && (
-          <div className={styles.moreAction}>
-            <button
-              type="button"
-              className={styles.moreBtn}
-              onClick={() => setShowAll((v) => !v)}
-            >
-              <span className={styles.moreBtnText}>
-                {showAll ? "SHOW LESS ↑" : "VIEW ALL CERTIFICATIONS →"}
+        {/* 2. ACCESS TO ALL CERTIFICATIONS */}
+        <div className={styles.catalogBar}>
+          <div className={styles.catalogInfo}>
+            <span className={styles.catalogEyebrow}>CREDENTIAL ARCHIVE</span>
+            <div className={styles.catalogCountRow}>
+              <span className={styles.catalogCount}>
+                {totalCount} CREDENTIALS
               </span>
-              <span className={styles.moreBtnCount}>
-                {certifications.length} CREDENTIALS
-              </span>
-            </button>
+            </div>
+            <p className={styles.catalogDesc}>
+              Complete repository of technical credentials, verified coursework, and learning achievements.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            className={styles.viewAllBtn}
+            onClick={() => {
+              const willExpand = !isExpanded;
+              setIsExpanded(willExpand);
+              if (willExpand) {
+                setTimeout(() => {
+                  const target = document.getElementById("all-certifications");
+                  if (target) {
+                    target.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }
+                }, 120);
+              }
+            }}
+            aria-expanded={isExpanded}
+          >
+            <span className={styles.viewAllBtnText}>
+              {isExpanded ? "HIDE FULL ARCHIVE ↑" : "VIEW ALL CERTIFICATIONS →"}
+            </span>
+            <span className={styles.viewAllBtnCount}>
+              {totalCount} CREDENTIALS
+            </span>
+          </button>
+        </div>
+
+        {/* 3. ALL CERTIFICATIONS (EXPANDED CATALOG WITH SEARCH + FILTERS) */}
+        {isExpanded && (
+          <div id="all-certifications" className={styles.allCatalog}>
+            <div className={styles.allCatalogHead}>
+              <div className={styles.allTitleCol}>
+                <div className={styles.allEyebrow}>
+                  <span className={styles.eyebrowDot} />
+                  <span>COMPLETE ARCHIVE</span>
+                </div>
+                <h3 className={styles.allHeading}>ALL CERTIFICATIONS</h3>
+                <p className={styles.allSubheading}>
+                  Search and filter credentials across artificial intelligence, cloud computing, and software engineering.
+                </p>
+              </div>
+
+              <div className={styles.allMetaCol}>
+                <span className={styles.resultsBadge}>
+                  {filteredList.length === totalCount
+                    ? `${totalCount} CREDENTIALS`
+                    : `${filteredList.length} OF ${totalCount} CREDENTIALS`}
+                </span>
+              </div>
+            </div>
+
+            {/* Search + Filter Toolbar */}
+            <div className={styles.toolbar}>
+              <div className={styles.searchBox}>
+                <svg
+                  className={styles.searchIcon}
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.3-4.3" />
+                </svg>
+                <input
+                  type="text"
+                  className={styles.searchInput}
+                  placeholder="Search certifications..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  aria-label="Search certifications"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    className={styles.clearBtn}
+                    onClick={() => setSearchQuery("")}
+                    aria-label="Clear search query"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+
+              <div
+                className={styles.filterPills}
+                role="tablist"
+                aria-label="Filter certifications by category"
+              >
+                {availableCategories.map((cat) => {
+                  const count = cat === "All" ? totalCount : categoryCounts[cat] || 0;
+                  const isActive = activeCategory === cat;
+                  return (
+                    <button
+                      key={cat}
+                      type="button"
+                      role="tab"
+                      aria-selected={isActive}
+                      className={`${styles.filterPill} ${
+                        isActive ? styles.filterPillActive : ""
+                      }`}
+                      onClick={() => setActiveCategory(cat)}
+                    >
+                      <span className={styles.filterPillLabel}>
+                        {cat.toUpperCase()}
+                      </span>
+                      <span className={styles.filterPillBadge}>{count}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Complete Rows Container */}
+            <div className={styles.rowsContainer}>
+              {filteredList.length > 0 ? (
+                filteredList.map((cert, i) => renderRow(cert, i, "all"))
+              ) : (
+                <div className={styles.noResults}>
+                  <p className={styles.noResultsTitle}>
+                    NO CERTIFICATIONS FOUND
+                  </p>
+                  <p className={styles.noResultsSub}>
+                    {searchQuery ? `No matches found for "${searchQuery}"` : ""}{" "}
+                    {activeCategory !== "All"
+                      ? `in category ${activeCategory}`
+                      : ""}
+                  </p>
+                  <button
+                    type="button"
+                    className={styles.resetBtn}
+                    onClick={() => {
+                      setSearchQuery("");
+                      setActiveCategory("All");
+                    }}
+                  >
+                    RESET SEARCH &amp; FILTERS
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Collapse action bar at bottom of the catalog */}
+            <div className={styles.collapseBar}>
+              <button
+                type="button"
+                className={styles.collapseBtn}
+                onClick={() => {
+                  setIsExpanded(false);
+                  const headerEl = document.getElementById("certifications");
+                  if (headerEl) {
+                    headerEl.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }
+                }}
+              >
+                <span>COLLAPSE COLLECTION ↑</span>
+              </button>
+            </div>
           </div>
         )}
       </div>

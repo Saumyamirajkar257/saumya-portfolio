@@ -157,17 +157,30 @@ const MODELS = {
       { key: "name", label: "Certificate Name", type: "text", required: true },
       { key: "organization", label: "Issuing Organization", type: "text", required: true },
       { key: "issuer", label: "Issuer / Platform (e.g. Coursera)", type: "text" },
+      { key: "provider", label: "Provider (alias)", type: "text" },
+      {
+        key: "category",
+        label: "Category",
+        type: "select-custom",
+        options: ["AI", "Cloud", "Software", "Programming", "Other"],
+      },
       { key: "issueDate", label: "Issue Date (e.g. JUL 2026)", type: "text", required: true },
-      { key: "expiryStatus", label: "Expiry Status (e.g. No expiry / Expires: JUL 2029 / Not provided)", type: "text" },
+      { key: "expiryDate", label: "Expiry Date (leave empty if none)", type: "text" },
+      { key: "expiryStatus", label: "Expiry Status (e.g. No expiry explicitly stated / Expires: JUL 2029 / Expiry information unavailable)", type: "text" },
       { key: "credentialId", label: "Credential ID (or Not provided)", type: "text" },
       { key: "verificationUrl", label: "Verification URL", type: "text" },
+      { key: "credentialUrl", label: "Credential URL", type: "text" },
       { key: "sourceCredentialUrl", label: "Source Credential URL", type: "text" },
-      { key: "category", label: "Category", type: "text" },
+      { key: "recipient", label: "Recipient Name", type: "text" },
+      { key: "skills", label: "Skills Covered (comma-separated)", type: "text" },
       { key: "description", label: "Description", type: "textarea" },
       { key: "imageUrl", label: "Certificate Image / Badge URL", type: "text" },
+      { key: "verified", label: "Verified Credential", type: "checkbox" },
+      { key: "featured", label: "Featured Credential (Top Showcase)", type: "checkbox" },
+      { key: "visible", label: "Visible on Portfolio", type: "checkbox" },
       { key: "status", label: "Status (published / draft)", type: "select", options: ["published", "draft"] },
-      { key: "featured", label: "Featured Credential", type: "checkbox" },
-      { key: "order", label: "Display Order (0 = Top / First)", type: "number" },
+      { key: "sortOrder", label: "Sort Order (0 = Top / First priority)", type: "number" },
+      { key: "order", label: "Display Order (legacy alias)", type: "number" },
     ],
   },
 };
@@ -363,6 +376,14 @@ function buildPayload(model, values) {
     }
     payload[f.key] = v;
   }
+  if (payload.sortOrder !== undefined && (payload.order === undefined || payload.order === 0)) {
+    payload.order = payload.sortOrder;
+  } else if (payload.order !== undefined && (payload.sortOrder === undefined || payload.sortOrder === 0)) {
+    payload.sortOrder = payload.order;
+  }
+  if (payload.visible !== undefined) {
+    payload.status = payload.visible ? "published" : "draft";
+  }
   payload.updatedAt = new Date().toISOString();
   return payload;
 }
@@ -374,8 +395,20 @@ function valuesFromItem(fields, item) {
     if (f.key === "issueDate" && !v && item?.date) v = item.date;
     if (f.key === "verificationUrl" && !v && (item?.credential_url || item?.credentialUrl))
       v = item.credential_url || item.credentialUrl;
+    if (f.key === "credentialUrl" && !v && (item?.verificationUrl || item?.credential_url))
+      v = item.verificationUrl || item.credential_url;
+    if (f.key === "provider" && !v && item?.issuer) v = item.issuer;
+    if (f.key === "issuer" && !v && item?.provider) v = item.provider;
+    if (f.key === "sortOrder" && v === undefined && item?.order !== undefined) v = item.order;
+    if (f.key === "order" && v === undefined && item?.sortOrder !== undefined) v = item.sortOrder;
+    if (f.key === "visible" && v === undefined) {
+      v = item?.visible !== false && item?.status !== "draft";
+    }
+    if (f.key === "verified" && v === undefined) {
+      v = item?.verified !== false;
+    }
     if (f.key === "status" && !v) {
-      v = item?.published === false ? "draft" : "published";
+      v = item?.published === false || item?.visible === false ? "draft" : "published";
     }
 
     if (f.type === "lines") v = joinLines(v);
@@ -482,6 +515,7 @@ function CertificationsManager() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("All");
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
 
@@ -804,17 +838,74 @@ function CertificationsManager() {
     setDeleteBusy(false);
   };
 
-  // Filtered Items via Search
+  // Toggle Featured status
+  const handleToggleFeatured = async (item) => {
+    try {
+      const newFeatured = !item.featured;
+      await updateDoc(doc(db, "certifications", String(item.id)), {
+        featured: newFeatured,
+        updatedAt: new Date().toISOString(),
+      });
+      clearContentCache();
+      setNotice(`"${item.name}" ${newFeatured ? "marked as Featured ★" : "unfeatured"}`);
+      refresh();
+      setTimeout(() => setNotice(""), 3000);
+    } catch (err) {
+      setError("Failed to update featured state: " + err.message);
+    }
+  };
+
+  // Toggle Visibility status (Published vs Draft)
+  const handleToggleVisibility = async (item) => {
+    try {
+      const isHidden = item.visible === false || item.status === "draft";
+      const nextVisible = isHidden;
+      await updateDoc(doc(db, "certifications", String(item.id)), {
+        visible: nextVisible,
+        status: nextVisible ? "published" : "draft",
+        updatedAt: new Date().toISOString(),
+      });
+      clearContentCache();
+      setNotice(`"${item.name}" is now ${nextVisible ? "Visible on portfolio ✓" : "Hidden from portfolio"}`);
+      refresh();
+      setTimeout(() => setNotice(""), 3000);
+    } catch (err) {
+      setError("Failed to update visibility: " + err.message);
+    }
+  };
+
+  // Filtered Items via Search and Category
   const filteredItems = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
-    if (!q) return items;
     return items.filter((item) => {
+      if (categoryFilter !== "All") {
+        const cat = (item.category || "").toLowerCase();
+        const text = `${item.name || ""} ${item.description || ""}`.toLowerCase();
+        let derivedCat = "other";
+        if (cat) {
+          derivedCat = cat;
+        } else if (text.includes("ai") || text.includes("artificial intelligence") || text.includes("generative")) {
+          derivedCat = "ai";
+        } else if (text.includes("cloud") || text.includes("aws") || text.includes("azure")) {
+          derivedCat = "cloud";
+        } else if (text.includes("software") || text.includes("jira") || text.includes("agile")) {
+          derivedCat = "software";
+        } else if (text.includes("python") || text.includes("javascript") || text.includes("html") || text.includes("css") || text.includes("programming") || text.includes("developer")) {
+          derivedCat = "programming";
+        }
+        if (derivedCat.toLowerCase() !== categoryFilter.toLowerCase()) {
+          return false;
+        }
+      }
+
+      if (!q) return true;
       const name = (item.name || "").toLowerCase();
-      const org = (item.organization || item.issuer || "").toLowerCase();
+      const org = (item.organization || item.issuer || item.provider || "").toLowerCase();
       const id = (item.credentialId || "").toLowerCase();
-      return name.includes(q) || org.includes(q) || id.includes(q);
+      const skills = (item.skills || "").toLowerCase();
+      return name.includes(q) || org.includes(q) || id.includes(q) || skills.includes(q);
     });
-  }, [items, searchQuery]);
+  }, [items, searchQuery, categoryFilter]);
 
   return (
     <div className="admin-panel">
@@ -1160,20 +1251,36 @@ function CertificationsManager() {
         </div>
       ) : (
         <>
-          {/* Search bar */}
-          <div className="admin-search">
-            <input
-              type="text"
-              placeholder="Search certificate, organization, ID…"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+          {/* Search bar & Category filter toolbar */}
+          <div style={{ display: "grid", gap: "10px", marginBottom: "16px" }}>
+            <div className="admin-search">
+              <input
+                type="text"
+                placeholder="Search certificate, organization, ID, skills…"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
+              <span className="admin-muted" style={{ fontSize: "11.5px", marginRight: "4px" }}>Filter:</span>
+              {["All", "AI", "Cloud", "Software", "Programming", "Other"].map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  className={`admin-btn admin-btn--sm ${categoryFilter === cat ? "admin-btn--primary" : ""}`}
+                  style={{ fontSize: "11px", padding: "4px 10px" }}
+                  onClick={() => setCategoryFilter(cat)}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Certificate List */}
           <ul className="admin-list">
             {filteredItems.map((item, idx) => {
-              const isDraft = item.status === "draft" || item.published === false;
+              const isDraft = item.status === "draft" || item.published === false || item.visible === false;
               const hasUrl = Boolean(
                 item.sourceCredentialUrl ||
                 item.verificationUrl ||
@@ -1186,7 +1293,7 @@ function CertificationsManager() {
                   <div className="admin-list__left">
                     <span
                       className="admin-list__orderBadge"
-                      title={`Display Order: ${item.order ?? idx}`}
+                      title={`Display Order: ${item.sortOrder ?? item.order ?? idx}`}
                     >
                       #{idx + 1}
                     </span>
@@ -1201,15 +1308,42 @@ function CertificationsManager() {
                         {item.featured && (
                           <span className="admin-badge admin-badge--featured">FEATURED</span>
                         )}
+                        {item.category && (
+                          <span className="admin-badge" style={{ fontSize: "9.5px" }}>
+                            {String(item.category).toUpperCase()}
+                          </span>
+                        )}
                       </div>
                       <span className="admin-muted">
-                        {item.organization || item.issuer || "Independent"} · {item.issueDate || item.date || "2026"}
+                        {item.organization || item.issuer || item.provider || "Independent"} · {item.issueDate || item.date || "2026"}
                         {item.credentialId && item.credentialId !== "Not provided" ? ` · ID: ${item.credentialId}` : ""}
                       </span>
                     </div>
                   </div>
 
                   <div className="admin-list__tools">
+                    {/* Instant Feature / Unfeature Button */}
+                    <button
+                      type="button"
+                      className={`admin-btn admin-btn--sm ${
+                        item.featured ? "admin-btn--featured-active" : ""
+                      }`}
+                      onClick={() => handleToggleFeatured(item)}
+                      title={item.featured ? "Click to unfeature" : "Click to feature at top of portfolio"}
+                    >
+                      {item.featured ? "★ Featured" : "☆ Feature"}
+                    </button>
+
+                    {/* Instant Visibility Toggle (Show / Hide) */}
+                    <button
+                      type="button"
+                      className="admin-btn admin-btn--sm"
+                      onClick={() => handleToggleVisibility(item)}
+                      title={isDraft ? "Click to publish on portfolio" : "Click to hide from portfolio"}
+                    >
+                      {isDraft ? "Show" : "Hide"}
+                    </button>
+
                     {/* Reorder */}
                     <div className="admin-reorder-btns">
                       <button

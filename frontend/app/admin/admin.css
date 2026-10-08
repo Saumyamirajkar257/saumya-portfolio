@@ -577,3 +577,48 @@
   border-color: rgba(0, 229, 160, 0.5);
   background: rgba(0, 229, 160, 0.04);
 }
+
+/* Badges & Action Buttons for Certifications & Content */
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-dim);
+}
+
+.admin-badge--published {
+  background: rgba(0, 229, 160, 0.1);
+  border-color: rgba(0, 229, 160, 0.35);
+  color: var(--accent);
+}
+
+.admin-badge--draft {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--text-mute);
+}
+
+.admin-badge--featured {
+  background: rgba(255, 204, 0, 0.12);
+  border-color: rgba(255, 204, 0, 0.4);
+  color: #ffcc00;
+}
+
+.admin-badge--verified {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.35);
+  color: #60a5fa;
+}
+
+.admin-btn--featured-active {
+  background: rgba(255, 204, 0, 0.15) !important;
+  border-color: rgba(255, 204, 0, 0.5) !important;
+  color: #ffcc00 !important;
+}
