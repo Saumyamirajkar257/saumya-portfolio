@@ -2,18 +2,26 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
-import { auth, db } from "@/lib/firebase";
+import { auth, db, storage } from "@/lib/firebase";
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
 import {
   collection,
   getDocs,
+  getDoc,
   doc,
   setDoc,
   deleteDoc,
   updateDoc,
 } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { fallbackContent } from "@/lib/fallback";
 import { clearContentCache, migrateInitialData } from "@/lib/content";
+import {
+  CANONICAL_RESUME_PATH,
+  CANONICAL_RESUME_FILENAME,
+  getActiveResumeUrl,
+  getResumeFilename,
+} from "@/lib/resume";
 import "./admin.css";
 
 /* ------------------------------------------------------------------ */
@@ -29,12 +37,11 @@ const parseLines = (s) =>
 const joinLines = (arr = []) => (Array.isArray(arr) ? arr.join("\n") : "");
 
 const SKILL_CATEGORIES = [
-  "Programming",
+  "Languages",
   "Web Development",
-  "IoT & Hardware",
-  "Tools",
-  "Cloud",
-  "Database",
+  "Backend / Database",
+  "Tools & Platforms",
+  "IoT / Hardware",
   "Professional",
 ];
 
@@ -97,9 +104,10 @@ const MODELS = {
     fields: [
       { key: "name", label: "Skill Name", type: "text", required: true },
       { key: "category", label: "Category", type: "select-custom", options: SKILL_CATEGORIES, required: true },
-      { key: "icon", label: "Icon Key (e.g. python, cpp, c, javascript, react, html, css, arduino, sensor, git, github, database, cloud, problem, comms, team, time)", type: "text" },
-      { key: "proficiency", label: "Proficiency / Level (optional)", type: "text" },
+      { key: "icon", label: "Icon Key (e.g. python, cpp, c, javascript, react, html, css, firebase, vite, arduino, sensor, git, github, excel, powerpoint, database, cloud, problem, comms, team, time)", type: "text" },
+      { key: "proficiency", label: "Proficiency Label (e.g. Advanced, Proficient — text only, no percentages)", type: "text" },
       { key: "keywords", label: "Keywords / Tags (one per line)", type: "lines" },
+      { key: "visible", label: "Visible on Portfolio", type: "checkbox" },
       { key: "status", label: "Status (published / draft)", type: "select", options: ["published", "draft"] },
       { key: "featured", label: "Featured in Constellation", type: "checkbox" },
       { key: "order", label: "Display Order (0 = Top / First)", type: "number" },
@@ -1417,6 +1425,28 @@ function ContentManager({ modelKey }) {
     setDeleteBusy(false);
   };
 
+  const toggleVisibility = async (item) => {
+    if (!item || model.isSingleton) return;
+    const isCurrentlyHidden =
+      item.status === "draft" || item.published === false || item.visible === false;
+    const newStatus = isCurrentlyHidden ? "published" : "draft";
+    const newVisible = isCurrentlyHidden;
+
+    try {
+      await updateDoc(doc(db, model.collection, String(item.id)), {
+        status: newStatus,
+        visible: newVisible,
+        published: newVisible,
+      });
+      clearContentCache();
+      setNotice(`${headline(item)} is now ${newVisible ? "VISIBLE" : "HIDDEN"} ✓`);
+      refresh();
+      setTimeout(() => setNotice(""), 3000);
+    } catch (err) {
+      setError("Failed to update visibility: " + err.message);
+    }
+  };
+
   const headline = (item) =>
     item.name ||
     item.title ||
@@ -1590,6 +1620,14 @@ function ContentManager({ modelKey }) {
                       </button>
                     </div>
                     <button
+                      type="button"
+                      className={`admin-btn admin-btn--sm ${isDraft ? "admin-btn--primary" : ""}`}
+                      onClick={() => toggleVisibility(item)}
+                      title={isDraft ? "Publish / Show on public portfolio" : "Hide from public portfolio"}
+                    >
+                      {isDraft ? "Show" : "Hide"}
+                    </button>
+                    <button
                       className="admin-btn admin-btn--sm"
                       onClick={() => beginEdit(item)}
                     >
@@ -1702,6 +1740,242 @@ function MessagesManager() {
           )}
         </ul>
       )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Résumé Management Panel                                           */
+/* ------------------------------------------------------------------ */
+
+function ResumeManager() {
+  const [loading, setLoading] = useState(true);
+  const [activeUrl, setActiveUrl] = useState(CANONICAL_RESUME_PATH);
+  const [customUrl, setCustomUrl] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [notice, setNotice] = useState("");
+  const [error, setError] = useState("");
+
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    try {
+      const snap = await getDoc(doc(db, "profile", "main"));
+      if (snap.exists()) {
+        const data = snap.data();
+        const resolved = getActiveResumeUrl(data);
+        setActiveUrl(resolved);
+        setCustomUrl(resolved);
+      } else {
+        setActiveUrl(CANONICAL_RESUME_PATH);
+        setCustomUrl(CANONICAL_RESUME_PATH);
+      }
+    } catch (err) {
+      console.warn("Resume fetch warning:", err.message);
+      setActiveUrl(CANONICAL_RESUME_PATH);
+      setCustomUrl(CANONICAL_RESUME_PATH);
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  const updateActiveResume = async (newUrl) => {
+    setError("");
+    setNotice("");
+    try {
+      await setDoc(doc(db, "profile", "main"), { resume_url: newUrl }, { merge: true });
+      clearContentCache();
+      setActiveUrl(newUrl);
+      setCustomUrl(newUrl);
+      setNotice("Active résumé updated successfully! Reflecting live on portfolio ✓");
+      setTimeout(() => setNotice(""), 3500);
+    } catch (err) {
+      setError("Failed to update résumé: " + err.message);
+    }
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.name.toLowerCase().endsWith(".pdf")) {
+      setError("Please select a valid PDF document (.pdf)");
+      return;
+    }
+
+    setUploading(true);
+    setError("");
+    setNotice("");
+
+    try {
+      if (!storage) {
+        throw new Error(
+          "Firebase Storage is not initialized in this environment. You can set a custom URL or use the canonical PDF."
+        );
+      }
+      const fileRef = ref(storage, `resumes/${Date.now()}_${file.name}`);
+      await uploadBytes(fileRef, file);
+      const downloadUrl = await getDownloadURL(fileRef);
+      await updateActiveResume(downloadUrl);
+      setNotice(`Uploaded "${file.name}" and set as active résumé ✓`);
+    } catch (err) {
+      setError("Upload failed: " + err.message);
+    }
+    setUploading(false);
+  };
+
+  const handleResetCanonical = async () => {
+    if (
+      !window.confirm(
+        `Reset active résumé to default canonical file (${CANONICAL_RESUME_PATH})?`
+      )
+    )
+      return;
+    await updateActiveResume(CANONICAL_RESUME_PATH);
+  };
+
+  const filename = getResumeFilename(activeUrl);
+  const isCanonical = activeUrl === CANONICAL_RESUME_PATH;
+
+  return (
+    <div className="admin-panel">
+      <div className="admin-panel__head">
+        <div>
+          <h2>Active Résumé Management</h2>
+          <p className="admin-muted" style={{ marginTop: "4px" }}>
+            Single managed resource consumed by Navigation, Hero CTA, and Contact section.
+          </p>
+        </div>
+        <div className="admin-panel__actions">
+          {notice ? <span className="admin-notice">{notice}</span> : null}
+          <button className="admin-btn" onClick={refresh}>
+            ↻ Refresh
+          </button>
+        </div>
+      </div>
+
+      {error ? <p className="admin-error">{error}</p> : null}
+
+      <div className="admin-resume-grid">
+        {/* Left Column: Active Resume Status & Management */}
+        <div className="admin-resume-card">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span className="admin-resume-badge">
+              ● {isCanonical ? "ACTIVE (CANONICAL)" : "ACTIVE (STORAGE / CUSTOM)"}
+            </span>
+            <span className="admin-muted" style={{ fontSize: "12px", fontFamily: "var(--font-mono)" }}>
+              SOURCE: FIRESTORE
+            </span>
+          </div>
+
+          <div>
+            <label style={{ fontSize: "11px", fontFamily: "var(--font-mono)", color: "var(--text-mute)", textTransform: "uppercase" }}>
+              Active Filename
+            </label>
+            <div style={{ fontSize: "16px", fontWeight: "700", marginTop: "4px", wordBreak: "break-all" }}>
+              {filename}
+            </div>
+          </div>
+
+          <div>
+            <label style={{ fontSize: "11px", fontFamily: "var(--font-mono)", color: "var(--text-mute)", textTransform: "uppercase" }}>
+              Current Active URL / Path
+            </label>
+            <div style={{ fontSize: "12.5px", fontFamily: "var(--font-mono)", color: "var(--text-dim)", marginTop: "4px", wordBreak: "break-all", background: "rgba(255,255,255,0.03)", padding: "8px 10px", borderRadius: "6px" }}>
+              {activeUrl}
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "4px" }}>
+            <a
+              href={activeUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="admin-btn admin-btn--sm"
+            >
+              Open in New Tab ↗
+            </a>
+            <a
+              href={activeUrl}
+              download={filename}
+              className="admin-btn admin-btn--sm"
+            >
+              Test Download ↓
+            </a>
+            <button
+              type="button"
+              className="admin-btn admin-btn--sm"
+              onClick={handleResetCanonical}
+              disabled={isCanonical}
+            >
+              Reset to Canonical
+            </button>
+          </div>
+
+          <hr style={{ border: "none", borderTop: "1px solid var(--line)", margin: "8px 0" }} />
+
+          {/* Upload New Resume */}
+          <div>
+            <h4 style={{ fontSize: "13.5px", marginBottom: "8px", fontWeight: "600" }}>Upload &amp; Replace Active Résumé</h4>
+            <label className="admin-dropzone">
+              <span style={{ fontSize: "24px" }}>📄</span>
+              <span style={{ fontWeight: "600", fontSize: "13px" }}>
+                {uploading ? "Uploading to Cloud Storage..." : "Choose or drag new PDF résumé"}
+              </span>
+              <span className="admin-muted" style={{ fontSize: "11.5px" }}>
+                Accepts .pdf (Updates all portfolio links instantly)
+              </span>
+              <input
+                type="file"
+                accept=".pdf"
+                style={{ display: "none" }}
+                onChange={handleFileUpload}
+                disabled={uploading}
+              />
+            </label>
+          </div>
+
+          {/* Direct URL Update */}
+          <div style={{ marginTop: "4px" }}>
+            <h4 style={{ fontSize: "13.5px", marginBottom: "8px", fontWeight: "600" }}>Or Set Custom Résumé URL / Path</h4>
+            <div style={{ display: "flex", gap: "8px" }}>
+              <input
+                type="text"
+                value={customUrl}
+                onChange={(e) => setCustomUrl(e.target.value)}
+                placeholder="/resume/Saumya_Mirajkar_Resume.pdf or https://..."
+                className="admin-input"
+                style={{ flex: 1, padding: "8px 12px", borderRadius: "6px", border: "1px solid var(--line-strong)", background: "rgba(255,255,255,0.05)", color: "#fff", fontSize: "13px" }}
+              />
+              <button
+                type="button"
+                className="admin-btn admin-btn--primary admin-btn--sm"
+                onClick={() => updateActiveResume(customUrl)}
+              >
+                Set Active
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Live Embedded Preview */}
+        <div className="admin-resume-card">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <h4 style={{ fontSize: "14px", margin: 0, fontWeight: "600" }}>Live Document Preview</h4>
+            <span className="admin-muted" style={{ fontSize: "11.5px", fontFamily: "var(--font-mono)" }}>
+              {filename}
+            </span>
+          </div>
+          <iframe
+            src={`${activeUrl}#toolbar=0`}
+            title="Active Résumé Preview"
+            className="admin-resume-preview-frame"
+          />
+        </div>
+      </div>
     </div>
   );
 }
@@ -1937,6 +2211,12 @@ export default function AdminPage() {
             Profile &amp; About
           </button>
           <button
+            className={`admin__navBtn ${tab === "resume" ? "is-active" : ""}`}
+            onClick={() => setTab("resume")}
+          >
+            Active Résumé 📄
+          </button>
+          <button
             className={`admin__navBtn ${tab === "messages" ? "is-active" : ""}`}
             onClick={() => setTab("messages")}
           >
@@ -1958,6 +2238,7 @@ export default function AdminPage() {
           <Overview onLogout={() => signOut(auth)} onSelectTab={setTab} />
         )}
         {tab === "certifications" && <CertificationsManager />}
+        {tab === "resume" && <ResumeManager />}
         {tab in MODELS && tab !== "certifications" && (
           <ContentManager modelKey={tab} />
         )}

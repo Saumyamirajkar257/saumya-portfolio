@@ -1,12 +1,14 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
 
 let app = null;
 let auth = null;
 let db = null;
+let storage = null;
 
 if (apiKey) {
   const firebaseConfig = {
@@ -22,9 +24,10 @@ if (apiKey) {
     app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
     auth = getAuth(app);
     db = getFirestore(app);
+    storage = getStorage(app);
   } catch (err) {
     console.warn("Firebase initialization warning:", err.message);
   }
 }
 
-export { app, auth, db };
+export { app, auth, db, storage };

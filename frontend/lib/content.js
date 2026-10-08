@@ -30,6 +30,7 @@ function withTimeout(promise, ms = 6000) {
  */
 function isPubliclyVisible(item) {
   if (item.published === false) return false;
+  if (item.visible === false) return false;
   if (item.status === "draft" || item.status === "hidden") return false;
   return true;
 }
@@ -99,13 +100,26 @@ export async function getContent(forceRefresh = false) {
 
         if (fetchedItems.length > 0) {
           // FIRESTORE IS THE SINGLE SOURCE OF TRUTH:
+          let itemsToUse = fetchedItems;
+          if (c === "skills" && fallbackContent.skills) {
+            const existingNames = new Set(
+              fetchedItems.map((s) => (s.name || "").toLowerCase().trim())
+            );
+            const missingFallbacks = fallbackContent.skills.filter(
+              (s) => !existingNames.has((s.name || "").toLowerCase().trim())
+            );
+            if (missingFallbacks.length > 0) {
+              itemsToUse = [...fetchedItems, ...missingFallbacks];
+            }
+          }
+
           // Filter out unpublished/draft/hidden items for the public view
-          const publicItems = fetchedItems.filter(isPubliclyVisible);
+          const publicItems = itemsToUse.filter(isPubliclyVisible);
           // Sort strictly by display order
           publicItems.sort(
             (a, b) =>
-              Number(a.order ?? a.displayOrder ?? 999) -
-              Number(b.order ?? b.displayOrder ?? 999)
+              Number(a.sortOrder ?? a.order ?? a.displayOrder ?? 999) -
+              Number(b.sortOrder ?? b.order ?? b.displayOrder ?? 999)
           );
           content[c] = publicItems;
         } else if (fallbackContent[c]) {
@@ -184,11 +198,23 @@ export function subscribeContent(onUpdate) {
         (snap) => {
           const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
           if (items.length > 0) {
-            const publicItems = items.filter(isPubliclyVisible);
+            let itemsToUse = items;
+            if (colName === "skills" && fallbackContent.skills) {
+              const existingNames = new Set(
+                items.map((s) => (s.name || "").toLowerCase().trim())
+              );
+              const missingFallbacks = fallbackContent.skills.filter(
+                (s) => !existingNames.has((s.name || "").toLowerCase().trim())
+              );
+              if (missingFallbacks.length > 0) {
+                itemsToUse = [...items, ...missingFallbacks];
+              }
+            }
+            const publicItems = itemsToUse.filter(isPubliclyVisible);
             publicItems.sort(
               (a, b) =>
-                Number(a.order ?? a.displayOrder ?? 999) -
-                Number(b.order ?? b.displayOrder ?? 999)
+                Number(a.sortOrder ?? a.order ?? a.displayOrder ?? 999) -
+                Number(b.sortOrder ?? b.order ?? b.displayOrder ?? 999)
             );
             state[colName] = publicItems;
           } else if (snap.empty && fallbackContent[colName]) {

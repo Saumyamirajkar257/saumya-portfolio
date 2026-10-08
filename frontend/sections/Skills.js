@@ -140,6 +140,18 @@ const SKILL_ICONS = {
       <polyline points="12 6 12 12 16 14" />
     </svg>
   ),
+  firebase: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4.5 19L7.5 4.5L11 11L8.5 15.5L4.5 19Z" />
+      <path d="M12.5 12L15 7.5L20 19L4.5 19L12.5 12Z" />
+      <circle cx="12" cy="18" r="1.2" fill="currentColor" />
+    </svg>
+  ),
+  vite: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+    </svg>
+  ),
   code: (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <polyline points="16 18 22 12 16 6" />
@@ -162,19 +174,44 @@ function resolveIcon(item) {
     return SKILL_ICONS.javascript;
   if (name.includes("html")) return SKILL_ICONS.html;
   if (name.includes("css")) return SKILL_ICONS.css;
+  if (name.includes("firebase") || name.includes("firestore")) return SKILL_ICONS.firebase;
+  if (name.includes("vite")) return SKILL_ICONS.vite;
   if (name.includes("github")) return SKILL_ICONS.github;
   if (name.includes("git")) return SKILL_ICONS.git;
-  if (name.includes("sql") || name.includes("data") || name.includes("mongo") || name.includes("fire"))
+  if (name.includes("excel")) return SKILL_ICONS.excel;
+  if (name.includes("powerpoint")) return SKILL_ICONS.powerpoint;
+  if (name.includes("sql") || name.includes("data") || name.includes("mongo"))
     return SKILL_ICONS.database;
   if (name.includes("cloud") || name.includes("aws") || name.includes("azure"))
     return SKILL_ICONS.cloud;
-  if (name.includes("excel")) return SKILL_ICONS.excel;
-  if (name.includes("powerpoint")) return SKILL_ICONS.powerpoint;
   if (name.includes("problem")) return SKILL_ICONS.problem;
   if (name.includes("comm")) return SKILL_ICONS.comms;
   if (name.includes("team")) return SKILL_ICONS.team;
   if (name.includes("time")) return SKILL_ICONS.time;
   return SKILL_ICONS.code;
+}
+
+const CANONICAL_ORDER = [
+  "LANGUAGES",
+  "WEB DEVELOPMENT",
+  "BACKEND / DATABASE",
+  "TOOLS & PLATFORMS",
+  "IoT / HARDWARE",
+  "PROFESSIONAL",
+];
+
+function normalizeCategory(raw = "") {
+  const c = (raw || "").trim().toUpperCase();
+  if (c.includes("LANG") || c.includes("PROG")) return "LANGUAGES";
+  if (c.includes("WEB") || c.includes("FRONTEND")) return "WEB DEVELOPMENT";
+  if (c.includes("BACKEND") || c.includes("DATABASE") || c.includes("DATA") || c.includes("CLOUD"))
+    return "BACKEND / DATABASE";
+  if (c.includes("IOT") || c.includes("HARDWARE") || c.includes("EMBEDDED") || c.includes("SENSOR"))
+    return "IoT / HARDWARE";
+  if (c.includes("TOOL") || c.includes("PLATFORM")) return "TOOLS & PLATFORMS";
+  if (c.includes("PROFESSIONAL") || c.includes("CORE") || c.includes("SOFT"))
+    return "PROFESSIONAL";
+  return raw.trim().toUpperCase() || "TECHNICAL COMPETENCIES";
 }
 
 // 8 Orbital slots for the visual constellation geometry
@@ -193,43 +230,58 @@ export default function Skills({ skills = [] }) {
   const [hoveredNode, setHoveredNode] = useState(null);
   const reduce = useReducedMotion();
 
-  const sortedSkills = [...skills].sort(
-    (a, b) => Number(a.order ?? 999) - Number(b.order ?? 999)
-  );
+  // Filter out hidden / draft items and sort by CMS sortOrder / order
+  const visibleSkills = [...skills]
+    .filter((s) => s.visible !== false && s.status !== "draft" && s.status !== "hidden")
+    .sort(
+      (a, b) =>
+        Number(a.sortOrder ?? a.order ?? a.displayOrder ?? 999) -
+        Number(b.sortOrder ?? b.order ?? b.displayOrder ?? 999)
+    );
 
-  // Group dynamic skills into categories for the recruiter fast scanner
+  // Group dynamic skills into canonical professional categories
   const categoryMap = new Map();
 
-  sortedSkills.forEach((s) => {
-    let catName = (s.category || "TECHNICAL & PROGRAMMING").trim().toUpperCase();
-    if (catName === "LANGUAGES" || catName === "PROGRAMMING") catName = "TECHNICAL & PROGRAMMING";
-    if (catName === "WEB" || catName === "WEB DEVELOPMENT") catName = "WEB DEVELOPMENT & FRAMEWORKS";
-    if (catName === "IOT & EMBEDDED" || catName === "IOT & HARDWARE" || catName === "HARDWARE")
-      catName = "HARDWARE, IOT & TOOLS";
-    if (catName === "TOOLS & PLATFORMS" || catName === "TOOLS") catName = "TOOLS & PLATFORMS";
-    if (catName === "PROFESSIONAL" || catName === "CORE") catName = "CORE & PROFESSIONAL";
+  visibleSkills.forEach((s) => {
+    const catTitle = normalizeCategory(s.category);
 
-    if (!categoryMap.has(catName)) {
-      categoryMap.set(catName, []);
+    if (!categoryMap.has(catTitle)) {
+      categoryMap.set(catTitle, []);
     }
-    categoryMap.get(catName).push({
+    categoryMap.get(catTitle).push({
       id: s.id,
       name: s.name,
+      proficiency: s.proficiency || null,
       icon: resolveIcon(s),
     });
   });
 
-  const categories = Array.from(categoryMap.entries()).map(([title, list], idx) => ({
-    id: `cat-${idx}`,
-    title,
-    skills: list,
-  }));
+  // Sort categories according to CANONICAL_ORDER
+  const categories = Array.from(categoryMap.entries())
+    .sort(([catA], [catB]) => {
+      const idxA = CANONICAL_ORDER.indexOf(catA);
+      const idxB = CANONICAL_ORDER.indexOf(catB);
+      const scoreA = idxA === -1 ? 99 : idxA;
+      const scoreB = idxB === -1 ? 99 : idxB;
+      return scoreA - scoreB;
+    })
+    .map(([title, list], idx) => ({
+      id: `cat-${idx}`,
+      title,
+      skills: list,
+    }));
+
+  // Featured constellation pool: prefer featured skills, fallback to top sorted
+  const featuredPool = [
+    ...visibleSkills.filter((s) => s.featured),
+    ...visibleSkills.filter((s) => !s.featured),
+  ];
 
   // Build dynamic constellation nodes from the top skills
   const constellationNodes = ORBIT_SLOTS.map((slot, idx) => {
-    const skill = sortedSkills[idx] || {
+    const skill = featuredPool[idx] || {
       id: `fallback-${idx}`,
-      name: `Core Competency 0${idx + 1}`,
+      name: `Competency 0${idx + 1}`,
       category: "Engineering",
     };
     return {
@@ -453,7 +505,12 @@ export default function Skills({ skills = [] }) {
                 {/* Category Heading & Index */}
                 <div className={styles.categoryCol}>
                   <span className={styles.categoryIndex}>0{idx + 1}</span>
-                  <span className={styles.categoryName}>{cat.title}</span>
+                  <div className={styles.categoryMeta}>
+                    <span className={styles.categoryName}>{cat.title}</span>
+                    <span className={styles.categoryCount}>
+                      {cat.skills.length} {cat.skills.length === 1 ? "COMPETENCY" : "COMPETENCIES"}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Skill Chips List */}
@@ -462,6 +519,11 @@ export default function Skills({ skills = [] }) {
                     <div key={skill.id || skill.name} className={styles.skillChip}>
                       <span className={styles.skillChipIcon}>{skill.icon}</span>
                       <span className={styles.skillChipName}>{skill.name}</span>
+                      {skill.proficiency && (
+                        <span className={styles.skillProficiency}>
+                          {skill.proficiency}
+                        </span>
+                      )}
                     </div>
                   ))}
                 </div>

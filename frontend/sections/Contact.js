@@ -3,6 +3,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 import ContactForm from "@/components/ContactForm";
 import { EASE, TIMING } from "@/components/animations/MotionSystem";
+import { getActiveResumeUrl } from "@/lib/resume";
 import styles from "./Contact.module.css";
 
 const ENVELOPE_ICON = (
@@ -35,6 +36,7 @@ const RESUME_ICON = (
 );
 
 export default function Contact({ profile }) {
+  const resumeUrl = getActiveResumeUrl(profile);
   const reduce = useReducedMotion();
   const socials = profile?.socials || {};
   const email = profile?.email || "Saumyamirajkar25@icloud.com";
@@ -87,13 +89,24 @@ export default function Contact({ profile }) {
                 </a>
 
                 <a
-                  href={profile?.resume_url || "/resume/Saumya_Mirajkar_Resume.pdf"}
+                  href={resumeUrl}
                   target="_blank"
                   rel="noreferrer noopener"
                   className={styles.resumeBtn}
+                  title="View Saumya Mirajkar's Résumé in browser"
                 >
                   {RESUME_ICON}
-                  <span>RÉSUMÉ</span>
+                  <span>VIEW RÉSUMÉ</span>
+                  <span className={styles.resumeArrow}>→</span>
+                </a>
+
+                <a
+                  href={resumeUrl}
+                  download="Saumya_Mirajkar_Resume.pdf"
+                  className={styles.resumeBtnGhost}
+                  title="Download Saumya Mirajkar's Résumé PDF"
+                >
+                  <span>DOWNLOAD RÉSUMÉ</span>
                   <span className={styles.resumeArrow}>↓</span>
                 </a>
               </div>

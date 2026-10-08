@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { CANONICAL_RESUME_PATH, getActiveResumeUrl } from "@/lib/resume";
+import { subscribeContent, getContent } from "@/lib/content";
 
 const LINKS = [
   { label: "Home", href: "#home" },
@@ -20,7 +22,25 @@ export default function Navbar({ name }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("#home");
+  const [resumeUrl, setResumeUrl] = useState(CANONICAL_RESUME_PATH);
+  const [resumeMenuOpen, setResumeMenuOpen] = useState(false);
   const reduce = useReducedMotion();
+
+  // Keep résumé URL in sync with CMS in real time
+  useEffect(() => {
+    getContent(false).then((data) => {
+      if (data?.profile?.resume_url) setResumeUrl(data.profile.resume_url);
+    }).catch(() => {});
+
+    const unsub = subscribeContent((liveData) => {
+      if (liveData?.profile?.resume_url) {
+        setResumeUrl(liveData.profile.resume_url);
+      }
+    });
+    return () => {
+      if (typeof unsub === "function") unsub();
+    };
+  }, []);
 
   if (pathname?.startsWith("/ielts") || pathname?.startsWith("/secret") || pathname?.startsWith("/vault")) {
     return null;
@@ -114,15 +134,54 @@ export default function Navbar({ name }) {
           </nav>
 
           <div className="nav__actions">
-            <a
-              href="/resume/Saumya_Mirajkar_Resume.pdf"
-              target="_blank"
-              rel="noreferrer"
-              className="nav__resumeLink"
+            <div
+              className="nav__resumeWrapper"
+              onMouseEnter={() => setResumeMenuOpen(true)}
+              onMouseLeave={() => setResumeMenuOpen(false)}
             >
-              <span>Résumé</span>
-              <span aria-hidden="true" style={{ fontSize: "14px" }}>↓</span>
-            </a>
+              <a
+                href={resumeUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="nav__resumeLink"
+                title="View or download Saumya's Résumé"
+              >
+                <span>Résumé</span>
+                <span aria-hidden="true" style={{ fontSize: "14px" }}>↓</span>
+              </a>
+
+              <AnimatePresence>
+                {resumeMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 4, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 4, scale: 0.98 }}
+                    transition={{ duration: 0.15 }}
+                    className="nav__resumeDropdown"
+                  >
+                    <a
+                      href={resumeUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="nav__resumeDropdownItem"
+                      onClick={() => setResumeMenuOpen(false)}
+                    >
+                      <span>View in Browser</span>
+                      <span>↗</span>
+                    </a>
+                    <a
+                      href={resumeUrl}
+                      download="Saumya_Mirajkar_Resume.pdf"
+                      className="nav__resumeDropdownItem"
+                      onClick={() => setResumeMenuOpen(false)}
+                    >
+                      <span>Download PDF</span>
+                      <span>↓</span>
+                    </a>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
 
           <button
@@ -170,15 +229,25 @@ export default function Navbar({ name }) {
                 transition={{ delay: 0.5, duration: 0.4 }}
                 className="nav-overlay__foot"
               >
-                <a
-                  href="/resume/Saumya_Mirajkar_Resume.pdf"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="btn btn--primary"
-                  style={{ width: "fit-content", padding: "10px 22px", borderRadius: "8px" }}
-                >
-                  DOWNLOAD RÉSUMÉ ↓
-                </a>
+                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
+                  <a
+                    href={resumeUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn btn--primary"
+                    style={{ width: "fit-content", padding: "10px 18px", borderRadius: "8px" }}
+                  >
+                    VIEW RÉSUMÉ ↗
+                  </a>
+                  <a
+                    href={resumeUrl}
+                    download="Saumya_Mirajkar_Resume.pdf"
+                    className="btn btn--secondary"
+                    style={{ width: "fit-content", padding: "10px 18px", borderRadius: "8px" }}
+                  >
+                    DOWNLOAD RÉSUMÉ ↓
+                  </a>
+                </div>
                 <span className="text-mono nav-overlay__tag">PUNE, INDIA</span>
               </motion.div>
             </nav>
