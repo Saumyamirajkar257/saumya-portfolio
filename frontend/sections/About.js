@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { EASE, TIMING } from "@/components/animations/MotionSystem";
+import { EASE, TIMING, MaskedHeading, MagneticButton } from "@/components/animations/MotionSystem";
 import {
   getActiveResumeUrl,
   getResumeFilename,
@@ -137,13 +137,24 @@ export default function About({
 
               <div className={styles.rowsList}>
                 {credentialRows.map((row, idx) => (
-                  <div key={row.index || idx} className={styles.credRow}>
+                  <motion.div
+                    key={row.index || idx}
+                    className={styles.credRow}
+                    initial={{ opacity: 0, x: -12 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{
+                      duration: reduce ? 0.01 : 0.5,
+                      delay: reduce ? 0 : 0.08 + idx * 0.06,
+                      ease: EASE.premium,
+                    }}
+                  >
                     <span className={styles.credIndex}>{row.index || `0${idx + 1}`}</span>
                     <div className={styles.credText}>
                       <span className={styles.credMain}>{row.main}</span>
                       <span className={styles.credSub}>{row.sub}</span>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
@@ -156,7 +167,7 @@ export default function About({
                 <span className={styles.eyebrowDot} />
                 <span>GET TO KNOW ME</span>
               </div>
-              <h2 className={styles.heading}>ABOUT</h2>
+              <MaskedHeading text="ABOUT" as="h2" className={styles.heading} />
             </div>
 
             <motion.div
@@ -196,46 +207,52 @@ export default function About({
 
             {/* Minimal Editorial CTAs */}
             <div className={styles.ctaWrapper}>
-              <a
-                href="#projects"
-                className={styles.exploreBtn}
-                onClick={(e) => {
-                  e.preventDefault();
-                  const el = document.querySelector("#projects");
-                  if (!el) return;
-                  if (window.__lenis) {
-                    window.__lenis.scrollTo(el, { offset: -60, duration: 1.2 });
-                  } else {
-                    el.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
-                  }
-                }}
-              >
-                <span>EXPLORE MY WORK</span>
-                <span className={styles.exploreArrow}>→</span>
-              </a>
+              <MagneticButton strength={0.25}>
+                <a
+                  href="#projects"
+                  className={styles.exploreBtn}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const el = document.querySelector("#projects");
+                    if (!el) return;
+                    if (window.__lenis) {
+                      window.__lenis.scrollTo(el, { offset: -60, duration: 1.2 });
+                    } else {
+                      el.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
+                    }
+                  }}
+                >
+                  <span>EXPLORE MY WORK</span>
+                  <span className={styles.exploreArrow}>→</span>
+                </a>
+              </MagneticButton>
 
               {isResumeAvailable && resumeUrl && (
                 <>
-                  <a
-                    href={resumeUrl}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className={styles.resumeViewBtn}
-                    aria-label="View Saumya Mirajkar's official resume in new tab"
-                  >
-                    <span>VIEW RÉSUMÉ</span>
-                    <span className={styles.exploreArrow}>→</span>
-                  </a>
+                  <MagneticButton strength={0.25}>
+                    <a
+                      href={resumeUrl}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className={styles.resumeViewBtn}
+                      aria-label="View Saumya Mirajkar's official resume in new tab"
+                    >
+                      <span>VIEW RÉSUMÉ</span>
+                      <span className={styles.exploreArrow}>→</span>
+                    </a>
+                  </MagneticButton>
 
-                  <a
-                    href={resumeUrl}
-                    download={resumeFilename}
-                    className={styles.resumeDownloadBtn}
-                    aria-label="Download Saumya Mirajkar's resume PDF"
-                  >
-                    <span>DOWNLOAD RÉSUMÉ</span>
-                    <span className={styles.exploreArrow}>↓</span>
-                  </a>
+                  <MagneticButton strength={0.25}>
+                    <a
+                      href={resumeUrl}
+                      download={resumeFilename}
+                      className={styles.resumeDownloadBtn}
+                      aria-label="Download Saumya Mirajkar's resume PDF"
+                    >
+                      <span>DOWNLOAD RÉSUMÉ</span>
+                      <span className={styles.exploreArrow}>↓</span>
+                    </a>
+                  </MagneticButton>
                 </>
               )}
             </div>

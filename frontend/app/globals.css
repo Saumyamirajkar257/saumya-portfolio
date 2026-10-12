@@ -470,6 +470,19 @@ section.block {
   transition: color 0.2s ease;
 }
 
+.nav__link::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 12px;
+  right: 12px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.45);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 @media (hover: none) and (pointer: coarse) {
   .nav__link:active {
     color: #FFFFFF;
@@ -479,6 +492,10 @@ section.block {
 
 @media (hover: hover) and (pointer: fine) {
   .nav__link:hover { color: #FFFFFF; }
+  .nav__link:not(.is-active):hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
 }
 .nav__link.is-active { color: #FFFFFF; font-weight: 600; }
 .nav__link-underline {

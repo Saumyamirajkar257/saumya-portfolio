@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { MagneticButton } from "@/components/animations/MotionSystem";
 
 const NAV_LINKS = [
   { label: "Home", href: "#home" },
@@ -100,13 +101,15 @@ export default function Footer() {
 
           {/* Right: Back to Top */}
           <div className="footer__action">
-            <button
-              className="btn btn--secondary btn--sm"
-              onClick={() => scrollTo("#home")}
-              aria-label="Back to top of page"
-            >
-              Back to top ↑
-            </button>
+            <MagneticButton strength={0.3}>
+              <button
+                className="btn btn--secondary btn--sm"
+                onClick={() => scrollTo("#home")}
+                aria-label="Back to top of page"
+              >
+                Back to top ↑
+              </button>
+            </MagneticButton>
           </div>
         </div>
 

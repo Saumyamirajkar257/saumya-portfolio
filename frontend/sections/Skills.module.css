@@ -404,6 +404,15 @@
   pointer-events: none;
 }
 
+.footerQuoteMask {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 4px;
+}
+
 .footerQuote {
   position: relative;
   font-family: 'Bebas Neue', 'Anton', 'Impact', sans-serif;
@@ -421,16 +430,28 @@
                -1px -1px 0px rgba(255, 255, 255, 0.05);
 }
 
-.footerTag {
+.footerTagWrap {
   position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.footerTag {
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.25em;
   color: rgba(255, 255, 255, 0.45);
   text-transform: uppercase;
-  z-index: 2;
-  display: inline-block;
+}
+
+.footerTagSep {
+  opacity: 0.35;
+  color: rgba(255, 255, 255, 0.3);
 }
 
 /* ============================================================

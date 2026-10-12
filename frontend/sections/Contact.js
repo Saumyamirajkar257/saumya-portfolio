@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import ContactForm from "@/components/ContactForm";
-import { EASE, TIMING } from "@/components/animations/MotionSystem";
+import { EASE, TIMING, MagneticButton } from "@/components/animations/MotionSystem";
 import { getActiveResumeUrl, getResumeFilename } from "@/lib/resume";
 import styles from "./Contact.module.css";
 
@@ -54,8 +54,29 @@ export default function Contact({ profile }) {
             </div>
 
             <h2 className={styles.heading}>
-              LET'S BUILD<br />
-              <span className={styles.headingDim}>SOMETHING GREAT.</span>
+              <span style={{ display: "block", overflow: "hidden" }}>
+                <motion.span
+                  style={{ display: "block" }}
+                  initial={{ y: "115%", opacity: 0 }}
+                  whileInView={{ y: "0%", opacity: 1 }}
+                  viewport={{ once: true, margin: "0px 0px -8% 0px" }}
+                  transition={{ duration: 0.85, ease: EASE.cinematic }}
+                >
+                  LET'S BUILD
+                </motion.span>
+              </span>
+              <span style={{ display: "block", overflow: "hidden" }}>
+                <motion.span
+                  style={{ display: "block" }}
+                  className={styles.headingDim}
+                  initial={{ y: "115%", opacity: 0 }}
+                  whileInView={{ y: "0%", opacity: 1 }}
+                  viewport={{ once: true, margin: "0px 0px -8% 0px" }}
+                  transition={{ duration: 0.85, delay: 0.12, ease: EASE.cinematic }}
+                >
+                  SOMETHING GREAT.
+                </motion.span>
+              </span>
             </h2>
 
             <p className={styles.subheading}>
@@ -69,49 +90,57 @@ export default function Contact({ profile }) {
               </a>
 
               <div className={styles.socialRow}>
-                <a
-                  href={socials.linkedin || profile?.linkedin || "https://linkedin.com/in/saumyamirajkar"}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className={styles.socialBtn}
-                >
-                  {LINKEDIN_ICON}
-                  <span>LINKEDIN</span>
-                </a>
+                <MagneticButton strength={0.3}>
+                  <a
+                    href={socials.linkedin || profile?.linkedin || "https://linkedin.com/in/saumyamirajkar"}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className={styles.socialBtn}
+                  >
+                    {LINKEDIN_ICON}
+                    <span>LINKEDIN</span>
+                  </a>
+                </MagneticButton>
 
-                <a
-                  href={socials.github || profile?.github || "https://github.com/saumyamirajkar"}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className={styles.socialBtn}
-                >
-                  {GITHUB_ICON}
-                  <span>GITHUB</span>
-                </a>
+                <MagneticButton strength={0.3}>
+                  <a
+                    href={socials.github || profile?.github || "https://github.com/saumyamirajkar"}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className={styles.socialBtn}
+                  >
+                    {GITHUB_ICON}
+                    <span>GITHUB</span>
+                  </a>
+                </MagneticButton>
 
                 {resumeUrl && (
                   <>
-                    <a
-                      href={resumeUrl}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      className={styles.resumeBtn}
-                      title="View Saumya Mirajkar's Résumé in browser"
-                    >
-                      {RESUME_ICON}
-                      <span>VIEW RÉSUMÉ</span>
-                      <span className={styles.resumeArrow}>→</span>
-                    </a>
+                    <MagneticButton strength={0.25}>
+                      <a
+                        href={resumeUrl}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className={styles.resumeBtn}
+                        title="View Saumya Mirajkar's Résumé in browser"
+                      >
+                        {RESUME_ICON}
+                        <span>VIEW RÉSUMÉ</span>
+                        <span className={styles.resumeArrow}>→</span>
+                      </a>
+                    </MagneticButton>
 
-                    <a
-                      href={resumeUrl}
-                      download={resumeFilename}
-                      className={styles.resumeBtnGhost}
-                      title="Download Saumya Mirajkar's Résumé PDF"
-                    >
-                      <span>DOWNLOAD RÉSUMÉ</span>
-                      <span className={styles.resumeArrow}>↓</span>
-                    </a>
+                    <MagneticButton strength={0.25}>
+                      <a
+                        href={resumeUrl}
+                        download={resumeFilename}
+                        className={styles.resumeBtnGhost}
+                        title="Download Saumya Mirajkar's Résumé PDF"
+                      >
+                        <span>DOWNLOAD RÉSUMÉ</span>
+                        <span className={styles.resumeArrow}>↓</span>
+                      </a>
+                    </MagneticButton>
                   </>
                 )}
               </div>

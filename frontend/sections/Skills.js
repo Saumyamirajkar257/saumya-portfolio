@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { EASE, TIMING } from "@/components/animations/MotionSystem";
+import { EASE, TIMING, MaskedHeading, BorderDraw } from "@/components/animations/MotionSystem";
 import styles from "./Skills.module.css";
 
 // Crisp monochrome SVG icons for technical & professional skills
@@ -327,7 +327,7 @@ export default function Skills({ skills = [] }) {
             <span className={styles.eyebrowDot} />
             <span>TECHNICAL COMPETENCIES</span>
           </div>
-          <h2 className={styles.heading}>SKILLS</h2>
+          <MaskedHeading text="SKILLS" as="h2" className={styles.heading} />
           <p className={styles.subheading}>
             Sensor-driven hardware, software engineering, and core technical proficiencies.
           </p>
@@ -535,17 +535,106 @@ export default function Skills({ skills = [] }) {
         {/* Minimal Editorial Philosophy Sign-off */}
         <motion.div
           className={styles.footerNote}
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "0px 0px -10% 0px" }}
           transition={{ duration: TIMING.section, ease: EASE.premium }}
         >
-          <p className={styles.footerQuote}>
-            “With great power comes great responsibility.”
-          </p>
-          <span className={styles.footerTag}>
-            POWER · RESPONSIBILITY · PURPOSE
-          </span>
+          {/* Simple border reveal */}
+          <BorderDraw
+            origin="center"
+            color="rgba(255, 255, 255, 0.14)"
+            duration={0.9}
+            delay={0.1}
+          />
+
+          {/* Subtle masked text reveal */}
+          <div className={styles.footerQuoteMask}>
+            <motion.p
+              className={styles.footerQuote}
+              initial={{ y: "115%", opacity: 0 }}
+              whileInView={{ y: "0%", opacity: 1 }}
+              viewport={{ once: true, margin: "0px 0px -8% 0px" }}
+              transition={{ duration: 0.95, delay: 0.18, ease: EASE.cinematic }}
+            >
+              “With great power comes great responsibility.”
+            </motion.p>
+          </div>
+
+          {/* Restrained stagger for “POWER · RESPONSIBILITY · PURPOSE” */}
+          <motion.div
+            className={styles.footerTagWrap}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "0px 0px -8% 0px" }}
+            variants={{
+              hidden: {},
+              visible: {
+                transition: {
+                  staggerChildren: 0.09,
+                  delayChildren: 0.38,
+                },
+              },
+            }}
+          >
+            <motion.span
+              className={styles.footerTag}
+              variants={{
+                hidden: { opacity: 0, y: 8 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: { duration: 0.45, ease: EASE.premium },
+                },
+              }}
+            >
+              POWER
+            </motion.span>
+            <motion.span
+              className={styles.footerTagSep}
+              variants={{
+                hidden: { opacity: 0 },
+                visible: { opacity: 0.4, transition: { duration: 0.3 } },
+              }}
+            >
+              ·
+            </motion.span>
+            <motion.span
+              className={styles.footerTag}
+              variants={{
+                hidden: { opacity: 0, y: 8 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: { duration: 0.45, ease: EASE.premium },
+                },
+              }}
+            >
+              RESPONSIBILITY
+            </motion.span>
+            <motion.span
+              className={styles.footerTagSep}
+              variants={{
+                hidden: { opacity: 0 },
+                visible: { opacity: 0.4, transition: { duration: 0.3 } },
+              }}
+            >
+              ·
+            </motion.span>
+            <motion.span
+              className={styles.footerTag}
+              variants={{
+                hidden: { opacity: 0, y: 8 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: { duration: 0.45, ease: EASE.premium },
+                },
+              }}
+            >
+              PURPOSE
+            </motion.span>
+          </motion.div>
         </motion.div>
       </div>
     </section>

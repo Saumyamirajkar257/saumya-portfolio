@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { EASE, TIMING } from "@/components/animations/MotionSystem";
+import { EASE, TIMING, MaskedHeading } from "@/components/animations/MotionSystem";
 import styles from "./Education.module.css";
 
 function getSemesterNum(key = "") {
@@ -43,7 +43,7 @@ export default function Education({ education = [] }) {
             <span className={styles.eyebrowDot} />
             <span>ACADEMIC PATHWAY</span>
           </div>
-          <h2 className={styles.heading}>EDUCATION</h2>
+          <MaskedHeading text="EDUCATION" as="h2" className={styles.heading} />
           <p className={styles.subheading}>
             The institutions and milestones that shaped my foundation.
           </p>

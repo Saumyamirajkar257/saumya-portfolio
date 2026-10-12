@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { EASE, TIMING } from "@/components/animations/MotionSystem";
+import { EASE, TIMING, MaskedHeading, BorderDraw } from "@/components/animations/MotionSystem";
 import styles from "./Projects.module.css";
 
 const FILTERS = ["ALL", "HARDWARE + IoT", "FULL-STACK & WEB", "PYTHON SOFTWARE"];
@@ -53,8 +53,8 @@ function ProjectCard({ project, index, onOpen }) {
       }}
       className={styles.card}
     >
-      {/* Project Image Area */}
-      <div
+      {/* Project Image Area with smooth clip reveal */}
+      <motion.div
         className={styles.cardImageWrapper}
         onClick={() => onOpen(project)}
         role="button"
@@ -66,6 +66,10 @@ function ProjectCard({ project, index, onOpen }) {
           }
         }}
         aria-label={`Open case study for ${project.title}`}
+        initial={{ clipPath: "inset(8% 0% 0% 0%)", opacity: 0.85 }}
+        whileInView={{ clipPath: "inset(0% 0% 0% 0%)", opacity: 1 }}
+        viewport={{ once: true, margin: "0px 0px -4% 0px" }}
+        transition={{ duration: 0.75, delay: reduce ? 0 : Math.min(index * 0.05, 0.2), ease: EASE.cinematic }}
       >
         {project.image ? (
           <Image
@@ -82,7 +86,7 @@ function ProjectCard({ project, index, onOpen }) {
           </div>
         )}
         <div className={styles.cardImageOverlay} />
-      </div>
+      </motion.div>
 
       {/* Card Content Block */}
       <div className={styles.cardBody}>
@@ -194,7 +198,7 @@ export default function Projects({ projects = [] }) {
               <span className={styles.eyebrowDot} />
               <span>REAL WORLD BUILDS</span>
             </div>
-            <h2 className={styles.heading}>FEATURED PROJECTS</h2>
+            <MaskedHeading text="FEATURED PROJECTS" as="h2" className={styles.heading} />
             <p className={styles.subheading}>
               A mix of hardware and software projects that solve real problems.
             </p>

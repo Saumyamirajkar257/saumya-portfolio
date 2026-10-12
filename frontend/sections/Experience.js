@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { EASE, TIMING } from "@/components/animations/MotionSystem";
+import { EASE, TIMING, MaskedHeading } from "@/components/animations/MotionSystem";
 import styles from "./Experience.module.css";
 
 const FALLBACK_EXPERIENCE = [
@@ -57,7 +57,7 @@ export default function Experience({ experience = [] }) {
             <span className={styles.eyebrowDot} />
             <span>CAREER PATHWAY</span>
           </div>
-          <h2 className={styles.heading}>EXPERIENCE</h2>
+          <MaskedHeading text="EXPERIENCE" as="h2" className={styles.heading} />
           <p className={styles.subheading}>
             Education, internships, and technical development.
           </p>

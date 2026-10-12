@@ -23,6 +23,10 @@ export const TIMING = {
 export const EASE = {
   // Primary: custom cubic-bezier for smooth, natural motion
   premium: [0.22, 1, 0.36, 1],
+  // Cinematic: exponential-like deceleration for editorial typography
+  cinematic: [0.16, 1, 0.3, 1],
+  // Editorial: smooth dignified curve
+  editorial: [0.25, 1, 0.5, 1],
   // Elastic: for bouncy, playful interactions
   elastic: [0.34, 1.56, 0.64, 1],
   // Sharp: for quick, snappy feedback
@@ -257,14 +261,16 @@ export function HoverLift({ children, lift = -6, duration = TIMING.button, class
 
 /**
  * MagneticButton — Subtle magnetic pull effect on hover
+ * Automatically disabled on touch screens and prefers-reduced-motion
  */
-export function MagneticButton({ children, strength = 0.3, duration = TIMING.button, className = "" }) {
+export function MagneticButton({ children, strength = 0.25, className = "" }) {
   const ref = useRef(null);
   const reduce = useReducedMotion();
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
   const handleMouse = (e) => {
     if (reduce || !ref.current) return;
+    if (typeof window !== "undefined" && window.matchMedia("(hover: none)").matches) return;
     const rect = ref.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
@@ -288,7 +294,8 @@ export function MagneticButton({ children, strength = 0.3, duration = TIMING.but
       onMouseMove={handleMouse}
       onMouseLeave={resetPosition}
       animate={{ x: position.x, y: position.y }}
-      transition={{ duration: reduce ? 0 : duration, ease: EASE.premium }}
+      transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 280, damping: 20, mass: 0.5 }}
+      style={{ display: "inline-flex" }}
     >
       {children}
     </motion.div>
@@ -706,6 +713,178 @@ export function BorderGlow({ children, className = "", glowColor = "rgba(255,255
   );
 }
 
+/**
+ * MaskedHeading — Accessible, masked typography reveal
+ * Animates text rising up from an overflow: hidden bounding box.
+ */
+export function MaskedHeading({
+  text,
+  as = "h2",
+  className = "",
+  delay = 0,
+  stagger = 0.035,
+  duration = 0.85,
+  once = true,
+  margin = "0px 0px -8% 0px",
+  style = {}
+}) {
+  const reduce = useReducedMotion();
+  const words = text ? text.split(" ") : [];
+  const Component = motion[as] || motion.h2;
+
+  if (reduce) {
+    const Tag = as;
+    return <Tag className={className} style={style}>{text}</Tag>;
+  }
+
+  return (
+    <Component
+      className={className}
+      aria-label={text}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once, margin }}
+      variants={{
+        hidden: {},
+        visible: {
+          transition: {
+            staggerChildren: stagger,
+            delayChildren: delay,
+          },
+        },
+      }}
+      style={style}
+    >
+      <span className="sr-only" style={{ position: "absolute", width: "1px", height: "1px", padding: 0, margin: "-1px", overflow: "hidden", clip: "rect(0,0,0,0)", border: 0 }}>
+        {text}
+      </span>
+      {words.map((word, i) => (
+        <span
+          key={i}
+          aria-hidden="true"
+          style={{
+            display: "inline-block",
+            overflow: "hidden",
+            verticalAlign: "bottom",
+            marginRight: i < words.length - 1 ? "0.28em" : 0,
+          }}
+        >
+          <motion.span
+            style={{ display: "inline-block" }}
+            variants={{
+              hidden: { y: "115%", opacity: 0 },
+              visible: {
+                y: "0%",
+                opacity: 1,
+                transition: {
+                  duration,
+                  ease: EASE.cinematic,
+                },
+              },
+            }}
+          >
+            {word}
+          </motion.span>
+        </span>
+      ))}
+    </Component>
+  );
+}
+
+/**
+ * MaskedLine — Single line or element masked reveal
+ */
+export function MaskedLine({ children, delay = 0, duration = 0.85, className = "", style = {} }) {
+  const reduce = useReducedMotion();
+
+  if (reduce) {
+    return <div className={className} style={style}>{children}</div>;
+  }
+
+  return (
+    <div className={className} style={{ overflow: "hidden", ...style }}>
+      <motion.div
+        initial={{ y: "115%", opacity: 0 }}
+        whileInView={{ y: "0%", opacity: 1 }}
+        viewport={{ once: true, margin: "0px 0px -8% 0px" }}
+        transition={{ duration, delay, ease: EASE.cinematic }}
+      >
+        {children}
+      </motion.div>
+    </div>
+  );
+}
+
+/**
+ * BorderDraw — 1px thin rule line drawing effect
+ */
+export function BorderDraw({
+  origin = "left", // "left" | "right" | "center"
+  delay = 0,
+  duration = 0.85,
+  color = "rgba(255, 255, 255, 0.12)",
+  height = "1px",
+  className = "",
+  style = {}
+}) {
+  const reduce = useReducedMotion();
+
+  if (reduce) {
+    return (
+      <div
+        className={className}
+        style={{
+          width: "100%",
+          height,
+          backgroundColor: color,
+          ...style
+        }}
+      />
+    );
+  }
+
+  return (
+    <motion.div
+      className={className}
+      initial={{ scaleX: 0, opacity: 0 }}
+      whileInView={{ scaleX: 1, opacity: 1 }}
+      viewport={{ once: true, margin: "0px 0px -8% 0px" }}
+      transition={{ duration, delay, ease: EASE.cinematic }}
+      style={{
+        width: "100%",
+        height,
+        backgroundColor: color,
+        transformOrigin: origin,
+        ...style
+      }}
+    />
+  );
+}
+
+/**
+ * ClipImageReveal — Controlled image reveal with clip-path and gentle scale
+ */
+export function ClipImageReveal({ children, delay = 0, duration = 0.95, className = "", style = {} }) {
+  const reduce = useReducedMotion();
+
+  if (reduce) {
+    return <div className={className} style={style}>{children}</div>;
+  }
+
+  return (
+    <motion.div
+      className={className}
+      initial={{ clipPath: "inset(12% 0% 0% 0%)", opacity: 0, scale: 1.05 }}
+      whileInView={{ clipPath: "inset(0% 0% 0% 0%)", opacity: 1, scale: 1 }}
+      viewport={{ once: true, margin: "0px 0px -8% 0px" }}
+      transition={{ duration, delay, ease: EASE.cinematic }}
+      style={style}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 export default {
   TIMING,
   EASE,
@@ -729,5 +908,9 @@ export default {
   ViewportCounter,
   ProgressLine,
   GlowPulse,
-  BorderGlow
+  BorderGlow,
+  MaskedHeading,
+  MaskedLine,
+  BorderDraw,
+  ClipImageReveal,
 };

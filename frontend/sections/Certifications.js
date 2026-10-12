@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { EASE, TIMING } from "@/components/animations/MotionSystem";
+import { EASE, TIMING, MaskedHeading } from "@/components/animations/MotionSystem";
 import styles from "./Certifications.module.css";
 
 // Monochrome Provider Logos (SVGs for guaranteed reliability without broken images)
@@ -347,7 +347,7 @@ export default function Certifications({ certifications = [] }) {
               <span className={styles.eyebrowDot} />
               <span>ACCREDITATIONS</span>
             </div>
-            <h2 className={styles.heading}>FEATURED CERTIFICATIONS</h2>
+            <MaskedHeading text="FEATURED CERTIFICATIONS" as="h2" className={styles.heading} />
             <p className={styles.subheading}>
               Selected professional credentials and technical learning.
             </p>
@@ -414,7 +414,7 @@ export default function Certifications({ certifications = [] }) {
                   <span className={styles.eyebrowDot} />
                   <span>COMPLETE ARCHIVE</span>
                 </div>
-                <h3 className={styles.allHeading}>ALL CERTIFICATIONS</h3>
+                <MaskedHeading text="ALL CERTIFICATIONS" as="h3" className={styles.allHeading} />
                 <p className={styles.allSubheading}>
                   Search and filter credentials across artificial intelligence, cloud computing, and software engineering.
                 </p>
