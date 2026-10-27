@@ -52,6 +52,11 @@ const PROVIDER_LOGOS = {
       <path d="M6.8 9.5c-.8 0-1.4-.2-1.9-.6-.5-.4-.7-1-.7-1.7 0-.8.3-1.4.9-1.8.6-.4 1.4-.6 2.4-.6.9 0 1.6.1 2.2.3v-.4c0-.5-.1-.8-.4-1.1-.3-.3-.7-.4-1.3-.4-.5 0-.9.1-1.3.3-.4.2-.8.5-1.1.9l-.9-.8c.4-.5.9-.9 1.5-1.1.6-.3 1.3-.4 2-.4 1.1 0 1.9.3 2.5.8.6.5.9 1.3.9 2.3v4.4h-1.2v-.9c-.6.7-1.5 1.1-2.6 1.1zm.3-1.1c.6 0 1.2-.2 1.6-.6.4-.4.6-.9.6-1.5-.5-.2-1.1-.3-1.8-.3-.6 0-1.1.1-1.4.4-.3.2-.5.6-.5 1 0 .4.1.7.4.9.3.1.7.1 1.1.1z" />
     </svg>
   ),
+  upgrad: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zm0 13.5l-7-3.82v4.82c0 2.21 3.13 4 7 4s7-1.79 7-4v-4.82l-7 3.82z" />
+    </svg>
+  ),
 };
 
 function resolveProviderLogo(org = "", issuer = "") {
@@ -64,6 +69,7 @@ function resolveProviderLogo(org = "", issuer = "") {
   if (text.includes("microsoft")) return PROVIDER_LOGOS.microsoft;
   if (text.includes("credly") || text.includes("acclaim")) return PROVIDER_LOGOS.credly;
   if (text.includes("aws") || text.includes("amazon")) return PROVIDER_LOGOS.aws;
+  if (text.includes("upgrad") || text.includes("thriversity")) return PROVIDER_LOGOS.upgrad;
   return null;
 }
 
@@ -112,6 +118,7 @@ export const CANONICAL_CATEGORIES = [
   "Cloud",
   "Software",
   "Programming",
+  "Professional Development",
   "Other",
 ];
 
@@ -148,6 +155,16 @@ export function resolveCertificateCategory(cert) {
     text.includes("developer")
   ) {
     return "Programming";
+  }
+  if (
+    text.includes("networking") ||
+    text.includes("communication") ||
+    text.includes("essay") ||
+    text.includes("showcase") ||
+    text.includes("professional") ||
+    text.includes("thrive")
+  ) {
+    return "Professional Development";
   }
   return "Other";
 }
