@@ -32,6 +32,7 @@ Thumbs.db
 *.doc
 *.pdf
 !frontend/public/resume/*
+!frontend/public/certificates/*
 
 # Scratch files
 *.txt.txt
