@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import Link from "next/link";
 import { auth, db, storage } from "@/lib/firebase";
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
@@ -25,6 +25,8 @@ import {
   getResumeFilename,
   isResumePublished,
 } from "@/lib/resume";
+import AdminAICopilot from "@/components/AdminAICopilot";
+import { analyzeCertificate } from "@/lib/admin-ai";
 import "./admin.css";
 
 /* ------------------------------------------------------------------ */
@@ -592,6 +594,38 @@ function CertificationsManager() {
   };
 
   // Fetch Certificate from Backend
+  const fileInputRef = useRef(null);
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const isPdf = file.name.toLowerCase().endsWith(".pdf");
+    const isImg = file.type.startsWith("image/");
+    if (!isPdf && !isImg) {
+      alert("Please upload a PDF document (.pdf) or image file (.png, .jpg, .webp).");
+      return;
+    }
+
+    setFetching(true);
+    setImportError("");
+    setDuplicateMatch(null);
+
+    try {
+      const extracted = await analyzeCertificate({ file, storage });
+      const dup = checkDuplicate(extracted.credentialId, extracted.verificationUrl);
+      if (dup) {
+        setDuplicateMatch(dup);
+        setImportError("This credential already exists in your portfolio.");
+      } else {
+        setPreviewCert(extracted);
+      }
+    } catch (err) {
+      setImportError("Failed to analyze certificate: " + err.message);
+    }
+    setFetching(false);
+  };
+
   const handleFetchCertificate = async (e) => {
     if (e) e.preventDefault();
     if (!importUrl || !importUrl.trim()) {
@@ -951,6 +985,28 @@ function CertificationsManager() {
             >
               Close ✕
             </button>
+          </div>
+
+          <div style={{ display: "flex", gap: "10px", marginBottom: "16px", alignItems: "center" }}>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,image/png,image/jpeg,image/webp,image/jpg"
+              style={{ display: "none" }}
+              onChange={handleFileUpload}
+            />
+            <button
+              type="button"
+              className="admin-btn admin-btn--primary"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={fetching}
+              style={{ flex: 1, padding: "12px", justifyContent: "center", fontWeight: "700" }}
+            >
+              {fetching ? "ANALYZING DOCUMENT…" : "📄 UPLOAD CERTIFICATE (PDF / IMAGE) ✦"}
+            </button>
+          </div>
+          <div style={{ textAlign: "center", color: "var(--text-mute)", fontSize: "11px", letterSpacing: "0.08em", marginBottom: "16px" }}>
+            — OR INGEST VIA CREDENTIAL URL —
           </div>
 
           <form onSubmit={handleFetchCertificate}>
@@ -2315,6 +2371,22 @@ function Overview({ onLogout, onSelectTab }) {
         <div className="admin-stats" style={{ marginTop: "24px" }}>
           <div
             className="admin-stat"
+            style={{
+              cursor: "pointer",
+              background: "linear-gradient(135deg, rgba(0, 229, 160, 0.08), rgba(0, 180, 216, 0.08))",
+              borderColor: "rgba(0, 229, 160, 0.35)",
+            }}
+            onClick={() => onSelectTab("ai")}
+          >
+            <div className="admin-stat__value" style={{ color: "var(--accent)", display: "flex", alignItems: "center", gap: "6px" }}>
+              <span>✦</span>
+              <span style={{ fontSize: "28px" }}>COPILOT</span>
+            </div>
+            <div className="admin-stat__label" style={{ color: "var(--accent)" }}>AI ASSISTANT &amp; INGEST →</div>
+          </div>
+
+          <div
+            className="admin-stat"
             style={{ cursor: "pointer" }}
             onClick={() => onSelectTab("certifications")}
           >
@@ -2410,6 +2482,7 @@ export default function AdminPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState("certifications");
+  const [showFloatingAi, setShowFloatingAi] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => {
@@ -2447,6 +2520,23 @@ export default function AdminPage() {
             onClick={() => setTab("certifications")}
           >
             Certifications ⚡
+          </button>
+          <button
+            className={`admin__navBtn ${tab === "ai" ? "is-active" : ""}`}
+            onClick={() => setTab("ai")}
+            style={
+              tab === "ai"
+                ? {
+                    background:
+                      "linear-gradient(135deg, rgba(0,229,160,0.18), rgba(0,180,216,0.18))",
+                    borderColor: "rgba(0,229,160,0.45)",
+                    color: "var(--accent)",
+                    fontWeight: 700,
+                  }
+                : { color: "var(--accent)" }
+            }
+          >
+            ✦ AI Copilot ⚡
           </button>
           <button
             className={`admin__navBtn ${tab === "projects" ? "is-active" : ""}`}
@@ -2505,6 +2595,12 @@ export default function AdminPage() {
         {tab === "overview" && (
           <Overview onLogout={() => signOut(auth)} onSelectTab={setTab} />
         )}
+        {tab === "ai" && (
+          <AdminAICopilot
+            currentTab={tab}
+            onSelectTab={setTab}
+          />
+        )}
         {tab === "certifications" && <CertificationsManager />}
         {tab === "resume" && <ResumeManager />}
         {tab in MODELS && tab !== "certifications" && (
@@ -2512,6 +2608,29 @@ export default function AdminPage() {
         )}
         {tab === "messages" && <MessagesManager />}
       </main>
+
+      {/* Floating AI Quick Assistant Trigger */}
+      {tab !== "ai" && (
+        <button
+          type="button"
+          className="admin-floating-ai-trigger"
+          onClick={() => setShowFloatingAi((v) => !v)}
+          title="Toggle AI Copilot Assistant"
+        >
+          <span className="admin-floating-ai-icon">✦</span>
+          <span>AI Assistant</span>
+        </button>
+      )}
+
+      {/* Floating AI Copilot Drawer */}
+      {showFloatingAi && tab !== "ai" && (
+        <AdminAICopilot
+          isFloatingDrawer={true}
+          onCloseDrawer={() => setShowFloatingAi(false)}
+          currentTab={tab}
+          onSelectTab={setTab}
+        />
+      )}
     </div>
   );
 }
