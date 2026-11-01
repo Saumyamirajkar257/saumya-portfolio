@@ -14,6 +14,7 @@ const SECTIONS = [
   { id: "experience", label: "Experience", icon: "4" },
   { id: "education", label: "Education", icon: "5" },
   { id: "certifications", label: "Certs", icon: "6" },
+  { id: "ai", label: "AI", icon: "✦" },
   { id: "contact", label: "Contact", icon: "7" },
 ];
 
@@ -24,7 +25,7 @@ export default function ScrollRail() {
   const [activeId, setActiveId] = useState("home");
   const [visible, setVisible] = useState(false);
 
-  if (pathname?.startsWith("/ielts") || pathname?.startsWith("/secret") || pathname?.startsWith("/vault")) {
+  if (pathname?.startsWith("/ielts") || pathname?.startsWith("/secret") || pathname?.startsWith("/vault") || pathname?.startsWith("/admin")) {
     return null;
   }
 

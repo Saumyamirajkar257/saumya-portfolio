@@ -12,6 +12,7 @@ const NAV_LINKS = [
   { label: "Skills", href: "#skills" },
   { label: "Education", href: "#education" },
   { label: "Certifications", href: "#certifications" },
+  { label: "AI", href: "#ai" },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -20,7 +21,7 @@ export default function Footer() {
   const year = new Date().getFullYear();
   const [clickCount, setClickCount] = useState(0);
 
-  if (pathname?.startsWith("/ielts") || pathname?.startsWith("/secret") || pathname?.startsWith("/vault")) {
+  if (pathname?.startsWith("/ielts") || pathname?.startsWith("/secret") || pathname?.startsWith("/vault") || pathname?.startsWith("/admin")) {
     return null;
   }
 

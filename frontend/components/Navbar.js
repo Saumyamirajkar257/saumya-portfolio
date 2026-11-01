@@ -10,6 +10,7 @@ const LINKS = [
   { label: "Home", href: "#home" },
   { label: "About", href: "#about" },
   { label: "Projects", href: "#projects" },
+  { label: "AI", href: "#ai" },
   { label: "Experience", href: "#experience" },
   { label: "Skills", href: "#skills" },
   { label: "Education", href: "#education" },
@@ -40,7 +41,7 @@ export default function Navbar({ name }) {
     };
   }, []);
 
-  if (pathname?.startsWith("/ielts") || pathname?.startsWith("/secret") || pathname?.startsWith("/vault")) {
+  if (pathname?.startsWith("/ielts") || pathname?.startsWith("/secret") || pathname?.startsWith("/vault") || pathname?.startsWith("/admin")) {
     return null;
   }
 

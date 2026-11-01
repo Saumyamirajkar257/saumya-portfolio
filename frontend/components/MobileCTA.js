@@ -14,7 +14,7 @@ export default function MobileCTA() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  if (pathname?.startsWith("/ielts") || pathname?.startsWith("/secret") || pathname?.startsWith("/vault")) return null;
+  if (pathname?.startsWith("/ielts") || pathname?.startsWith("/secret") || pathname?.startsWith("/vault") || pathname?.startsWith("/admin")) return null;
   if (!visible) return null;
 
   return (

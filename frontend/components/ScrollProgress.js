@@ -13,7 +13,7 @@ export default function ScrollProgress() {
   const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.001 });
   const dotX = useTransform(scrollYProgress, [0, 1], ["0vw", "100vw"]);
 
-  if (!isMounted || reduce || pathname?.startsWith("/ielts") || pathname?.startsWith("/secret") || pathname?.startsWith("/vault")) return null;
+  if (!isMounted || reduce || pathname?.startsWith("/ielts") || pathname?.startsWith("/secret") || pathname?.startsWith("/vault") || pathname?.startsWith("/admin")) return null;
 
   return (
     <motion.div

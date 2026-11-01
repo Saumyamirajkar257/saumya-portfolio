@@ -7,6 +7,7 @@ import About from "@/sections/About";
 import Projects from "@/sections/Projects";
 import Experience from "@/sections/Experience";
 import Skills from "@/sections/Skills";
+import AISection from "@/sections/AISection";
 import Education from "@/sections/Education";
 import Certifications from "@/sections/Certifications";
 import Contact from "@/sections/Contact";
@@ -55,6 +56,7 @@ export default function LivePortfolio({ initialContent }) {
       <Projects projects={projects} />
       <Experience experience={experience} />
       <Skills skills={skills} />
+      <AISection certifications={certifications} projects={projects} />
       <Education education={education} />
       <Certifications certifications={certifications} />
       <Contact profile={profile} />

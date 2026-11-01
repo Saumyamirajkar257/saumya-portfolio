@@ -449,8 +449,8 @@ export default function AdminAICopilot({
       {/* ─── Header ─── */}
       <div className="admin-ai-head">
         <div className="admin-ai-title-wrap">
-          <div className="admin-ai-badge">✦ AI COPILOT</div>
-          <h2>Portfolio AI Assistant</h2>
+          <div className="admin-ai-badge">✦ AI COPILOT SECTION</div>
+          <h2>AI Admin Copilot &amp; Content Engine</h2>
         </div>
 
         <div className="admin-ai-head-actions">
